@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Koachify Scan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:        #88C057;
+  --green-dark:   #6FA344;
+  --green-soft:   #F0F9E8;
+  --green-mid:    #D4EBB8;
+  --navy:         #283E4A;
+  --navy-light:   #344F5E;
+  --bg:           #F4F6F5;
+  --white:        #FFFFFF;
+  --text:         #1A2B32;
+  --text-soft:    #4A6370;
+  --gray-mid:     #6B8A96;
+  --gray-light:   #C8D6DC;
+  --border:       #E2ECEB;
+  --red:          #C0392B;
+  --red-soft:     #FDECEA;
+  --yellow:       #F39C12;
+  --yellow-soft:  #FEF3DC;
+  --sem-green:    #27AE60;
+  --sem-green-soft: #E8F8EF;
+  --bridge-bg:    #E8F4E8;
+  --shadow-sm:    0 2px 8px rgba(40,62,74,0.08);
+  --shadow-md:    0 4px 20px rgba(40,62,74,0.12);
+  --shadow-lg:    0 8px 32px rgba(40,62,74,0.16);
+  --radius-sm:    10px;
+  --radius-md:    16px;
+  --radius-lg:    24px;
+  --font:         'Inter', system-ui, -apple-system, sans-serif;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════════ */
+#app {
+  height: 100dvh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: min(560px, 100vw);
+  margin: 0 auto;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 561px) {
+  #app {
+    box-shadow: 0 4px 60px rgba(0,0,0,0.14);
+    border-radius: 20px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   TOP BAR
+═══════════════════════════════════════════ */
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  min-height: 58px;
+  flex-shrink: 0;
+  background: var(--bg);
+}
+#topbar-back {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--white);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+}
+#topbar-back:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+#topbar-back svg { width: 18px; height: 18px; }
+#topbar-back.hidden { opacity: 0; pointer-events: none; }
+
+#topbar-logo img {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+#topbar-counter {
+  background: var(--navy);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  min-width: 52px;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════
+   LINEAR PROGRESS BAR
+═══════════════════════════════════════════ */
+#progress-bar-wrap {
+  padding: 0 16px 10px;
+  flex-shrink: 0;
+}
+#progress-bar-track {
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+#progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-dark), var(--green));
+  border-radius: 3px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ═══════════════════════════════════════════
+   CONTENT AREA
+═══════════════════════════════════════════ */
+#content-area {
+  flex: 1;
+  overflow: hidden; /* default: no scroll */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+/* Bridge, welcome, clarity CAN scroll */
+#content-area:has(#screen-bridge.active),
+#content-area:has(#screen-welcome.active),
+#content-area:has(#screen-clarity.active) {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ═══════════════════════════════════════════
+   SCREEN BASE
+═══════════════════════════════════════════ */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ═══════════════════════════════════════════
+   WELCOME SCREEN
+═══════════════════════════════════════════ */
+#screen-welcome {
+  min-height: 100%;
+  display: none;
+  flex-direction: column;
+  padding: 0;
+}
+#screen-welcome.active { display: flex; }
+
+.welcome-hero {
+  background: var(--navy);
+  padding: 32px 24px 40px;
+  text-align: center;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+.welcome-kochi-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(136,192,87,0.15);
+  border: 2px solid rgba(136,192,87,0.4);
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+.welcome-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: 3px;
+  margin-bottom: 6px;
+}
+.welcome-title span { color: var(--green); }
+.welcome-subtitle {
+  font-size: 13px;
+  color: var(--gray-light);
+  line-height: 1.5;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.welcome-body {
+  padding: 24px 20px 32px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.welcome-payoff {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.welcome-payoff p {
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+.welcome-payoff strong { color: var(--navy); }
+
+.welcome-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.welcome-pill {
+  background: var(--green-soft);
+  border: 1px solid var(--green-mid);
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.welcome-areas {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+}
+.welcome-area-chip {
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--navy);
+  box-shadow: var(--shadow-sm);
+  line-height: 1.3;
+}
+.welcome-area-chip span { display: block; font-size: 16px; margin-bottom: 4px; }
+
+/* ═══════════════════════════════════════════
+   BOTTOM ACTION AREA
+═══════════════════════════════════════════ */
+#bottom-action {
+  flex-shrink: 0;
+  padding: 10px 16px 14px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+#btn-go-back {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray);
+  cursor: pointer;
+  text-align: center;
+  letter-spacing: 0.2px;
+  transition: color 0.15s;
+}
+#btn-go-back:hover { color: var(--navy); }
+
+/* ═══════════════════════════════════════════
+   QUESTION SCREEN — NO SCROLL, FULL HEIGHT
+═══════════════════════════════════════════ */
+#screen-question {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 8px 16px 10px;
+}
+#screen-question.active { display: flex; animation: slideIn 0.3s cubic-bezier(0.4,0,0.2,1); }
+
+/* Planet/Module header card */
+.q-module-card {
+  background: var(--navy);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.q-module-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(136,192,87,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.q-module-info {}
+.q-module-system {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 1px;
+}
+.q-module-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.2;
+}
+
+/* Pillar tag */
+.q-pillar-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--green-soft);
+  border: 1px solid var(--green-mid);
+  color: var(--navy);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+.q-pillar-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+/* Question text */
+.q-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.45;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+.q-sub-text {
+  font-size: 11px;
+  color: var(--gray-mid);
+  margin-bottom: 8px;
+  font-style: italic;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════
+   ANSWER CARDS — flex fill, no scroll
+═══════════════════════════════════════════ */
+.options-list {
+  flex: 1;          /* fills all remaining space */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-height: 0;    /* allow shrink below content size */
+}
+
+.option-card {
+  flex: 1;          /* each card grows equally */
+  min-height: 0;
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.option-card:active { transform: scale(0.985); }
+.option-card:hover {
+  border-color: var(--green);
+  box-shadow: var(--shadow-md);
+}
+.option-card.selected {
+  border-color: var(--green);
+  background: var(--green-soft);
+  box-shadow: 0 0 0 1px var(--green), var(--shadow-sm);
+}
+
+/* Left: letter badge */
+.option-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gray-mid);
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.option-card.selected .option-badge {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--white);
+}
+
+.option-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.35;
+  flex: 1;
+  font-weight: 500;
+}
+.option-card.selected .option-text { color: var(--navy); font-weight: 600; }
+
+/* Right: checkmark indicator */
+.option-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.option-check svg {
+  width: 10px; height: 10px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.option-card.selected .option-check {
+  background: var(--green);
+  border-color: var(--green);
+}
+.option-card.selected .option-check svg { opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   OPEN TEXT QUESTION
+═══════════════════════════════════════════ */
+#open-wrap { flex: 1; display: none; flex-direction: column; min-height: 0; }
+.open-input {
+  width: 100%;
+  flex: 1;
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--text);
+  resize: none;
+  min-height: 0;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.open-input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(136,192,87,0.2);
+}
+.char-count-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--gray-mid);
+}
+.open-optional-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--gray-mid);
+  margin-bottom: 10px;
+}
+
+/* ═══════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════ */
+.btn-primary {
+  width: 100%;
+  background: var(--green);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 17px;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 4px 16px rgba(136,192,87,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary:hover {
+  background: var(--green-dark);
+  box-shadow: 0 6px 20px rgba(136,192,87,0.45);
+}
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled {
+  background: var(--border);
+  color: var(--gray-mid);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn-arrow {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-arrow svg { width: 10px; height: 10px; }
+
+/* ═══════════════════════════════════════════
+   BRIDGE SCREEN
+═══════════════════════════════════════════ */
+#screen-bridge {
+  padding: 0;
+  min-height: 100%;
+}
+
+.bridge-container {
+  min-height: 100%;
+  padding: 12px 20px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.bridge-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.bridge-progress-mini {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+.bridge-progress-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.bridge-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-dark), var(--green));
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.bridge-progress-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-light);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+.bridge-tag {
+  background: var(--navy);
+  color: var(--gray-light);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.bridge-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 0 0 24px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Image placeholder hero (full-bleed top of card) ── */
+.bridge-img-placeholder {
+  width: 100%;
+  height: 160px;
+  background: linear-gradient(145deg, var(--navy) 0%, #1a4a60 55%, var(--green-dark) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  margin-bottom: 22px;
+  overflow: hidden;
+}
+.bridge-img-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 70% 40%, rgba(136,192,87,0.18) 0%, transparent 65%);
+}
+.bridge-img-placeholder::after {
+  content: 'IMMAGINE DA INSERIRE';
+  position: absolute;
+  bottom: 10px;
+  font-size: 9px;
+  font-family: var(--font);
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.3);
+}
+.bridge-img-icon-large {
+  font-size: 62px;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.35));
+  position: relative;
+  z-index: 1;
+}
+/* Camera/image placeholder icon */
+.bridge-img-camera {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  opacity: 0.25;
+  z-index: 1;
+}
+
+/* Card body (below image) */
+.bridge-card-body {
+  padding: 0 22px;
+}
+
+.bridge-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--green-soft);
+  border: 2px solid var(--green-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 14px;
+}
+
+.bridge-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.3;
+  margin-bottom: 14px;
+}
+
+.bridge-text {
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.75;
+}
+
+.bridge-next-label {
+  font-size: 12px;
+  color: var(--gray-mid);
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════
+   MODULE 0 INTRO
+═══════════════════════════════════════════ */
+.m0-header {
+  background: var(--navy);
+  padding: 20px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+}
+.m0-header-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--green);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.m0-header-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+/* ═══════════════════════════════════════════
+   CLARITY MAP
+═══════════════════════════════════════════ */
+#screen-clarity { padding: 0; min-height: 100%; }
+
+.clarity-hero {
+  background: var(--navy);
+  padding: 28px 20px 36px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+.clarity-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(136,192,87,0.08);
+}
+.clarity-hero::before {
+  content: '';
+  position: absolute;
+  top: -30px; left: -30px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(136,192,87,0.05);
+}
+
+.clarity-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  position: relative;
+}
+.clarity-main-title {
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--white);
+  margin-bottom: 4px;
+  position: relative;
+}
+.clarity-arch-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 6px;
+  position: relative;
+}
+.clarity-arch-fascia {
+  font-size: 11px;
+  color: var(--gray-light);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+.clarity-body { padding: 24px 20px 40px; }
+
+.clarity-section-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.clarity-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Planet grid */
+.planet-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.planet-cell {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 14px 8px 12px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  border: 1.5px solid var(--border);
+  transition: transform 0.2s;
+}
+.planet-cell-icon { font-size: 18px; margin-bottom: 6px; }
+.planet-cell-name {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.3;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.sem-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.sem-badge-red { background: var(--red-soft); color: var(--red); }
+.sem-badge-yellow { background: var(--yellow-soft); color: #b07a00; }
+.sem-badge-green { background: var(--sem-green-soft); color: #1a8a48; }
+.sem-dot-small {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Strength / Priority rows */
+.result-row {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 10px;
+}
+.result-row-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.result-row-icon.green-bg { background: var(--sem-green-soft); }
+.result-row-icon.red-bg { background: var(--red-soft); }
+.result-row-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+  flex: 1;
+}
+.result-row-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+.result-row-badge.strength { background: var(--sem-green-soft); color: #1a8a48; }
+.result-row-badge.priority { background: var(--red-soft); color: var(--red); }
+
+/* Archetype text box */
+.arch-text-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.arch-text-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--green), var(--green-dark));
+}
+.arch-text-card p {
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.75;
+  padding-left: 8px;
+}
+
+/* CTA */
+.cta-block { text-align: center; }
+.cta-reassurance {
+  font-size: 12px;
+  color: var(--gray-mid);
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.cta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--gray-mid); }
+.btn-share {
+  width: 100%;
+  background: none;
+  color: var(--navy);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 15px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: border-color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-share:hover { border-color: var(--navy); background: rgba(40,62,74,0.04); }
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+#quiz-footer {
+  text-align: center;
+  padding: 6px 16px 8px;
+  font-size: 10px;
+  color: var(--gray-light);
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════ */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.screen.active { animation: slideIn 0.3s cubic-bezier(0.4,0,0.2,1); }
+#screen-welcome.active { animation: slideInUp 0.4s cubic-bezier(0.4,0,0.2,1); }
+
+/* ═══════════════════════════════════════════
+   DESKTOP SHADOW FRAME
+═══════════════════════════════════════════ */
+@media (min-width: 520px) {
+  body { display: flex; align-items: center; justify-content: center; background: #e0e8e5; }
+  #app { border-radius: 32px; overflow: hidden; box-shadow: var(--shadow-lg); height: 90vh; max-height: 840px; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <button id="topbar-back" class="hidden" onclick="goBackOne()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--navy)">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+    <div id="topbar-logo">
+      <img src="logo-scuro.svg" alt="Koachify" id="logo-img">
+    </div>
+    <div id="topbar-counter" style="visibility:hidden">1/9</div>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div id="progress-bar-wrap" style="visibility:hidden">
+    <div id="progress-bar-track">
+      <div id="progress-bar-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content-area">
+
+    <!-- ══ WELCOME ══ -->
+    <div class="screen active" id="screen-welcome">
+      <div class="welcome-hero">
+        <div class="welcome-kochi-ring">🔭</div>
+        <img src="logo-bianco.svg" alt="Koachify" style="height:28px;width:auto;margin:0 auto 10px;display:block;">
+        <div class="welcome-title" style="font-size:22px;letter-spacing:4px;">SCAN</div>
+        <div class="welcome-subtitle">Il check-up professionale per coach, terapeuti e consulenti online</div>
+      </div>
+      <div class="welcome-body">
+        <div class="welcome-payoff">
+          <p>In 10 minuti scopri <strong>esattamente cosa blocca la crescita del tuo business</strong> — e ottieni la tua <strong>Clarity Map</strong> con i tuoi punti di forza, i blocchi reali e le priorità concrete su cui agire adesso.</p>
+        </div>
+        <div class="welcome-pills">
+          <div class="welcome-pill">⏱ 8–12 minuti</div>
+          <div class="welcome-pill">📊 9 aree analizzate</div>
+          <div class="welcome-pill">🆓 Gratuito</div>
+        </div>
+        <div class="welcome-areas">
+          <div class="welcome-area-chip"><span>🌱</span>Attrazione</div>
+          <div class="welcome-area-chip"><span>💰</span>Conversione</div>
+          <div class="welcome-area-chip"><span>🗺️</span>Viaggio</div>
+          <div class="welcome-area-chip"><span>🏗️</span>Architettura</div>
+          <div class="welcome-area-chip"><span>🔬</span>Laboratorio</div>
+          <div class="welcome-area-chip"><span>✖️</span>Molt.</div>
+          <div class="welcome-area-chip"><span>🧭</span>Bussola</div>
+          <div class="welcome-area-chip"><span>🏘️</span>Villaggio</div>
+          <div class="welcome-area-chip"><span>🏎️</span>Scuderia</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ QUESTION ══ -->
+    <div class="screen" id="screen-question">
+      <!-- Module header card -->
+      <div class="q-module-card" id="q-module-card">
+        <div class="q-module-icon" id="q-module-icon">🌱</div>
+        <div class="q-module-info">
+          <div class="q-module-system" id="q-module-system">Sistema Prosperità</div>
+          <div class="q-module-name" id="q-module-name">Pianeta Attrazione</div>
+        </div>
+      </div>
+
+      <!-- Pillar chip -->
+      <div class="q-pillar-tag" id="q-pillar-tag" style="display:none">
+        <div class="q-pillar-dot"></div>
+        <span id="q-pillar-text"></span>
+      </div>
+
+      <!-- Sub label (for verification) -->
+      <div class="q-sub-text" id="q-sub" style="display:none"></div>
+
+      <!-- Question text -->
+      <div class="q-text" id="q-text"></div>
+
+      <!-- Options -->
+      <div class="options-list" id="options-list"></div>
+
+      <!-- Open text -->
+      <div id="open-wrap">
+        <div class="open-optional-tag">✏️ Risposta facoltativa</div>
+        <textarea class="open-input" id="open-input" maxlength="300" placeholder="Scrivi qui la tua risposta…" oninput="updateCharCount()"></textarea>
+        <div class="char-count-row"><span id="char-count">0</span>/300</div>
+      </div>
+    </div>
+
+    <!-- ══ BRIDGE ══ -->
+    <div class="screen" id="screen-bridge">
+      <div class="bridge-container">
+        <div class="bridge-tag-row">
+          <div class="bridge-tag" id="bridge-module-label">Area completata</div>
+          <div class="bridge-progress-mini">
+            <div class="bridge-progress-track">
+              <div class="bridge-progress-fill" id="bridge-progress-fill" style="width:11%"></div>
+            </div>
+            <span class="bridge-progress-label" id="bridge-progress-label">1 di 9</span>
+          </div>
+        </div>
+        <div class="bridge-card">
+          <div class="bridge-img-placeholder">
+            <div class="bridge-img-icon-large" id="bridge-img-icon">🌍</div>
+            <svg class="bridge-img-camera" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <div class="bridge-card-body">
+            <div class="bridge-icon-circle" id="bridge-icon">💡</div>
+            <div class="bridge-title" id="bridge-title"></div>
+            <div class="bridge-text" id="bridge-text"></div>
+          </div>
+        </div>
+        <div class="bridge-next-label" id="bridge-next-label">Prossima area →</div>
+      </div>
+    </div>
+
+    <!-- ══ CLARITY MAP ══ -->
+    <div class="screen" id="screen-clarity">
+      <div class="clarity-hero">
+        <div class="clarity-label">La tua</div>
+        <div class="clarity-main-title">Clarity Map</div>
+        <div class="clarity-arch-name" id="clarity-archetype-name"></div>
+        <div class="clarity-arch-fascia" id="clarity-archetype-fascia"></div>
+      </div>
+      <div class="clarity-body">
+
+        <div class="clarity-section-title" style="margin-bottom:14px">9 Aree analizzate</div>
+        <div class="planet-grid" id="planet-grid"></div>
+
+        <div id="strengths-wrap" style="display:none">
+          <div class="clarity-section-title">Punti di forza</div>
+          <div id="strength-list"></div>
+        </div>
+
+        <div id="priorities-wrap" style="display:none">
+          <div class="clarity-section-title" style="margin-top:8px">Priorità d'azione</div>
+          <div id="priority-list"></div>
+        </div>
+
+        <div class="clarity-section-title" style="margin-top:8px">Il tuo profilo</div>
+        <div class="arch-text-card" id="archetype-text-box"></div>
+
+        <div class="cta-block">
+          <a href="https://koachify.it/clarity-call" target="_blank" rel="noopener" style="text-decoration:none">
+            <button class="btn-primary">
+              Prenota la tua Clarity Call
+              <div class="btn-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </button>
+          </a>
+          <div class="cta-reassurance">
+            <span>Gratuita</span><div class="cta-dot"></div>
+            <span>30 minuti</span><div class="cta-dot"></div>
+            <span>Senza impegno</span>
+          </div>
+          <button class="btn-share" onclick="shareResults()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Condividi la tua Clarity Map
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /content-area -->
+
+  <!-- BOTTOM ACTION -->
+  <div id="bottom-action">
+    <button class="btn-primary" id="btn-continue" onclick="handleContinue()" disabled>
+      <span id="btn-label">Inizia il check-up</span>
+      <div class="btn-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+    </button>
+    <button id="btn-go-back" onclick="goBackOne()" style="display:none;">
+      ← Cambia risposta precedente
+    </button>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="quiz-footer">Koachify Suite © 2026 — koachify.it</div>
+
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+const state = {
+  phase: 'welcome',
+  currentModule: 0,
+  currentPillarIndex: 0,
+  answers: {},
+  pillarSemafori: {},
+  planetSemafori: {},
+  biasFlags: {},
+  fatturato: null,
+  archetipo: null,
+  history: [],
+  openAnswers: {},
+  _selectedLetter: null,
+  _afterBridgeModule: null,
+  _backAvailable: false
+};
+let _autoAdvanceTimer = null;
+
+// ═══════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════
+const MODULE_NAMES = {
+  0:'Profilazione iniziale', 1:'Pianeta Attrazione', 2:'Pianeta Conversione',
+  3:'Pianeta Viaggio', 4:'Pianeta Architettura', 5:'Pianeta Laboratorio',
+  6:'Pianeta Moltiplicazione', 7:'Pianeta Bussola', 8:'Pianeta Villaggio', 9:'Pianeta Scuderia'
+};
+const MODULE_ICONS = {
+  0:'📋', 1:'🌱', 2:'💰', 3:'🗺️', 4:'🏗️', 5:'🔬', 6:'✖️', 7:'🧭', 8:'🏘️', 9:'🏎️'
+};
+const MODULE_SYSTEMS = {
+  1:'Sistema Prosperità', 2:'Sistema Prosperità', 3:'Sistema Prosperità',
+  4:'Sistema Libertà', 5:'Sistema Libertà', 6:'Sistema Libertà',
+  7:'Sistema Serenità', 8:'Sistema Serenità', 9:'Sistema Serenità'
+};
+const PLANET_NAMES = ['Attrazione','Conversione','Viaggio','Architettura','Laboratorio','Moltiplicazione','Bussola','Villaggio','Scuderia'];
+const PLANET_ICONS = ['🌱','💰','🗺️','🏗️','🔬','✖️','🧭','🏘️','🏎️'];
+
+// ═══════════════════════════════════════════════════════════
+// DATA — MODULE 0
+// ═══════════════════════════════════════════════════════════
+const MODULE0 = [
+  { id:'q0_1', text:'Come ti definiresti principalmente?', options:[
+    {l:'A',t:'Coach (life, business, sportivo, benessere o altro)'},
+    {l:'B',t:'Formatore o trainer'},
+    {l:'C',t:'Consulente o professionista della consulenza'},
+    {l:'D',t:'Terapeuta o professionista del supporto psicologico'},
+    {l:'E',t:'Infopreneur / venditore di corsi e prodotti digitali'}
+  ]},
+  { id:'q0_2', text:'Da quanto tempo svolgi questa attività?', options:[
+    {l:'A',t:'Sono agli inizi — meno di 6 mesi'},
+    {l:'B',t:'Da 6 mesi a 2 anni'},
+    {l:'C',t:'Da 2 a 5 anni'},
+    {l:'D',t:'Da più di 5 anni'}
+  ]},
+  { id:'q0_3', text:'Qual è il tuo fatturato mensile medio attuale da questa attività?', options:[
+    {l:'A',t:'Non ho ancora entrate regolari'},
+    {l:'B',t:'Tra 0 e 1.500€ al mese'},
+    {l:'C',t:'Tra 1.500€ e 5.000€ al mese'},
+    {l:'D',t:'Tra 5.000€ e 15.000€ al mese'},
+    {l:'E',t:'Tra 15.000€ e 50.000€ al mese'},
+    {l:'F',t:'Oltre 50.000€ al mese'}
+  ]},
+  { id:'q0_4', text:'In questo momento, qual è la cosa che vuoi risolvere di più?', options:[
+    {l:'A',t:'Trovare più clienti — non ne ho abbastanza o non arrivano in modo costante'},
+    {l:'B',t:'Guadagnare di più senza lavorare più ore'},
+    {l:'C',t:'Mettere ordine — ho tutto sparso e non riesco a gestire bene'},
+    {l:'D',t:'Avere più tempo libero — sono sempre operativo e non riesco a staccare'},
+    {l:'E',t:'Capire come crescere e scalare quello che ho già costruito'},
+    {l:'F',t:'Avere qualcuno con cui confrontarmi e un supporto quando ne ho bisogno'}
+  ]},
+  { id:'q0_5', type:'open', optional:true, text:'In una frase, qual è la cosa che ti blocca di più nel tuo business?', maxlength:200 }
+];
+
+// ═══════════════════════════════════════════════════════════
+// DATA — MODULES 1-9
+// ═══════════════════════════════════════════════════════════
+const MODULES = {
+  1: { name:'Pianeta Attrazione', system:'Sistema Prosperità', pillars:[
+    { name:'Creare il proprio pubblico',
+      perception:{ id:'q1_1p', text:'Quanto chiaramente sai descrivere a chi ti rivolgi — chi è esattamente il tuo cliente ideale e cosa lo distingue da tutti gli altri?', options:[
+        {l:'A',t:'Non ho ancora una risposta chiara — tendo a dire che aiuto chiunque voglia migliorare'},
+        {l:'B',t:'Ho un\'idea di chi è il mio cliente tipo, ma non l\'ho mai definita per iscritto'},
+        {l:'C',t:'Ho un profilo chiaro del mio cliente ideale e lo uso quando creo contenuti o offerte'}
+      ]},
+      verification:{ id:'q1_1v', text:'Quale di queste cose hai già fatto o hai concretamente a disposizione oggi?', options:[
+        {l:'A',t:'Non ho niente di scritto — vado a istinto quando devo descrivere il mio cliente'},
+        {l:'B',t:'Ho una descrizione generale scritta da qualche parte, ma non la uso regolarmente'},
+        {l:'C',t:'Ho un documento con: situazione, problemi specifici, obiezioni e linguaggio del mio cliente — e lo consulto'},
+        {l:'D',t:'Ho tutto questo e ho anche parlato direttamente con persone del mio target per verificarlo'}
+      ]}
+    },
+    { name:'Diventare la guida del mercato',
+      perception:{ id:'q1_2p', text:'Le persone del tuo settore ti riconoscono come un punto di riferimento — qualcuno da seguire per un motivo specifico?', options:[
+        {l:'A',t:'No — non sono ancora percepito come un\'autorità nel mio settore'},
+        {l:'B',t:'Qualcuno mi conosce e mi segue, ma non ho un posizionamento chiaro e riconoscibile'},
+        {l:'C',t:'Sì — ho un metodo o un punto di vista specifico che mi distingue e le persone mi seguono per quello'}
+      ]},
+      verification:{ id:'q1_2v', text:'Quale di queste situazioni descrive meglio la tua realtà oggi?', options:[
+        {l:'A',t:'Le persone mi contattano principalmente per passaparola da chi mi conosce già'},
+        {l:'B',t:'Ho contenuti online ma non seguono una linea editoriale precisa e coerente'},
+        {l:'C',t:'Ho un messaggio chiaro e riconoscibile che comunico in modo costante su almeno un canale'},
+        {l:'D',t:'Il mio nome o il mio metodo viene citato spontaneamente da altri nel mio settore'}
+      ]}
+    },
+    { name:'Generare domanda', hasOpenConditional:true,
+      openConditional:{ id:'q1_open', text:'Usando parole tue — come descriveresti oggi il tuo modo di trovare nuovi clienti?', maxlength:300, optional:true },
+      perception:{ id:'q1_3p', text:'Hai un modo strutturato per far sapere alle persone giuste che esisti e portarle verso di te — indipendentemente dal passaparola?', options:[
+        {l:'A',t:'No — i clienti arrivano quasi solo per passaparola o per caso'},
+        {l:'B',t:'Faccio qualcosa (post, contenuti, qualche campagna) ma non è strutturato e i risultati sono irregolari'},
+        {l:'C',t:'Sì — ho un sistema che genera interesse e nuovi contatti in modo abbastanza costante'}
+      ]},
+      verification:{ id:'q1_3v', text:'Nelle ultime 4 settimane, cosa è successo nel tuo business in modo misurabile?', options:[
+        {l:'A',t:'Non ho traccia precisa di quante persone nuove ho raggiunto'},
+        {l:'B',t:'Ho pubblicato o fatto qualcosa, ma non so dirti quanti nuovi contatti ho generato'},
+        {l:'C',t:'So esattamente quanti nuovi contatti o richieste ho ricevuto questo mese'},
+        {l:'D',t:'Ho un sistema attivo che porta nuovi contatti ogni settimana in modo prevedibile'}
+      ]}
+    }
+  ],
+  bridges:{ red:{icon:'💡',title:'L\'attrazione clienti è la prima area critica',text:'L\'87% dei coach che hanno fatto questo check-up con noi aveva esattamente questa situazione sull\'attrazione clienti. Non è una questione di bravura o di impegno. Micaela faceva coaching da tre anni, i suoi clienti erano soddisfatti e la consigliavano — ma ogni mese era una roulette. Quando ha iniziato a costruire un sistema, in otto settimane aveva un flusso costante di nuovi contatti senza dipendere dal passaparola. Quello che hai appena analizzato è solo la prima delle 9 aree del tuo business.'},
+    yellow:{icon:'💡',title:'Hai qualcosa — ma non è ancora un sistema',text:'Avere qualcosa ma non vederlo funzionare in modo costante è la situazione più comune tra chi fa questo lavoro da 1 a 4 anni. Simone postava ogni giorno, aveva clienti, faceva contenuti — ma i risultati erano irregolari. Il problema non era lo sforzo. Era che mancava il collegamento tra quello che faceva e un sistema che lo rendesse prevedibile.'},
+    green:{icon:'✅',title:'Sei nel 15% dei coach più strutturati',text:'Avere un sistema di attrazione clienti che funziona ti mette già nel 15% dei coach più strutturati. Fabio aveva clienti in entrata, sistema funzionante, risultati costanti. Ma quando abbiamo analizzato le aree successive, è emerso che tutto quel lavoro sull\'attrazione produceva molto meno di quello che poteva, perché c\'erano blocchi a valle che disperdevano energia e opportunità.'}
+  }},
+  2: { name:'Pianeta Conversione', system:'Sistema Prosperità', pillars:[
+    { name:'Creare la giusta offerta',
+      perception:{ id:'q2_1p', text:'Le persone che ti scoprono riescono a capire subito cosa offri, quanto costa e perché dovrebbero scegliere te?', options:[
+        {l:'A',t:'No — spesso devo spiegare molto prima che capiscano cosa faccio esattamente'},
+        {l:'B',t:'Qualcuno capisce, altri no — la mia offerta non è ancora chiarissima a tutti'},
+        {l:'C',t:'Sì — ho un\'offerta chiara, con un prezzo definito e un messaggio che funziona'}
+      ]},
+      verification:{ id:'q2_1v', text:'Quale di queste cose hai fatto o hai a disposizione oggi?', options:[
+        {l:'A',t:'Non ho un\'offerta strutturata — vendo un po\' caso per caso in base a cosa chiede il cliente'},
+        {l:'B',t:'Ho un\'offerta base ma non ha un prezzo fisso o una struttura definita'},
+        {l:'C',t:'Ho almeno un\'offerta con nome, prezzo, durata e benefici scritti chiaramente'},
+        {l:'D',t:'Ho più offerte strutturate per diversi livelli di clienti, con pagine di vendita o materiali dedicati'}
+      ]}
+    },
+    { name:'Avere flussi di vendita',
+      perception:{ id:'q2_2p', text:'Hai un processo ripetibile che porta le persone interessate a diventare tuoi clienti paganti — senza doverlo reinventare ogni volta?', options:[
+        {l:'A',t:'No — ogni vendita è diversa, vado un po\' a intuito o aspetto che siano loro a chiedermi'},
+        {l:'B',t:'Ho qualcosa ma non è strutturato — a volte funziona, a volte no'},
+        {l:'C',t:'Sì — ho un processo di vendita che seguo e che mi dà risultati abbastanza costanti'}
+      ]},
+      verification:{ id:'q2_2v', text:'Cosa hai concretamente attivo oggi per convertire l\'interesse in vendite?', options:[
+        {l:'A',t:'Niente di strutturato — rispondo a chi mi contatta e vedo come va'},
+        {l:'B',t:'Ho un modo per parlare con i potenziali clienti ma non ho uno script o un processo'},
+        {l:'C',t:'Ho una call di vendita strutturata o un processo definito che seguo con ogni prospect'},
+        {l:'D',t:'Ho funnel, automazioni o sequenze che prelavorano il contatto prima che arrivi alla call o alla vendita'}
+      ]}
+    },
+    { name:'Ciclo promozionale',
+      perception:{ id:'q2_3p', text:'Fai attività promozionale in modo regolare e pianificato — o solo quando hai bisogno di nuovi clienti?', options:[
+        {l:'A',t:'Solo quando ne ho bisogno — non ho un calendario o una routine promozionale'},
+        {l:'B',t:'Ogni tanto faccio qualcosa ma non è pianificato — dipende dall\'umore o dal tempo'},
+        {l:'C',t:'Sì — ho un ritmo promozionale regolare che seguo indipendentemente dalla situazione'}
+      ]},
+      verification:{ id:'q2_3v', text:'Nelle ultime 8 settimane, hai fatto almeno una di queste cose in modo deliberato?', options:[
+        {l:'A',t:'No — non ho fatto niente di pianificato sul lato commerciale'},
+        {l:'B',t:'Ho fatto qualcosa spontaneamente ma non era pianificato in anticipo'},
+        {l:'C',t:'Ho fatto almeno un\'azione promozionale pianificata (lancio, offerta, campagna, sequenza email)'},
+        {l:'D',t:'Ho un calendario promozionale mensile che include lanci, nurturing e riattivazione clienti'}
+      ]}
+    }
+  ],
+  bridges:{ red:{icon:'💡',title:'Non riuscire a vendere non dipende dal tuo valore',text:'Non riuscire a vendere in modo costante non dipende dal fatto che il tuo servizio non valga — dipende dal fatto che manca un sistema. Il 79% dei coach che seguiamo aveva esattamente questo blocco: bravi nel lavoro, bloccati nella vendita. Fabio ci ha detto "non sono portato per vendere" quando ci siamo conosciuti. Dodici settimane dopo aveva chiuso 7 nuovi clienti con lo stesso processo ogni volta.'},
+    yellow:{icon:'💡',title:'Vendere in modo irregolare è frustrante',text:'Vendere in modo irregolare è spesso più frustrante che non vendere per niente — perché sai che ce la fai, ma non riesci a renderlo costante. Questo è il segnale che il sistema c\'è ma non è ancora solido. Micaela aveva esattamente questo problema: mesi da 4-5 clienti, poi mesi da 1.'},
+    green:{icon:'✅',title:'Hai un processo di vendita strutturato — è raro',text:'Avere un processo di vendita strutturato è raro — e fa tutta la differenza sulla prevedibilità del tuo business. La domanda ora è: quel sistema è scalabile? Riesce a funzionare anche senza che tu sia presente in ogni fase? Nelle prossime aree analizziamo esattamente questo.'}
+  }},
+  3: { name:'Pianeta Viaggio', system:'Sistema Prosperità', pillars:[
+    { name:'Percorso del cliente',
+      perception:{ id:'q3_1p', text:'I tuoi clienti sanno esattamente cosa li aspetta nel percorso con te — e hanno ragione per restare nel tempo o acquistare di nuovo?', options:[
+        {l:'A',t:'No — lavoro sessione per sessione, non c\'è un percorso strutturato'},
+        {l:'B',t:'Ho qualcosa ma non è definito chiaramente — il cliente non vede sempre il quadro completo'},
+        {l:'C',t:'Sì — ho un percorso strutturato che mostro al cliente fin dall\'inizio'}
+      ]},
+      verification:{ id:'q3_1v', text:'Quale di queste cose hai attiva oggi?', options:[
+        {l:'A',t:'Non ho un percorso definito — ogni cliente è un caso a sé'},
+        {l:'B',t:'Ho un\'idea del percorso in testa ma non l\'ho mai formalizzata o mostrata ai clienti'},
+        {l:'C',t:'Ho un percorso visivo o scritto che mostro ai nuovi clienti per far capire il viaggio completo'},
+        {l:'D',t:'Ho più livelli o fasi del percorso con opzioni di rinnovo o upgrade integrate'}
+      ]}
+    },
+    { name:'Proprietà intellettuale',
+      perception:{ id:'q3_2p', text:'Hai un metodo, un framework o un approccio tuo che ti distingue dagli altri e che potresti spiegare in modo chiaro a chiunque?', options:[
+        {l:'A',t:'No — lavoro in modo intuitivo, non ho un metodo formalizzato'},
+        {l:'B',t:'Ho qualcosa che uso ma non l\'ho mai scritto o definito in modo preciso'},
+        {l:'C',t:'Sì — ho un mio metodo con un nome, dei passi definiti e lo comunico chiaramente'}
+      ]},
+      verification:{ id:'q3_2v', text:'Quale di queste cose hai fatto o hai a disposizione?', options:[
+        {l:'A',t:'Non ho niente di scritto sul mio approccio o metodo'},
+        {l:'B',t:'Ho degli appunti o materiali sparsi ma non organizzati in un sistema coerente'},
+        {l:'C',t:'Ho un documento o una presentazione che descrive il mio metodo in modo chiaro e replicabile'},
+        {l:'D',t:'Ho un metodo con nome proprio, struttura definita e materiali formativi o di supporto'}
+      ]}
+    },
+    { name:'Esperienza del cliente',
+      perception:{ id:'q3_3p', text:'I tuoi clienti vivono un\'esperienza coerente e curata in ogni momento del loro percorso con te — dal primo contatto all\'erogazione del servizio?', options:[
+        {l:'A',t:'No — mi concentro sul contenuto ma l\'esperienza intorno non è curata'},
+        {l:'B',t:'Alcune parti sono curate, altre no — non è uniforme'},
+        {l:'C',t:'Sì — ogni punto di contatto con il cliente è pensato e curato'}
+      ]},
+      verification:{ id:'q3_3v', text:'Quale di queste cose hai attiva oggi?', options:[
+        {l:'A',t:'Non ho pensato sistematicamente all\'esperienza del cliente — vado a istinto'},
+        {l:'B',t:'Ho qualche elemento curato (es. i materiali del corso o le sessioni) ma non tutto il percorso'},
+        {l:'C',t:'Ho un onboarding strutturato, comunicazioni regolari e un sistema per raccogliere feedback'},
+        {l:'D',t:'Ho un customer journey mappato con ogni touchpoint definito, dalla scoperta al post-servizio'}
+      ]}
+    }
+  ],
+  bridges:{ red:{icon:'💡',title:'Il cliente soddisfatto che non torna',text:'Il 68% dei coach che ci ha contattato aveva clienti soddisfatti ma che non rinnovavano e non portavano referenze in modo sistematico. Non perché il lavoro non fosse buono — ma perché mancava il sistema intorno. Simone aveva clienti felici ma ogni fine mese ricominciava da zero.'},
+    yellow:{icon:'💡',title:'La conoscenza è ancora nella tua testa',text:'Avere qualcosa ma non averlo mai formalizzato è la situazione più comune tra i professionisti che lavorano da anni. Il problema non è che non sai fare il tuo lavoro — è che quella conoscenza è rimasta nella tua testa invece di diventare un sistema.'},
+    green:{icon:'✅',title:'Vantaggio competitivo reale',text:'Avere un percorso cliente strutturato e una propria metodologia definita ti mette in una posizione di vantaggio competitivo importante. Nelle prossime aree analizziamo come stai sul lato operativo — spesso è lì che si nasconde il freno alla crescita.'}
+  }},
+  4: { name:'Pianeta Architettura', system:'Sistema Libertà', pillars:[
+    { name:'Registri e documenti',
+      perception:{ id:'q4_1p', text:'Hai tutti i documenti fondamentali del tuo business scritti, aggiornati e facilmente consultabili — come il tuo posizionamento, il profilo cliente, le tue offerte, i tuoi prezzi?', options:[
+        {l:'A',t:'No — ho tutto in testa o sparso, niente di organizzato per iscritto'},
+        {l:'B',t:'Ho qualcosa ma è incompleto o non lo aggiorno mai'},
+        {l:'C',t:'Sì — ho i documenti principali del mio business scritti e li consulto regolarmente'}
+      ]},
+      verification:{ id:'q4_1v', text:'Quale di questi documenti hai effettivamente scritto e aggiornato negli ultimi 6 mesi?', options:[
+        {l:'A',t:'Nessuno — non ho documenti strutturati sul mio business'},
+        {l:'B',t:'Uno o due — qualcosa c\'è ma non è completo né aggiornato'},
+        {l:'C',t:'La maggior parte: posizionamento, offerte, profilo cliente e prezzi sono scritti'},
+        {l:'D',t:'Tutto: ho un documento master del mio business che aggiorno regolarmente'}
+      ]}
+    },
+    { name:'Processi di marketing',
+      perception:{ id:'q4_2p', text:'I tuoi processi di marketing sono scritti e replicabili — sai esattamente cosa fare ogni settimana per attrarre e convertire clienti?', options:[
+        {l:'A',t:'No — vado a istinto, non ho processi scritti'},
+        {l:'B',t:'Ho qualcosa in testa ma non è scritto — dipende da come mi sento quel giorno'},
+        {l:'C',t:'Sì — ho un piano editoriale, una routine di marketing e processi definiti'}
+      ]},
+      verification:{ id:'q4_2v', text:'Quale di queste situazioni descrive meglio la tua routine di marketing oggi?', options:[
+        {l:'A',t:'Non ho una routine — faccio marketing quando mi ricordo o quando ho paura di non avere clienti'},
+        {l:'B',t:'Ho qualche abitudine ma non è strutturata — a volte seguo un piano, a volte no'},
+        {l:'C',t:'Ho una routine settimanale definita per i contenuti, le comunicazioni e le attività di marketing'},
+        {l:'D',t:'Ho processi documentati per ogni attività di marketing che posso delegare o replicare facilmente'}
+      ]}
+    },
+    { name:'Processi gestione interna',
+      perception:{ id:'q4_3p', text:'La gestione interna del tuo business — amministrazione, clienti, appuntamenti, pagamenti — è organizzata in modo che non dipenda tutto dalla tua testa?', options:[
+        {l:'A',t:'No — gestisco tutto mentalmente e rischio di perdere cose'},
+        {l:'B',t:'Ho qualche sistema ma non copre tutto — alcune aree sono ancora caotiche'},
+        {l:'C',t:'Sì — ho procedure chiare per la gestione interna del mio business'}
+      ]},
+      verification:{ id:'q4_3v', text:'Quale di queste cose hai attiva oggi?', options:[
+        {l:'A',t:'Niente di strutturato — uso email, messaggi e memoria per gestire tutto'},
+        {l:'B',t:'Ho qualche strumento (agenda, fogli Excel) ma non ho un sistema integrato'},
+        {l:'C',t:'Ho un CRM o strumento di gestione dove tengo clienti, appuntamenti e comunicazioni'},
+        {l:'D',t:'Ho procedure operative standard per ogni area — qualcuno potrebbe gestire il mio business seguendole'}
+      ]}
+    }
+  ],
+  bridges:{ red:{icon:'💡',title:'Il caos operativo è il killer silenzioso',text:'Il caos operativo è il killer silenzioso di tutti i business di coaching. Non lo vedi subito, ma ti ruba ore ogni giorno e ti impedisce di crescere. Il 74% dei coach gestiva il proprio business principalmente "a memoria". Fabio ha perso un cliente da 3.000€ perché si era dimenticato di ricontattarlo. Non perché fosse disorganizzato — ma perché non aveva un sistema.'},
+    yellow:{icon:'💡',title:'Il caos selettivo è insidioso',text:'Avere qualcosa ma non avere tutto strutturato crea quello che chiamiamo "caos selettivo": alcune cose funzionano, altre no, e non sai mai quale parte del business ti creerà il prossimo problema. Micaela diceva "funziona, ma ogni tanto salta qualcosa". Era esattamente questo.'},
+    green:{icon:'✅',title:'L\'architettura documentata è rara e potente',text:'Avere l\'architettura documentata del tuo business è uno dei fondamentali più rari — e più potenti. Significa che puoi delegare, replicare e crescere senza che tutto dipenda da te.'}
+  }},
+  5: { name:'Pianeta Laboratorio', system:'Sistema Libertà', pillars:[
+    { name:'CRM tools',
+      perception:{ id:'q5_1p', text:'Hai uno strumento dove tieni traccia di tutti i tuoi contatti, clienti e conversazioni — senza dover ricordare tutto a memoria?', options:[
+        {l:'A',t:'No — uso email, messaggi e memoria. Non ho un sistema per gestire i contatti'},
+        {l:'B',t:'Ho qualcosa (fogli Excel, note) ma non è un sistema vero e proprio'},
+        {l:'C',t:'Sì — ho un CRM o strumento dedicato dove gestisco tutti i miei contatti'}
+      ]},
+      verification:{ id:'q5_1v', text:'Quale di queste situazioni descrive meglio il tuo sistema contatti oggi?', options:[
+        {l:'A',t:'Gestisco tutto tra email, WhatsApp e memoria — non ho un archivio strutturato'},
+        {l:'B',t:'Ho un foglio Excel o un documento ma non è sempre aggiornato'},
+        {l:'C',t:'Ho un CRM dove registro i contatti, lo stato di ogni trattativa e le note sulle conversazioni'},
+        {l:'D',t:'Ho un CRM integrato con automazioni, tag e pipeline che gestisce i contatti in modo automatico'}
+      ]}
+    },
+    { name:'Marketing tools',
+      perception:{ id:'q5_2p', text:'Gli strumenti che usi per fare marketing — sito, email, social, funnel — sono integrati tra loro o ognuno funziona in modo separato?', options:[
+        {l:'A',t:'Uso strumenti separati che non si parlano tra loro — è caotico e costoso'},
+        {l:'B',t:'Ho qualcosa di integrato ma non tutto — ci sono ancora pezzi scollegati'},
+        {l:'C',t:'Sì — i miei strumenti di marketing sono integrati e lavorano insieme'}
+      ]},
+      verification:{ id:'q5_2v', text:'Quanti strumenti separati stai pagando oggi per gestire il tuo marketing e il tuo business?', options:[
+        {l:'A',t:'Più di 6 strumenti diversi — e spesso non si integrano bene tra loro'},
+        {l:'B',t:'Tra 3 e 6 strumenti — alcuni integrati, altri no'},
+        {l:'C',t:'2-3 strumenti ben integrati che coprono la maggior parte delle mie esigenze'},
+        {l:'D',t:'Un unico strumento che gestisce CRM, email, funnel, corsi e comunicazioni in modo integrato'}
+      ]}
+    },
+    { name:'Tools analisi e KPI',
+      perception:{ id:'q5_3p', text:'Sai esattamente come sta andando il tuo business — hai numeri chiari su entrate, clienti, tassi di conversione e attività?', options:[
+        {l:'A',t:'No — non monitoro i numeri in modo sistematico'},
+        {l:'B',t:'Monitoro alcune cose ma non ho una visione completa e regolare'},
+        {l:'C',t:'Sì — ho KPI definiti che monitoro regolarmente e su cui baso le mie decisioni'}
+      ]},
+      verification:{ id:'q5_3v', text:'Quale di queste cose fai oggi?', options:[
+        {l:'A',t:'Non guardo i numeri — vado a sensazione su come sta andando il business'},
+        {l:'B',t:'Controllo le entrate ogni tanto ma non ho KPI strutturati'},
+        {l:'C',t:'Monitoro regolarmente: entrate mensili, nuovi contatti, tasso di conversione, clienti attivi'},
+        {l:'D',t:'Ho una dashboard con tutti i KPI chiave che aggiorno settimanalmente per prendere decisioni'}
+      ]}
+    }
+  ],
+  bridges:{ red:{icon:'💡',title:'6+ strumenti separati = ore perse ogni settimana',text:'In media, i coach che usano 6+ strumenti separati spendono tra 400€ e 900€ al mese in abbonamenti — e perdono 6-8 ore a settimana per far comunicare sistemi che non si parlano tra loro. Simone spendeva 670€ al mese tra vari tool. Oggi usa un solo strumento e spende meno della metà.'},
+    yellow:{icon:'💡',title:'Punti di attrito invisibili',text:'Avere alcuni strumenti integrati ma non tutti crea punti di attrito invisibili che rallentano il business ogni giorno. Non li vedi perché ci hai fatto l\'abitudine — ma sommano ore di lavoro manuale ogni settimana.'},
+    green:{icon:'✅',title:'Strumenti integrati = base scalabile',text:'Avere strumenti integrati e KPI monitorati regolarmente è la base di un business scalabile. La domanda ora è: stai usando questi strumenti al massimo del loro potenziale?'}
+  }},
+  6: { name:'Pianeta Moltiplicazione', system:'Sistema Libertà', pillars:[
+    { name:'Team e collaboratori',
+      perception:{ id:'q6_1p', text:'Hai qualcuno che ti aiuta nel tuo business — anche solo per alcune attività specifiche — oppure fai davvero tutto da solo?', options:[
+        {l:'A',t:'Faccio tutto da solo — non ho nessun collaboratore né figura di supporto'},
+        {l:'B',t:'Ho qualcuno ma in modo informale o saltuario — non è una collaborazione strutturata'},
+        {l:'C',t:'Sì — ho almeno un collaboratore o figura di supporto con ruolo e compiti definiti'}
+      ]},
+      verification:{ id:'q6_1v', text:'Come descrivi meglio la tua situazione con i collaboratori oggi?', options:[
+        {l:'A',t:'Ho provato a delegare ma non ha funzionato — ho finito per rifare tutto da solo'},
+        {l:'B',t:'Ho qualcuno che mi aiuta su richiesta ma non ha compiti fissi o responsabilità chiare'},
+        {l:'C',t:'Ho almeno una figura con ruolo definito, compiti chiari e autonomia operativa'},
+        {l:'D',t:'Ho un team strutturato con ruoli, responsabilità e processi che funzionano senza di me'}
+      ]}
+    },
+    { name:'AI al proprio servizio',
+      perception:{ id:'q6_2p', text:'Usi strumenti di intelligenza artificiale in modo regolare per risparmiare tempo su attività ripetitive del tuo business?', options:[
+        {l:'A',t:'No — non uso l\'AI o la uso raramente senza un metodo preciso'},
+        {l:'B',t:'Uso qualcosa (ChatGPT o altro) ma in modo sporadico, senza un sistema'},
+        {l:'C',t:'Sì — ho integrato strumenti AI nel mio flusso di lavoro quotidiano in modo regolare'}
+      ]},
+      verification:{ id:'q6_2v', text:'Su quali attività usi l\'AI in modo regolare oggi?', options:[
+        {l:'A',t:'Quasi nessuna — non so bene come usarla in modo utile per il mio business'},
+        {l:'B',t:'Solo per scrivere contenuti ogni tanto — niente di sistematico'},
+        {l:'C',t:'Uso l\'AI per contenuti, email, ricerche e almeno un\'altra attività in modo regolare'},
+        {l:'D',t:'Ho automatizzato con AI diverse attività ripetitive — la uso come un collaboratore virtuale'}
+      ]}
+    },
+    { name:'Task management e mindset',
+      perception:{ id:'q6_3p', text:'Hai un sistema per gestire le tue attività quotidiane — sai sempre cosa fare prima e non finisci mai la giornata con la sensazione di aver lavorato tanto senza aver fatto le cose davvero importanti?', options:[
+        {l:'A',t:'No — mi perdo spesso nelle urgenze e alla fine del giorno non so bene cosa ho fatto'},
+        {l:'B',t:'Qualche volta riesco a gestirmi, altre no — non è stabile'},
+        {l:'C',t:'Sì — ho un sistema di task management che seguo regolarmente'}
+      ]},
+      verification:{ id:'q6_3v', text:'Quale di queste situazioni descrive meglio la tua gestione delle attività oggi?', options:[
+        {l:'A',t:'Gestisco tutto a memoria o con liste informali — spesso dimentico cose importanti'},
+        {l:'B',t:'Ho un sistema (agenda, app) ma non lo seguo in modo costante'},
+        {l:'C',t:'Ho un sistema di task management che uso ogni giorno e che mi aiuta a prioritizzare'},
+        {l:'D',t:'Ho un sistema integrato tra task personali e business con blocchi di tempo pianificati'}
+      ]}
+    }
+  ],
+  bridges:{ red:{icon:'💡',title:'Fare tutto da soli non è una virtù — è un limite',text:'Fare tutto da soli non è una virtù — è un limite. Il tuo tempo e la tua energia sono la risorsa più scarsa che hai. Il "tuttofare" è la trappola più comune tra i coach: sei bravo in quello che fai, quindi fai anche tutto il resto. Ma ogni ora su attività che non richiedono il tuo talento è un\'ora che non stai crescendo.'},
+    yellow:{icon:'💡',title:'Dal lavorare nel business al lavorare sul business',text:'Avere qualcosa ma non averlo ancora sistematizzato è esattamente il punto di transizione tra "lavorare nel business" e "lavorare sul business". Sei vicino — ma non ci sei ancora.'},
+    green:{icon:'✅',title:'Stai lavorando come un imprenditore',text:'Avere collaboratori, usare l\'AI e gestire bene il tempo sono i tre ingredienti della moltiplicazione. Se li hai tutti e tre, stai già lavorando come un imprenditore — non come un libero professionista.'}
+  }},
+  7: { name:'Pianeta Bussola', system:'Sistema Serenità', pillars:[
+    { name:'Canali di assistenza h24',
+      perception:{ id:'q7_1p', text:'Quando hai un dubbio o un problema nel tuo business — tecnico, strategico o operativo — sai esattamente a chi rivolgerti o dove trovare la risposta?', options:[
+        {l:'A',t:'No — mi arrangio da solo, cerco su Google o aspetto di trovare la risposta'},
+        {l:'B',t:'A volte trovo supporto, a volte no — non ho un riferimento fisso e affidabile'},
+        {l:'C',t:'Sì — ho canali di supporto chiari e so dove trovare risposta quando ne ho bisogno'}
+      ]},
+      verification:{ id:'q7_1v', text:'Quale di queste situazioni descrive il tuo accesso al supporto oggi?', options:[
+        {l:'A',t:'Cerco su YouTube o Google — non ho nessun supporto dedicato al mio business'},
+        {l:'B',t:'Ho qualche gruppo online o community ma non è sempre utile o tempestivo'},
+        {l:'C',t:'Ho accesso a supporto dedicato (chat, email, community attiva) con tempi di risposta ragionevoli'},
+        {l:'D',t:'Ho supporto prioritario con risposta rapida e accesso a un esperto quando ne ho bisogno'}
+      ]}
+    },
+    { name:'Knowledge base e tutorial',
+      perception:{ id:'q7_2p', text:'Hai accesso a materiali formativi aggiornati che ti aiutano a migliorare le aree del tuo business che non padroneggi ancora?', options:[
+        {l:'A',t:'No — mi formo in modo casuale quando trovo qualcosa di interessante online'},
+        {l:'B',t:'Ho qualcosa ma non è organizzato o aggiornato — non so mai dove trovare quello che mi serve'},
+        {l:'C',t:'Sì — ho accesso a formazione strutturata e aggiornata sulle aree chiave del mio business'}
+      ]},
+      verification:{ id:'q7_2v', text:'Quale di queste situazioni descrive la tua formazione oggi?', options:[
+        {l:'A',t:'Mi formo guardando video su YouTube o seguendo profili social — niente di strutturato'},
+        {l:'B',t:'Ho comprato qualche corso ma non l\'ho finito o non lo applico sistematicamente'},
+        {l:'C',t:'Ho accesso a formazione strutturata che seguo regolarmente e che applico al mio business'},
+        {l:'D',t:'Ho un percorso formativo continuo con sessioni live, materiali aggiornati e supporto pratico'}
+      ]}
+    },
+    { name:'Onboarding',
+      perception:{ id:'q7_3p', text:'Quando un nuovo cliente inizia a lavorare con te, ha un\'esperienza di partenza chiara e strutturata — sa cosa fare, cosa aspettarsi e si sente accolto fin dal primo momento?', options:[
+        {l:'A',t:'No — ogni nuovo cliente è un po\' un\'improvvisazione — non ho un processo di avvio'},
+        {l:'B',t:'Ho qualcosa ma non è completo o non funziona sempre bene'},
+        {l:'C',t:'Sì — ho un processo di onboarding definito che do a ogni nuovo cliente'}
+      ]},
+      verification:{ id:'q7_3v', text:'Quale di queste cose hai attiva per i tuoi nuovi clienti?', options:[
+        {l:'A',t:'Niente di strutturato — mando le informazioni man mano che servono'},
+        {l:'B',t:'Ho qualche materiale di benvenuto ma non è un processo completo'},
+        {l:'C',t:'Ho un processo di onboarding con materiali, istruzioni e primo contatto strutturato'},
+        {l:'D',t:'Ho un onboarding automatizzato con sequenze, materiali e check point per i primi 30 giorni'}
+      ]}
+    }
+  ],
+  bridges:{ red:{icon:'💡',title:'L\'isolamento consuma l\'energia silenziosamente',text:'Il senso di isolamento e di non sapere dove trovare risposta è uno dei fattori che più lentamente consuma l\'energia di un coach. Non è debolezza — è la conseguenza naturale di fare un lavoro che richiede aggiornamento continuo, senza avere un ecosistema di supporto intorno. Mancano 2 aree al termine del check-up.'},
+    yellow:{icon:'💡',title:'Il supporto occasionale non basta',text:'Avere qualcosa ma non avere un sistema di supporto stabile significa che ogni problema diventa più grande del necessario. La formazione sporadica e il supporto occasionale non bastano per restare aggiornato in un mercato che cambia ogni 6 mesi.'},
+    green:{icon:'✅',title:'Il tuo business può crescere con te',text:'Avere supporto, formazione e onboarding strutturati significa che il tuo business non dipende solo da quello che sai in questo momento — può crescere con te. Nell\'area successiva scopriamo se hai anche una community con cui confrontarti.'}
+  }},
+  8: { name:'Pianeta Villaggio', system:'Sistema Serenità', pillars:[
+    { name:'Accademia e corsi',
+      perception:{ id:'q8_1p', text:'Hai accesso a una formazione strutturata — corsi, programmi o percorsi — che ti aiuta a costruire le competenze di business che non hai ancora?', options:[
+        {l:'A',t:'No — non ho accesso a formazione strutturata specifica per il mio tipo di business'},
+        {l:'B',t:'Ho accesso a qualcosa ma non è specifico o completo per quello che mi serve'},
+        {l:'C',t:'Sì — ho accesso a formazione specifica, pratica e aggiornata per il mio business'}
+      ]},
+      verification:{ id:'q8_1v', text:'Quale di queste situazioni descrive la tua formazione di business oggi?', options:[
+        {l:'A',t:'Seguo contenuti gratuiti online ma non ho un percorso strutturato'},
+        {l:'B',t:'Ho fatto qualche corso ma non era specifico per il mio settore o non l\'ho applicato'},
+        {l:'C',t:'Seguo una formazione strutturata specifica per coach o professionisti con applicazioni pratiche'},
+        {l:'D',t:'Ho accesso a formazione continuativa con sessioni live, materiali pratici e casi studio del mio settore'}
+      ]}
+    },
+    { name:'Community e forum',
+      perception:{ id:'q8_2p', text:'Fai parte di una community o gruppo di colleghi — coach, formatori o consulenti — con cui ti confronti regolarmente sul tuo business?', options:[
+        {l:'A',t:'No — lavoro in isolamento, non ho una community professionale attiva'},
+        {l:'B',t:'Faccio parte di qualche gruppo ma non è molto attivo o utile per me'},
+        {l:'C',t:'Sì — ho una community attiva dove mi confronto regolarmente con altri professionisti'}
+      ]},
+      verification:{ id:'q8_2v', text:'Come descriveresti la tua community professionale oggi?', options:[
+        {l:'A',t:'Gruppi Facebook o Telegram che seguo raramente — non ci sono confronti reali'},
+        {l:'B',t:'Una o due community a cui partecipo ogni tanto ma non in modo sistematico'},
+        {l:'C',t:'Una community attiva dove mi confronto, chiedo feedback e ricevo supporto regolare'},
+        {l:'D',t:'Una community professionale selezionata dove ci sono scambi di alto livello e collaborazioni reali'}
+      ]}
+    },
+    { name:'Networking e supporto',
+      perception:{ id:'q8_3p', text:'Hai un network professionale attivo — persone con cui collabori, ti confronti o che ti mandano clienti in modo reciproco?', options:[
+        {l:'A',t:'No — lavoro principalmente in isolamento, non ho un network professionale attivo'},
+        {l:'B',t:'Ho qualche contatto ma non è un network strutturato e attivo'},
+        {l:'C',t:'Sì — ho un network di professionisti con cui collaboro e mi confronto regolarmente'}
+      ]},
+      verification:{ id:'q8_3v', text:'Quale di queste situazioni descrive il tuo networking oggi?', options:[
+        {l:'A',t:'Non faccio networking in modo attivo — aspetto che le connessioni avvengano naturalmente'},
+        {l:'B',t:'Partecipo a qualche evento o gruppo ma non ho relazioni professionali attive'},
+        {l:'C',t:'Ho almeno 3-5 colleghi con cui mi confronto regolarmente e con cui ci sono collaborazioni'},
+        {l:'D',t:'Ho un network strutturato con referral reciproci, collaborazioni e scambio sistematico di opportunità'}
+      ]}
+    }
+  ],
+  bridges:{ red:{icon:'💡',title:'Chi cresce di più non è il più bravo',text:'Lavorare in isolamento è la norma per i coach — ma non deve essere così. Chi cresce più velocemente non è necessariamente il più bravo: è quello che ha intorno le persone giuste con cui confrontarsi, imparare e collaborare. Fabio ha risolto in 2 settimane un problema che lo bloccava da mesi, dopo essere entrato in una community professionale.'},
+    yellow:{icon:'💡',title:'Le connessioni giuste moltiplicano le possibilità',text:'Avere qualcosa ma non avere connessioni professionali davvero attive e utili è come avere un telefono con poca batteria. La community e il network giusti moltiplicano le tue possibilità senza che tu debba fare di più.'},
+    green:{icon:'✅',title:'Vantaggio competitivo sottovalutato',text:'Avere formazione, community e network attivi è uno dei vantaggi competitivi più sottovalutati nel settore del coaching. Chi li ha cresce più velocemente e con meno fatica.'}
+  }},
+  9: { name:'Pianeta Scuderia', system:'Sistema Serenità', pillars:[
+    { name:'Tutor personale dedicato',
+      perception:{ id:'q9_1p', text:'Quando devi implementare qualcosa di tecnico o complesso nel tuo business — un funnel, un\'automazione, una configurazione — riesci a farlo senza bloccarti o perdere giorni a capire come si fa?', options:[
+        {l:'A',t:'No — mi blocco spesso e perdo molto tempo su cose tecniche che non riesco a risolvere'},
+        {l:'B',t:'A volte riesco, a volte no — dipende da quanto è complesso'},
+        {l:'C',t:'Sì — riesco a implementare le cose tecniche senza bloccarmi'}
+      ]},
+      verification:{ id:'q9_1v', text:'Quando ti blocchi su qualcosa di tecnico, cosa fai oggi?', options:[
+        {l:'A',t:'Cerco su YouTube o Google per ore — a volte trovo, a volte no'},
+        {l:'B',t:'Chiedo a qualcuno che conosco ma non è sempre disponibile o non sempre sa aiutarmi'},
+        {l:'C',t:'Ho accesso a supporto tecnico dedicato che mi sblocca in tempi ragionevoli'},
+        {l:'D',t:'Ho qualcuno che non solo mi spiega ma entra con me nel sistema e lo fa insieme a me'}
+      ]}
+    },
+    { name:'Done With You',
+      perception:{ id:'q9_2p', text:'Hai mai avuto accesso a un esperto che lavora insieme a te in diretta — non solo ti spiega cosa fare ma lo fa con te, schermata condivisa, finché non è fatto?', options:[
+        {l:'A',t:'No — ho sempre dovuto implementare tutto da solo'},
+        {l:'B',t:'Una o due volte, ma non in modo sistematico o continuativo'},
+        {l:'C',t:'Sì — ho accesso regolare a supporto operativo diretto con qualcuno che lavora con me'}
+      ]},
+      verification:{ id:'q9_2v', text:'Cosa ti ha dato di più quel tipo di supporto operativo diretto?', options:[
+        {l:'A',t:'Non ne ho mai avuto — non so cosa mi darebbe'},
+        {l:'B',t:'Mi ha aiutato una volta sola su una cosa specifica ma non è continuativo'},
+        {l:'C',t:'Mi ha permesso di implementare cose che da solo non avrei mai fatto'},
+        {l:'D',t:'Ha cambiato il modo in cui lavoro — adesso sono molto più veloce nell\'implementare'}
+      ]}
+    },
+    { name:'Done For You',
+      perception:{ id:'q9_3p', text:'Nel tuo business ci sono attività operative che vorresti delegare completamente — non imparare a farle, ma farle fare a qualcuno di esperto direttamente al posto tuo?', options:[
+        {l:'A',t:'Sì, molte cose — ma non so a chi delegarle o non mi fido di farlo'},
+        {l:'B',t:'Qualcosa sì, ma non ho ancora trovato il modo giusto per farlo'},
+        {l:'C',t:'Ho già delegato le attività principali a persone o servizi di fiducia'}
+      ]},
+      verification:{ id:'q9_3v', text:'Quale di queste situazioni descrive la tua capacità di delegare oggi?', options:[
+        {l:'A',t:'Faccio tutto da solo perché è più veloce che spiegare a qualcun altro'},
+        {l:'B',t:'Ho provato a delegare ma non mi sono trovato bene — preferisco controllare tutto'},
+        {l:'C',t:'Ho delegato alcune attività specifiche a collaboratori o freelance di fiducia'},
+        {l:'D',t:'Ho un sistema di delega strutturato dove so esattamente cosa delegare, a chi e come verificarlo'}
+      ]}
+    }
+  ],
+  bridges: null
+}};
+
+const ARCHETIPI = {
+  1:{ name:'Il Potenziale Inespresso', fascia:'Fascia 0–3k · Prevalenza Rossi', text:'La tua Clarity Map mostra chiaramente che hai il talento e le competenze per fare questo lavoro — ma il sistema attorno non c\'è ancora. Questo non è un limite: è il punto di partenza. Chi costruisce le fondamenta giuste adesso, cresce in modo solido e sostenibile. Le tue priorità concrete sono chiare e lavorarle nell\'ordine giusto fa tutta la differenza.' },
+  2:{ name:'Il Tuttofare Esausto', fascia:'Fascia 1.5k–8k · Mix Rossi e Gialli', text:'La tua Clarity Map mostra un business che esiste e produce — ma che dipende interamente da te per ogni singola cosa. Questo crea un tetto invisibile alla tua crescita: non puoi crescere più di quanto riesci a gestire da solo. Le priorità che emergono dalla tua mappa ti mostrano esattamente dove intervenire per liberare energia e iniziare a scalare.' },
+  3:{ name:'Il Freelance che vuole Scalare', fascia:'Fascia 5k–25k · Prevalenza Gialli con qualche Verde', text:'La tua Clarity Map mostra un business solido nelle fondamenta — ma con blocchi precisi che impediscono il salto di livello. Hai già dimostrato che sai portare valore ai clienti. Adesso la sfida è far crescere il business senza crescere proporzionalmente le ore di lavoro. Le tue priorità sono chiare — e sono esattamente quelle che fanno la differenza tra restare freelance e diventare imprenditore.' },
+  4:{ name:'L\'Imprenditore in Costruzione', fascia:'Fascia 15k+ · Molti Verdi con buchi specifici', text:'La tua Clarity Map mostra un business già strutturato e performante — con alcune aree specifiche che, se ottimizzate, potrebbero moltiplicare i risultati già ottenuti. I tuoi blocchi non sono problemi di base: sono sfide da imprenditore. Le priorità che emergono dalla tua mappa sono precise e lavorarle nel modo giusto è quello che ti porta al livello successivo.' }
+};
+
+// ═══════════════════════════════════════════════════════════
+// SCORING
+// ═══════════════════════════════════════════════════════════
+function scoreSemaforo(perc, verif) {
+  if (perc === 'A') return 'red';
+  if (!verif) return 'yellow';
+  if (perc === 'B') { if (verif === 'A') return 'red'; return 'yellow'; }
+  if (perc === 'C') { if (verif === 'C' || verif === 'D') return 'green'; return 'yellow'; }
+  return 'yellow';
+}
+function isBias(perc, verif) { return perc === 'C' && (verif === 'A' || verif === 'B'); }
+function scorePlanet(s1, s2, s3) {
+  const v = s => s==='red'?0:s==='yellow'?1:2;
+  const t = v(s1)+v(s2)+v(s3);
+  return t<=1?'red':t<=3?'yellow':'green';
+}
+function determineArchetype() {
+  const fat = state.fatturato;
+  const sems = Object.values(state.planetSemafori);
+  const n = sems.length || 1;
+  const pR = sems.filter(s=>s==='red').length/n;
+  const pY = sems.filter(s=>s==='yellow').length/n;
+  const pG = sems.filter(s=>s==='green').length/n;
+  if ((fat==='A'||fat==='B') && pR>0.6) return 1;
+  if ((fat==='B'||fat==='C') && pR>=0.4 && pY>=0.3) return 2;
+  if ((fat==='C'||fat==='D') && pY>0.5) return 3;
+  if ((fat==='D'||fat==='E'||fat==='F') && pG>0.5) return 4;
+  if (fat==='A'||fat==='B') return 1;
+  if (fat==='C') return 2;
+  if (fat==='D') return 3;
+  return 4;
+}
+
+// ═══════════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('content-area').scrollTop = 0;
+  // swap logo: bianco su welcome (navy bg), scuro su resto (light bg)
+  const logoImg = document.getElementById('logo-img');
+  if (logoImg) logoImg.src = (id === 'screen-welcome') ? 'logo-bianco.svg' : 'logo-scuro.svg';
+}
+function setTopbar(showBack, counterText) {
+  // if showBack=false → always hide; if true → let updateBackBtn() decide based on _backAvailable
+  if (!showBack) document.getElementById('topbar-back').classList.add('hidden');
+  const counter = document.getElementById('topbar-counter');
+  if (counterText) { counter.textContent = counterText; counter.style.visibility = 'visible'; }
+  else { counter.style.visibility = 'hidden'; }
+}
+function setProgress(pct) {
+  const wrap = document.getElementById('progress-bar-wrap');
+  if (pct === null) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  wrap.style.visibility = 'visible';
+  document.getElementById('progress-bar-fill').style.width = pct + '%';
+}
+function setBtnLabel(text, disabled) {
+  document.getElementById('btn-label').textContent = text;
+  document.getElementById('btn-continue').disabled = !!disabled;
+}
+function setBtnVisible(v) {
+  document.getElementById('bottom-action').style.display = v ? '' : 'none';
+}
+function setTopbarVisible(v) {
+  document.getElementById('topbar').style.display = v ? 'flex' : 'none';
+}
+
+function updateBackBtn() {
+  const can = state._backAvailable;
+  document.getElementById('btn-go-back').style.display = can ? 'block' : 'none';
+  const topBtn = document.getElementById('topbar-back');
+  if (can) topBtn.classList.remove('hidden');
+  else topBtn.classList.add('hidden');
+}
+
+function markAdvanced() {
+  state._backAvailable = true;
+  updateBackBtn();
+}
+
+function goBackOne() {
+  if (!state._backAvailable) return;
+  state._backAvailable = false;
+  updateBackBtn();
+  goBack();
+}
+
+function renderOptions(options) {
+  const list = document.getElementById('options-list');
+  list.innerHTML = '';
+  options.forEach(opt => {
+    const card = document.createElement('div');
+    card.className = 'option-card';
+    card.dataset.letter = opt.l;
+    card.innerHTML = `
+      <div class="option-badge">${opt.l}</div>
+      <div class="option-text">${opt.t}</div>
+      <div class="option-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>`;
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.option-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      state._selectedLetter = opt.l;
+      document.getElementById('btn-continue').disabled = false;
+      // auto-advance: cancel any previous timer, then fire after 360ms
+      clearTimeout(_autoAdvanceTimer);
+      _autoAdvanceTimer = setTimeout(() => { handleContinue(); }, 360);
+    });
+    list.appendChild(card);
+  });
+}
+
+function showModuleCard(m) {
+  document.getElementById('q-module-icon').textContent = MODULE_ICONS[m];
+  document.getElementById('q-module-system').textContent = m === 0 ? 'Check-up professionale' : (MODULE_SYSTEMS[m] || '');
+  document.getElementById('q-module-name').textContent = MODULE_NAMES[m];
+}
+function showPillarTag(name) {
+  const tag = document.getElementById('q-pillar-tag');
+  if (name) { document.getElementById('q-pillar-text').textContent = name; tag.style.display = 'inline-flex'; }
+  else { tag.style.display = 'none'; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// FLOW STATE
+// ═══════════════════════════════════════════════════════════
+let module0Index = 0;
+let currentModule = 0;
+let currentPillarIndex = 0;
+let awaitingVerification = false;
+let awaitingOpenConditional = false;
+
+// ═══════════════════════════════════════════════════════════
+// ENTRY POINT
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  setBtnLabel('Inizia il check-up');
+  document.getElementById('btn-continue').disabled = false;
+  document.getElementById('btn-continue').onclick = () => {
+    document.getElementById('btn-continue').onclick = handleContinue;
+    startQuiz();
+  };
+  setBtnVisible(true);
+  setTopbar(false, null);
+  setProgress(null);
+});
+
+function startQuiz() {
+  module0Index = 0;
+  state.phase = 'module0';
+  setTopbar(false, null);
+  setProgress(null);
+  showModule0Question(0);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODULE 0
+// ═══════════════════════════════════════════════════════════
+function showModule0Question(idx) {
+  module0Index = idx;
+  const q = MODULE0[idx];
+  showModuleCard(0);
+  showPillarTag(null);
+  document.getElementById('q-sub').style.display = 'none';
+  document.getElementById('open-wrap').style.display = 'none';
+  document.getElementById('options-list').innerHTML = '';
+  state._selectedLetter = null;
+
+  if (q.type === 'open') {
+    state.history.push({type:'module0-open', idx});
+    document.getElementById('q-text').textContent = q.text;
+    document.getElementById('open-wrap').style.display = 'flex';
+    document.getElementById('open-input').maxLength = q.maxlength || 300;
+    document.getElementById('open-input').value = '';
+    document.getElementById('char-count').textContent = '0';
+    setBtnLabel('Continua →', false);
+  } else {
+    state.history.push({type:'module0', idx});
+    document.getElementById('q-text').textContent = q.text;
+    renderOptions(q.options);
+    setBtnLabel('Continua →', true);
+  }
+  setTopbar(idx > 0, null);
+  showScreen('screen-question');
+}
+
+// ═══════════════════════════════════════════════════════════
+// HANDLE CONTINUE
+// ═══════════════════════════════════════════════════════════
+function handleContinue() {
+  if (state.phase === 'module0') { handleModule0Continue(); return; }
+  if (state.phase === 'module') { handleModuleContinue(); return; }
+  if (state.phase === 'bridge') { afterBridge(); return; }
+}
+
+function handleModule0Continue() {
+  const q = MODULE0[module0Index];
+  if (q.type === 'open') {
+    state.openAnswers['q0_5'] = document.getElementById('open-input').value;
+  } else {
+    state.answers[q.id] = state._selectedLetter;
+    if (q.id === 'q0_3') state.fatturato = state._selectedLetter;
+  }
+  state._selectedLetter = null;
+  markAdvanced();
+  if (module0Index < MODULE0.length - 1) { showModule0Question(module0Index + 1); }
+  else { startModule(1); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODULE 1-9
+// ═══════════════════════════════════════════════════════════
+function startModule(m) {
+  currentModule = m;
+  currentPillarIndex = 0;
+  awaitingVerification = false;
+  awaitingOpenConditional = false;
+  state.phase = 'module';
+  setTopbarVisible(true);
+  setTopbar(true, `${m}/9`);
+  setProgress(Math.round((m-1)/9*100));
+  showPillarPerception(m, 0);
+}
+
+function showPillarPerception(m, pIdx) {
+  currentPillarIndex = pIdx;
+  awaitingVerification = false;
+  awaitingOpenConditional = false;
+  const mod = MODULES[m];
+  const pillar = mod.pillars[pIdx];
+  const perc = pillar.perception;
+  state.history.push({type:'perception', m, pIdx});
+  showModuleCard(m);
+  showPillarTag(pillar.name);
+  document.getElementById('q-sub').style.display = 'none';
+  document.getElementById('open-wrap').style.display = 'none';
+  document.getElementById('q-text').textContent = perc.text;
+  renderOptions(perc.options);
+  state._selectedLetter = null;
+  setBtnLabel('Continua →', true);
+  showScreen('screen-question');
+}
+
+function handleModuleContinue() {
+  const mod = MODULES[currentModule];
+  const pillar = mod.pillars[currentPillarIndex];
+
+  if (awaitingOpenConditional) {
+    state.openAnswers[`m${currentModule}_open`] = document.getElementById('open-input').value;
+    awaitingOpenConditional = false;
+    markAdvanced();
+    advanceAfterPillar();
+    return;
+  }
+
+  if (awaitingVerification) {
+    const letter = state._selectedLetter;
+    const verifId = pillar.verification.id;
+    state.answers[verifId] = letter;
+    const percLetter = state.answers[pillar.perception.id];
+    const sem = scoreSemaforo(percLetter, letter);
+    state.pillarSemafori[`m${currentModule}p${currentPillarIndex+1}`] = sem;
+    if (isBias(percLetter, letter)) state.biasFlags[`m${currentModule}`] = true;
+    state._selectedLetter = null;
+    awaitingVerification = false;
+
+    if (pillar.hasOpenConditional && state.biasFlags[`m${currentModule}`]) {
+      awaitingOpenConditional = true;
+      state.history.push({type:'open-conditional', m:currentModule, pIdx:currentPillarIndex});
+      showModuleCard(currentModule);
+      showPillarTag(null);
+      document.getElementById('q-sub').style.display = 'none';
+      document.getElementById('options-list').innerHTML = '';
+      document.getElementById('q-text').textContent = pillar.openConditional.text;
+      document.getElementById('open-wrap').style.display = 'flex';
+      document.getElementById('open-input').maxLength = pillar.openConditional.maxlength;
+      document.getElementById('open-input').value = '';
+      document.getElementById('char-count').textContent = '0';
+      setBtnLabel('Continua →', false);
+      markAdvanced();
+      showScreen('screen-question');
+      return;
+    }
+    markAdvanced();
+    advanceAfterPillar();
+    return;
+  }
+
+  // Was perception
+  const letter = state._selectedLetter;
+  state.answers[pillar.perception.id] = letter;
+  state._selectedLetter = null;
+
+  if (letter === 'A') {
+    state.pillarSemafori[`m${currentModule}p${currentPillarIndex+1}`] = 'red';
+    markAdvanced();
+    advanceAfterPillar();
+  } else {
+    awaitingVerification = true;
+    state.history.push({type:'verification', m:currentModule, pIdx:currentPillarIndex});
+    const sub = document.getElementById('q-sub');
+    sub.textContent = '↳ Domanda di approfondimento';
+    sub.style.display = 'block';
+    document.getElementById('open-wrap').style.display = 'none';
+    document.getElementById('q-text').textContent = pillar.verification.text;
+    renderOptions(pillar.verification.options);
+    state._selectedLetter = null;
+    setBtnLabel('Continua →', true);
+    markAdvanced();
+    showScreen('screen-question');
+  }
+}
+
+function advanceAfterPillar() {
+  const mod = MODULES[currentModule];
+  if (currentPillarIndex < mod.pillars.length - 1) {
+    showPillarPerception(currentModule, currentPillarIndex + 1);
+  } else {
+    finishModule(currentModule);
+  }
+}
+
+function finishModule(m) {
+  const sems = [
+    state.pillarSemafori[`m${m}p1`],
+    state.pillarSemafori[`m${m}p2`],
+    state.pillarSemafori[`m${m}p3`]
+  ];
+  state.planetSemafori[`p${m}`] = scorePlanet(sems[0], sems[1], sems[2]);
+  const mod = MODULES[m];
+  if (mod.bridges) {
+    const bKey = state.planetSemafori[`p${m}`];
+    const bridge = mod.bridges[bKey];
+    state.phase = 'bridge';
+    state._afterBridgeModule = m;
+    document.getElementById('bridge-module-label').textContent = MODULE_NAMES[m] + ' — completato';
+    document.getElementById('bridge-img-icon').textContent = MODULE_ICONS[m] || '🌍';
+    document.getElementById('bridge-icon').textContent = bridge.icon;
+    document.getElementById('bridge-title').textContent = bridge.title;
+    document.getElementById('bridge-text').textContent = bridge.text;
+    document.getElementById('bridge-next-label').textContent =
+      m < 9 ? `Prossima: ${MODULE_NAMES[m+1]} →` : 'Calcolo Clarity Map...';
+    setTopbarVisible(false);
+    setProgress(null);   // hide progress bar wrap entirely in bridge
+    // update bridge progress dots
+    const pct = Math.round(m/9*100);
+    document.getElementById('bridge-progress-fill').style.width = pct + '%';
+    document.getElementById('bridge-progress-label').textContent = `${m} di 9`;
+    setBtnLabel('Continua →', false);
+    state._backAvailable = false;
+    updateBackBtn();
+    showScreen('screen-bridge');
+  } else {
+    showClarityMap();
+  }
+}
+
+function afterBridge() {
+  const m = state._afterBridgeModule;
+  markAdvanced();
+  if (m < 9) { startModule(m + 1); }
+  else { showClarityMap(); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// CLARITY MAP
+// ═══════════════════════════════════════════════════════════
+function showClarityMap() {
+  state.archetipo = determineArchetype();
+  const arch = ARCHETIPI[state.archetipo];
+  document.getElementById('clarity-archetype-name').textContent = arch.name;
+  document.getElementById('clarity-archetype-fascia').textContent = arch.fascia;
+
+  // Grid
+  const grid = document.getElementById('planet-grid');
+  grid.innerHTML = '';
+  PLANET_NAMES.forEach((name, i) => {
+    const sem = state.planetSemafori[`p${i+1}`] || 'yellow';
+    const labels = {red:'Critico', yellow:'Da sviluppare', green:'Solido'};
+    const cell = document.createElement('div');
+    cell.className = 'planet-cell';
+    cell.innerHTML = `
+      <div class="planet-cell-icon">${PLANET_ICONS[i]}</div>
+      <div class="planet-cell-name">${name}</div>
+      <div class="sem-badge sem-badge-${sem}">
+        <div class="sem-dot-small" style="background:${sem==='red'?'#C0392B':sem==='yellow'?'#F39C12':'#27AE60'}"></div>
+        ${labels[sem]}
+      </div>`;
+    grid.appendChild(cell);
+  });
+
+  // Strengths
+  const sl = document.getElementById('strength-list');
+  sl.innerHTML = '';
+  let hasS = false;
+  PLANET_NAMES.forEach((name,i) => {
+    if (state.planetSemafori[`p${i+1}`]==='green') {
+      hasS = true;
+      sl.innerHTML += `<div class="result-row">
+        <div class="result-row-icon green-bg">${PLANET_ICONS[i]}</div>
+        <div class="result-row-label">${name}</div>
+        <div class="result-row-badge strength">✓ Solido</div>
+      </div>`;
+    }
+  });
+  document.getElementById('strengths-wrap').style.display = hasS ? '' : 'none';
+
+  // Priorities
+  const pl = document.getElementById('priority-list');
+  pl.innerHTML = '';
+  let hasP = false; let pc = 0;
+  PLANET_NAMES.forEach((name,i) => {
+    if (state.planetSemafori[`p${i+1}`]==='red' && pc < 3) {
+      hasP = true; pc++;
+      pl.innerHTML += `<div class="result-row">
+        <div class="result-row-icon red-bg">${PLANET_ICONS[i]}</div>
+        <div class="result-row-label">${name}</div>
+        <div class="result-row-badge priority">#${pc} Priorità</div>
+      </div>`;
+    }
+  });
+  document.getElementById('priorities-wrap').style.display = hasP ? '' : 'none';
+
+  // Archetype text
+  document.getElementById('archetype-text-box').innerHTML = `<p>${arch.text}</p>`;
+
+  setTopbar(false, null);
+  setProgress(100);
+  setBtnVisible(false);
+  showScreen('screen-clarity');
+}
+
+// ═══════════════════════════════════════════════════════════
+// BACK NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function goBack() {
+  if (state.history.length === 0) return;
+  const last = state.history.pop();
+
+  if (last.type === 'module0' || last.type === 'module0-open') {
+    state.phase = 'module0';
+    if (last.idx === 0) {
+      state._backAvailable = false; updateBackBtn();
+      showScreen('screen-welcome');
+      setTopbar(false, null); setProgress(null);
+      setBtnLabel('Inizia il check-up', false); setBtnVisible(true);
+      return;
+    }
+    showModule0Question(last.idx - 1);
+    state.history.pop();
+    state.history.push({type:last.type, idx:last.idx-1});
+    return;
+  }
+  if (last.type === 'perception') {
+    if (last.pIdx===0 && last.m===1) {
+      state.phase='module0';
+      setTopbar(false,null); setProgress(null);
+      showModule0Question(MODULE0.length-1);
+      return;
+    }
+    currentModule=last.m; currentPillarIndex=last.pIdx;
+    awaitingVerification=false; awaitingOpenConditional=false;
+    state.phase='module';
+    setTopbar(true,`${last.m}/9`);
+    setProgress(Math.round((last.m-1)/9*100));
+    showPillarPerception(last.m,last.pIdx);
+    state.history.pop(); state.history.push(last);
+    return;
+  }
+  if (last.type==='verification') {
+    currentModule=last.m; currentPillarIndex=last.pIdx;
+    awaitingVerification=false; state.phase='module';
+    setTopbar(true,`${last.m}/9`);
+    setProgress(Math.round((last.m-1)/9*100));
+    showPillarPerception(last.m,last.pIdx);
+    return;
+  }
+  if (last.type==='open-conditional') {
+    awaitingOpenConditional=false; awaitingVerification=true;
+    currentModule=last.m; currentPillarIndex=last.pIdx;
+    const mod=MODULES[last.m]; const pillar=mod.pillars[last.pIdx];
+    state.history.push({type:'verification',m:last.m,pIdx:last.pIdx});
+    document.getElementById('q-sub').textContent='↳ Domanda di approfondimento';
+    document.getElementById('q-sub').style.display='block';
+    document.getElementById('open-wrap').style.display='none';
+    document.getElementById('q-text').textContent=pillar.verification.text;
+    renderOptions(pillar.verification.options);
+    setBtnLabel('Continua →',true);
+    showScreen('screen-question');
+    return;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
+function updateCharCount() {
+  const len = document.getElementById('open-input').value.length;
+  document.getElementById('char-count').textContent = len;
+  document.getElementById('btn-continue').disabled = false;
+}
+
+function shareResults() {
+  const arch = ARCHETIPI[state.archetipo] || ARCHETIPI[1];
+  const text = `Ho appena fatto il Koachify Scan e sono "${arch.name}". Scopri il tuo profilo su koachify.it/scan`;
+  if (navigator.share) { navigator.share({title:'La mia Koachify Clarity Map',text}).catch(()=>{}); }
+  else { navigator.clipboard.writeText(text).then(()=>alert('Testo copiato! Incollalo dove vuoi.')).catch(()=>{}); }
+}
+
+try { localStorage.setItem('koachify_scan', JSON.stringify({v:1})); } catch(e){}
+</script>
+</body>
+</html>
