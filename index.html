@@ -367,6 +367,17 @@ html, body {
   background: var(--green);
 }
 
+/* Breadcrumb contestuale sopra la domanda */
+.q-context-row {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gray-mid);
+  margin-bottom: 5px;
+  flex-shrink: 0;
+}
+
 /* Question text */
 .q-text {
   font-size: 15px;
@@ -416,11 +427,14 @@ html, body {
 .option-card:active { transform: scale(0.985); }
 .option-card:hover {
   border-color: var(--green);
+  border-left: 3px solid var(--green);
+  background: #f5fbf0;
   box-shadow: var(--shadow-md);
 }
 .option-card.selected {
   border-color: var(--green);
-  background: var(--green-soft);
+  border-left: 3px solid var(--green);
+  background: #f0f9e8;
   box-shadow: 0 0 0 1px var(--green), var(--shadow-sm);
 }
 
@@ -446,14 +460,27 @@ html, body {
   color: var(--white);
 }
 
+.option-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 .option-text {
   font-size: 13px;
-  color: var(--text);
+  color: var(--navy);
   line-height: 1.35;
-  flex: 1;
-  font-weight: 500;
+  font-weight: 600;
 }
-.option-card.selected .option-text { color: var(--navy); font-weight: 600; }
+.option-subtext {
+  font-size: 11px;
+  color: #6B7F8A;
+  line-height: 1.3;
+  font-weight: 400;
+}
+.option-card.selected .option-text { color: var(--navy); font-weight: 700; }
+.option-card.selected .option-subtext { color: #5a6f7a; }
 
 /* Right: checkmark indicator */
 .option-check {
@@ -1067,6 +1094,9 @@ html, body {
       <!-- Sub label (for verification) -->
       <div class="q-sub-text" id="q-sub" style="display:none"></div>
 
+      <!-- Breadcrumb contestuale -->
+      <div class="q-context-row" id="q-context-row"></div>
+
       <!-- Question text -->
       <div class="q-text" id="q-text"></div>
 
@@ -1261,42 +1291,42 @@ const MODULES = {
   1: { name:'Pianeta Attrazione', system:'Sistema Prosperità', pillars:[
     { name:'Creare il proprio pubblico',
       perception:{ id:'q1_1p', text:'Quanto chiaramente sai descrivere a chi ti rivolgi — chi è esattamente il tuo cliente ideale e cosa lo distingue da tutti gli altri?', options:[
-        {l:'A',t:'Non ho ancora una risposta chiara — tendo a dire che aiuto chiunque voglia migliorare'},
-        {l:'B',t:'Ho un\'idea di chi è il mio cliente tipo, ma non l\'ho mai definita per iscritto'},
-        {l:'C',t:'Ho un profilo chiaro del mio cliente ideale e lo uso quando creo contenuti o offerte'}
+        {l:'A',t:'Non ho ancora una risposta chiara — tendo a dire che aiuto chiunque voglia migliorare',s:'Vuoi includere tutti, ma così non convinci nessuno in particolare'},
+        {l:'B',t:'Ho un\'idea di chi è il mio cliente tipo, ma non l\'ho mai definita per iscritto',s:'L\'intuizione c\'è, ma senza forma scritta non scala'},
+        {l:'C',t:'Ho un profilo chiaro del mio cliente ideale e lo uso quando creo contenuti o offerte',s:'Parli la lingua del tuo cliente — questo fa tutta la differenza'}
       ]},
       verification:{ id:'q1_1v', text:'Quale di queste cose hai già fatto o hai concretamente a disposizione oggi?', options:[
-        {l:'A',t:'Non ho niente di scritto — vado a istinto quando devo descrivere il mio cliente'},
-        {l:'B',t:'Ho una descrizione generale scritta da qualche parte, ma non la uso regolarmente'},
-        {l:'C',t:'Ho un documento con: situazione, problemi specifici, obiezioni e linguaggio del mio cliente — e lo consulto'},
-        {l:'D',t:'Ho tutto questo e ho anche parlato direttamente con persone del mio target per verificarlo'}
+        {l:'A',t:'Non ho niente di scritto — vado a istinto quando devo descrivere il mio cliente',s:'Vai a istinto — funziona fino a un certo punto'},
+        {l:'B',t:'Ho una descrizione generale scritta da qualche parte, ma non la uso regolarmente',s:'Hai scritto qualcosa, ma rimane in un cassetto'},
+        {l:'C',t:'Ho un documento con: situazione, problemi specifici, obiezioni e linguaggio del mio cliente — e lo consulto',s:'Conosci il tuo cliente meglio di quanto lui si conosca'},
+        {l:'D',t:'Ho tutto questo e ho anche parlato direttamente con persone del mio target per verificarlo',s:'Hai la voce del tuo cliente direttamente dalla fonte'}
       ]}
     },
     { name:'Diventare la guida del mercato',
       perception:{ id:'q1_2p', text:'Le persone del tuo settore ti riconoscono come un punto di riferimento — qualcuno da seguire per un motivo specifico?', options:[
-        {l:'A',t:'No — non sono ancora percepito come un\'autorità nel mio settore'},
-        {l:'B',t:'Qualcuno mi conosce e mi segue, ma non ho un posizionamento chiaro e riconoscibile'},
-        {l:'C',t:'Sì — ho un metodo o un punto di vista specifico che mi distingue e le persone mi seguono per quello'}
+        {l:'A',t:'No — non sono ancora percepito come un\'autorità nel mio settore',s:'Sei competente, ma nessuno lo sa ancora'},
+        {l:'B',t:'Qualcuno mi conosce e mi segue, ma non ho un posizionamento chiaro e riconoscibile',s:'Ti vedono, ma non capiscono esattamente perché scegliere te'},
+        {l:'C',t:'Sì — ho un metodo o un punto di vista specifico che mi distingue e le persone mi seguono per quello',s:'Hai un punto di vista unico che ti fa riconoscere'}
       ]},
       verification:{ id:'q1_2v', text:'Quale di queste situazioni descrive meglio la tua realtà oggi?', options:[
-        {l:'A',t:'Le persone mi contattano principalmente per passaparola da chi mi conosce già'},
-        {l:'B',t:'Ho contenuti online ma non seguono una linea editoriale precisa e coerente'},
-        {l:'C',t:'Ho un messaggio chiaro e riconoscibile che comunico in modo costante su almeno un canale'},
-        {l:'D',t:'Il mio nome o il mio metodo viene citato spontaneamente da altri nel mio settore'}
+        {l:'A',t:'Le persone mi contattano principalmente per passaparola da chi mi conosce già',s:'Il passaparola è prezioso, ma non è un sistema'},
+        {l:'B',t:'Ho contenuti online ma non seguono una linea editoriale precisa e coerente',s:'Crei contenuti ma senza una direzione chiara'},
+        {l:'C',t:'Ho un messaggio chiaro e riconoscibile che comunico in modo costante su almeno un canale',s:'Il tuo messaggio è coerente — le persone ti trovano per quello'},
+        {l:'D',t:'Il mio nome o il mio metodo viene citato spontaneamente da altri nel mio settore',s:'Sei diventato un punto di riferimento nel tuo settore'}
       ]}
     },
     { name:'Generare domanda', hasOpenConditional:true,
       openConditional:{ id:'q1_open', text:'Usando parole tue — come descriveresti oggi il tuo modo di trovare nuovi clienti?', maxlength:300, optional:true },
       perception:{ id:'q1_3p', text:'Hai un modo strutturato per far sapere alle persone giuste che esisti e portarle verso di te — indipendentemente dal passaparola?', options:[
-        {l:'A',t:'No — i clienti arrivano quasi solo per passaparola o per caso'},
-        {l:'B',t:'Faccio qualcosa (post, contenuti, qualche campagna) ma non è strutturato e i risultati sono irregolari'},
-        {l:'C',t:'Sì — ho un sistema che genera interesse e nuovi contatti in modo abbastanza costante'}
+        {l:'A',t:'No — i clienti arrivano quasi solo per passaparola o per caso',s:'Ogni mese ricomincia da zero — il passaparola non basta'},
+        {l:'B',t:'Faccio qualcosa (post, contenuti, qualche campagna) ma non è strutturato e i risultati sono irregolari',s:'Fai cose, ma i risultati non sono prevedibili'},
+        {l:'C',t:'Sì — ho un sistema che genera interesse e nuovi contatti in modo abbastanza costante',s:'Sai come farti trovare — il sistema gira anche senza di te'}
       ]},
       verification:{ id:'q1_3v', text:'Nelle ultime 4 settimane, cosa è successo nel tuo business in modo misurabile?', options:[
-        {l:'A',t:'Non ho traccia precisa di quante persone nuove ho raggiunto'},
-        {l:'B',t:'Ho pubblicato o fatto qualcosa, ma non so dirti quanti nuovi contatti ho generato'},
-        {l:'C',t:'So esattamente quanti nuovi contatti o richieste ho ricevuto questo mese'},
-        {l:'D',t:'Ho un sistema attivo che porta nuovi contatti ogni settimana in modo prevedibile'}
+        {l:'A',t:'Non ho traccia precisa di quante persone nuove ho raggiunto',s:'Non misuri perché non sai ancora cosa misurare'},
+        {l:'B',t:'Ho pubblicato o fatto qualcosa, ma non so dirti quanti nuovi contatti ho generato',s:'L\'impegno c\'è, ma non sai se sta portando risultati'},
+        {l:'C',t:'So esattamente quanti nuovi contatti o richieste ho ricevuto questo mese',s:'Controlli i numeri — sai dove stai andando'},
+        {l:'D',t:'Ho un sistema attivo che porta nuovi contatti ogni settimana in modo prevedibile',s:'Hai un motore di acquisizione che funziona ogni settimana'}
       ]}
     }
   ],
@@ -1307,41 +1337,41 @@ const MODULES = {
   2: { name:'Pianeta Conversione', system:'Sistema Prosperità', pillars:[
     { name:'Creare la giusta offerta',
       perception:{ id:'q2_1p', text:'Le persone che ti scoprono riescono a capire subito cosa offri, quanto costa e perché dovrebbero scegliere te?', options:[
-        {l:'A',t:'No — spesso devo spiegare molto prima che capiscano cosa faccio esattamente'},
-        {l:'B',t:'Qualcuno capisce, altri no — la mia offerta non è ancora chiarissima a tutti'},
-        {l:'C',t:'Sì — ho un\'offerta chiara, con un prezzo definito e un messaggio che funziona'}
+        {l:'A',t:'No — spesso devo spiegare molto prima che capiscano cosa faccio esattamente',s:'Devi spiegare troppo — l\'offerta non parla da sola'},
+        {l:'B',t:'Qualcuno capisce, altri no — la mia offerta non è ancora chiarissima a tutti',s:'Il messaggio è ancora sfumato — non tutti capiscono al volo'},
+        {l:'C',t:'Sì — ho un\'offerta chiara, con un prezzo definito e un messaggio che funziona',s:'La tua offerta si capisce senza bisogno di spiegarla'}
       ]},
       verification:{ id:'q2_1v', text:'Quale di queste cose hai fatto o hai a disposizione oggi?', options:[
-        {l:'A',t:'Non ho un\'offerta strutturata — vendo un po\' caso per caso in base a cosa chiede il cliente'},
-        {l:'B',t:'Ho un\'offerta base ma non ha un prezzo fisso o una struttura definita'},
-        {l:'C',t:'Ho almeno un\'offerta con nome, prezzo, durata e benefici scritti chiaramente'},
-        {l:'D',t:'Ho più offerte strutturate per diversi livelli di clienti, con pagine di vendita o materiali dedicati'}
+        {l:'A',t:'Non ho un\'offerta strutturata — vendo un po\' caso per caso in base a cosa chiede il cliente',s:'Nessuna offerta standard — ogni vendita è inventata sul momento'},
+        {l:'B',t:'Ho un\'offerta base ma non ha un prezzo fisso o una struttura definita',s:'Hai qualcosa ma manca struttura e chiarezza di prezzo'},
+        {l:'C',t:'Ho almeno un\'offerta con nome, prezzo, durata e benefici scritti chiaramente',s:'Offerta definita, prezzo chiaro, messaggio scritto'},
+        {l:'D',t:'Ho più offerte strutturate per diversi livelli di clienti, con pagine di vendita o materiali dedicati',s:'Portfolio di offerte per ogni stadio del cliente'}
       ]}
     },
     { name:'Avere flussi di vendita',
       perception:{ id:'q2_2p', text:'Hai un processo ripetibile che porta le persone interessate a diventare tuoi clienti paganti — senza doverlo reinventare ogni volta?', options:[
-        {l:'A',t:'No — ogni vendita è diversa, vado un po\' a intuito o aspetto che siano loro a chiedermi'},
-        {l:'B',t:'Ho qualcosa ma non è strutturato — a volte funziona, a volte no'},
-        {l:'C',t:'Sì — ho un processo di vendita che seguo e che mi dà risultati abbastanza costanti'}
+        {l:'A',t:'No — ogni vendita è diversa, vado un po\' a intuito o aspetto che siano loro a chiedermi',s:'La vendita ti pesa e ogni volta sembra un nuovo inizio'},
+        {l:'B',t:'Ho qualcosa ma non è strutturato — a volte funziona, a volte no',s:'Vendi, ma non riesci ancora a replicare il processo'},
+        {l:'C',t:'Sì — ho un processo di vendita che seguo e che mi dà risultati abbastanza costanti',s:'Segui un processo — la vendita è prevedibile'}
       ]},
       verification:{ id:'q2_2v', text:'Cosa hai concretamente attivo oggi per convertire l\'interesse in vendite?', options:[
-        {l:'A',t:'Niente di strutturato — rispondo a chi mi contatta e vedo come va'},
-        {l:'B',t:'Ho un modo per parlare con i potenziali clienti ma non ho uno script o un processo'},
-        {l:'C',t:'Ho una call di vendita strutturata o un processo definito che seguo con ogni prospect'},
-        {l:'D',t:'Ho funnel, automazioni o sequenze che prelavorano il contatto prima che arrivi alla call o alla vendita'}
+        {l:'A',t:'Niente di strutturato — rispondo a chi mi contatta e vedo come va',s:'Aspetti che siano loro a chiederti — non è un sistema'},
+        {l:'B',t:'Ho un modo per parlare con i potenziali clienti ma non ho uno script o un processo',s:'Parli con i prospect ma improvvisi ogni volta'},
+        {l:'C',t:'Ho una call di vendita strutturata o un processo definito che seguo con ogni prospect',s:'Hai una call strutturata che porta risultati costanti'},
+        {l:'D',t:'Ho funnel, automazioni o sequenze che prelavorano il contatto prima che arrivi alla call o alla vendita',s:'Il sistema vende anche quando non sei presente'}
       ]}
     },
     { name:'Ciclo promozionale',
       perception:{ id:'q2_3p', text:'Fai attività promozionale in modo regolare e pianificato — o solo quando hai bisogno di nuovi clienti?', options:[
-        {l:'A',t:'Solo quando ne ho bisogno — non ho un calendario o una routine promozionale'},
-        {l:'B',t:'Ogni tanto faccio qualcosa ma non è pianificato — dipende dall\'umore o dal tempo'},
-        {l:'C',t:'Sì — ho un ritmo promozionale regolare che seguo indipendentemente dalla situazione'}
+        {l:'A',t:'Solo quando ne ho bisogno — non ho un calendario o una routine promozionale',s:'Fai marketing solo quando hai paura di non avere clienti'},
+        {l:'B',t:'Ogni tanto faccio qualcosa ma non è pianificato — dipende dall\'umore o dal tempo',s:'L\'attività promozionale dipende dall\'umore del giorno'},
+        {l:'C',t:'Sì — ho un ritmo promozionale regolare che seguo indipendentemente dalla situazione',s:'Il marketing è un\'abitudine, non un\'emergenza'}
       ]},
       verification:{ id:'q2_3v', text:'Nelle ultime 8 settimane, hai fatto almeno una di queste cose in modo deliberato?', options:[
-        {l:'A',t:'No — non ho fatto niente di pianificato sul lato commerciale'},
-        {l:'B',t:'Ho fatto qualcosa spontaneamente ma non era pianificato in anticipo'},
-        {l:'C',t:'Ho fatto almeno un\'azione promozionale pianificata (lancio, offerta, campagna, sequenza email)'},
-        {l:'D',t:'Ho un calendario promozionale mensile che include lanci, nurturing e riattivazione clienti'}
+        {l:'A',t:'No — non ho fatto niente di pianificato sul lato commerciale',s:'Zero pianificazione commerciale — tutto improvvisato'},
+        {l:'B',t:'Ho fatto qualcosa spontaneamente ma non era pianificato in anticipo',s:'Hai fatto qualcosa, ma non era nel piano'},
+        {l:'C',t:'Ho fatto almeno un\'azione promozionale pianificata (lancio, offerta, campagna, sequenza email)',s:'Almeno un\'azione promozionale pianificata nel periodo'},
+        {l:'D',t:'Ho un calendario promozionale mensile che include lanci, nurturing e riattivazione clienti',s:'Calendario promozionale mensile strutturato e seguito'}
       ]}
     }
   ],
@@ -1352,41 +1382,41 @@ const MODULES = {
   3: { name:'Pianeta Viaggio', system:'Sistema Prosperità', pillars:[
     { name:'Percorso del cliente',
       perception:{ id:'q3_1p', text:'I tuoi clienti sanno esattamente cosa li aspetta nel percorso con te — e hanno ragione per restare nel tempo o acquistare di nuovo?', options:[
-        {l:'A',t:'No — lavoro sessione per sessione, non c\'è un percorso strutturato'},
-        {l:'B',t:'Ho qualcosa ma non è definito chiaramente — il cliente non vede sempre il quadro completo'},
-        {l:'C',t:'Sì — ho un percorso strutturato che mostro al cliente fin dall\'inizio'}
+        {l:'A',t:'No — lavoro sessione per sessione, non c\'è un percorso strutturato',s:'Ogni sessione è un mondo a sé — nessuna continuità chiara'},
+        {l:'B',t:'Ho qualcosa ma non è definito chiaramente — il cliente non vede sempre il quadro completo',s:'Sai cosa farai, ma il cliente non vede la mappa'},
+        {l:'C',t:'Sì — ho un percorso strutturato che mostro al cliente fin dall\'inizio',s:'Il cliente sa dove va fin dal primo giorno'}
       ]},
       verification:{ id:'q3_1v', text:'Quale di queste cose hai attiva oggi?', options:[
-        {l:'A',t:'Non ho un percorso definito — ogni cliente è un caso a sé'},
-        {l:'B',t:'Ho un\'idea del percorso in testa ma non l\'ho mai formalizzata o mostrata ai clienti'},
-        {l:'C',t:'Ho un percorso visivo o scritto che mostro ai nuovi clienti per far capire il viaggio completo'},
-        {l:'D',t:'Ho più livelli o fasi del percorso con opzioni di rinnovo o upgrade integrate'}
+        {l:'A',t:'Non ho un percorso definito — ogni cliente è un caso a sé',s:'Ogni cliente è un progetto su misura — nessuna struttura'},
+        {l:'B',t:'Ho un\'idea del percorso in testa ma non l\'ho mai formalizzata o mostrata ai clienti',s:'Il percorso esiste nella tua testa, non sulla carta'},
+        {l:'C',t:'Ho un percorso visivo o scritto che mostro ai nuovi clienti per far capire il viaggio completo',s:'Mostri il viaggio completo prima di iniziare'},
+        {l:'D',t:'Ho più livelli o fasi del percorso con opzioni di rinnovo o upgrade integrate',s:'Percorso multi-livello con upgrade integrati'}
       ]}
     },
     { name:'Proprietà intellettuale',
       perception:{ id:'q3_2p', text:'Hai un metodo, un framework o un approccio tuo che ti distingue dagli altri e che potresti spiegare in modo chiaro a chiunque?', options:[
-        {l:'A',t:'No — lavoro in modo intuitivo, non ho un metodo formalizzato'},
-        {l:'B',t:'Ho qualcosa che uso ma non l\'ho mai scritto o definito in modo preciso'},
-        {l:'C',t:'Sì — ho un mio metodo con un nome, dei passi definiti e lo comunico chiaramente'}
+        {l:'A',t:'No — lavoro in modo intuitivo, non ho un metodo formalizzato',s:'Fai un ottimo lavoro ma non puoi replicarlo o delegarlo'},
+        {l:'B',t:'Ho qualcosa che uso ma non l\'ho mai scritto o definito in modo preciso',s:'Hai un approccio tuo ma non l\'hai mai messo su carta'},
+        {l:'C',t:'Sì — ho un mio metodo con un nome, dei passi definiti e lo comunico chiaramente',s:'Il tuo metodo ha un nome — e si distingue dalla concorrenza'}
       ]},
       verification:{ id:'q3_2v', text:'Quale di queste cose hai fatto o hai a disposizione?', options:[
-        {l:'A',t:'Non ho niente di scritto sul mio approccio o metodo'},
-        {l:'B',t:'Ho degli appunti o materiali sparsi ma non organizzati in un sistema coerente'},
-        {l:'C',t:'Ho un documento o una presentazione che descrive il mio metodo in modo chiaro e replicabile'},
-        {l:'D',t:'Ho un metodo con nome proprio, struttura definita e materiali formativi o di supporto'}
+        {l:'A',t:'Non ho niente di scritto sul mio approccio o metodo',s:'Nulla di scritto — tutto vive nella tua testa'},
+        {l:'B',t:'Ho degli appunti o materiali sparsi ma non organizzati in un sistema coerente',s:'Hai materiali sparsi ma non un sistema coerente'},
+        {l:'C',t:'Ho un documento o una presentazione che descrive il mio metodo in modo chiaro e replicabile',s:'Il tuo metodo è documentato e presentabile'},
+        {l:'D',t:'Ho un metodo con nome proprio, struttura definita e materiali formativi o di supporto',s:'Metodo proprietario con nome, struttura e materiali'}
       ]}
     },
     { name:'Esperienza del cliente',
       perception:{ id:'q3_3p', text:'I tuoi clienti vivono un\'esperienza coerente e curata in ogni momento del loro percorso con te — dal primo contatto all\'erogazione del servizio?', options:[
-        {l:'A',t:'No — mi concentro sul contenuto ma l\'esperienza intorno non è curata'},
-        {l:'B',t:'Alcune parti sono curate, altre no — non è uniforme'},
-        {l:'C',t:'Sì — ogni punto di contatto con il cliente è pensato e curato'}
+        {l:'A',t:'No — mi concentro sul contenuto ma l\'esperienza intorno non è curata',s:'Il contenuto è buono, ma l\'esperienza intorno è casuale'},
+        {l:'B',t:'Alcune parti sono curate, altre no — non è uniforme',s:'Alcune cose sono curate, altre lasciate al caso'},
+        {l:'C',t:'Sì — ogni punto di contatto con il cliente è pensato e curato',s:'Ogni momento del percorso è pensato — il cliente lo sente'}
       ]},
       verification:{ id:'q3_3v', text:'Quale di queste cose hai attiva oggi?', options:[
-        {l:'A',t:'Non ho pensato sistematicamente all\'esperienza del cliente — vado a istinto'},
-        {l:'B',t:'Ho qualche elemento curato (es. i materiali del corso o le sessioni) ma non tutto il percorso'},
-        {l:'C',t:'Ho un onboarding strutturato, comunicazioni regolari e un sistema per raccogliere feedback'},
-        {l:'D',t:'Ho un customer journey mappato con ogni touchpoint definito, dalla scoperta al post-servizio'}
+        {l:'A',t:'Non ho pensato sistematicamente all\'esperienza del cliente — vado a istinto',s:'L\'esperienza è lasciata al caso — va come va'},
+        {l:'B',t:'Ho qualche elemento curato (es. i materiali del corso o le sessioni) ma non tutto il percorso',s:'Hai curato alcuni momenti ma non l\'intero percorso'},
+        {l:'C',t:'Ho un onboarding strutturato, comunicazioni regolari e un sistema per raccogliere feedback',s:'Onboarding, comunicazione e feedback strutturati'},
+        {l:'D',t:'Ho un customer journey mappato con ogni touchpoint definito, dalla scoperta al post-servizio',s:'Customer journey completo da scoperta a post-servizio'}
       ]}
     }
   ],
@@ -1397,41 +1427,41 @@ const MODULES = {
   4: { name:'Pianeta Architettura', system:'Sistema Libertà', pillars:[
     { name:'Registri e documenti',
       perception:{ id:'q4_1p', text:'Hai tutti i documenti fondamentali del tuo business scritti, aggiornati e facilmente consultabili — come il tuo posizionamento, il profilo cliente, le tue offerte, i tuoi prezzi?', options:[
-        {l:'A',t:'No — ho tutto in testa o sparso, niente di organizzato per iscritto'},
-        {l:'B',t:'Ho qualcosa ma è incompleto o non lo aggiorno mai'},
-        {l:'C',t:'Sì — ho i documenti principali del mio business scritti e li consulto regolarmente'}
+        {l:'A',t:'No — ho tutto in testa o sparso, niente di organizzato per iscritto',s:'Il tuo business vive solo nella tua testa — rischio alto'},
+        {l:'B',t:'Ho qualcosa ma è incompleto o non lo aggiorno mai',s:'Hai qualcosa scritto ma non è mai aggiornato'},
+        {l:'C',t:'Sì — ho i documenti principali del mio business scritti e li consulto regolarmente',s:'Ogni decisione parte da documenti aggiornati'}
       ]},
       verification:{ id:'q4_1v', text:'Quale di questi documenti hai effettivamente scritto e aggiornato negli ultimi 6 mesi?', options:[
-        {l:'A',t:'Nessuno — non ho documenti strutturati sul mio business'},
-        {l:'B',t:'Uno o due — qualcosa c\'è ma non è completo né aggiornato'},
-        {l:'C',t:'La maggior parte: posizionamento, offerte, profilo cliente e prezzi sono scritti'},
-        {l:'D',t:'Tutto: ho un documento master del mio business che aggiorno regolarmente'}
+        {l:'A',t:'Nessuno — non ho documenti strutturati sul mio business',s:'Zero documentazione — tutto a memoria'},
+        {l:'B',t:'Uno o due — qualcosa c\'è ma non è completo né aggiornato',s:'Uno o due documenti incompleti o vecchi'},
+        {l:'C',t:'La maggior parte: posizionamento, offerte, profilo cliente e prezzi sono scritti',s:'Posizionamento, offerte e prezzi tutti scritti'},
+        {l:'D',t:'Tutto: ho un documento master del mio business che aggiorno regolarmente',s:'Documento master del business aggiornato regolarmente'}
       ]}
     },
     { name:'Processi di marketing',
       perception:{ id:'q4_2p', text:'I tuoi processi di marketing sono scritti e replicabili — sai esattamente cosa fare ogni settimana per attrarre e convertire clienti?', options:[
-        {l:'A',t:'No — vado a istinto, non ho processi scritti'},
-        {l:'B',t:'Ho qualcosa in testa ma non è scritto — dipende da come mi sento quel giorno'},
-        {l:'C',t:'Sì — ho un piano editoriale, una routine di marketing e processi definiti'}
+        {l:'A',t:'No — vado a istinto, non ho processi scritti',s:'Fai quello che ti senti — nessuna routine definita'},
+        {l:'B',t:'Ho qualcosa in testa ma non è scritto — dipende da come mi sento quel giorno',s:'La routine di marketing esiste solo nella tua testa'},
+        {l:'C',t:'Sì — ho un piano editoriale, una routine di marketing e processi definiti',s:'Sai esattamente cosa fare ogni settimana'}
       ]},
       verification:{ id:'q4_2v', text:'Quale di queste situazioni descrive meglio la tua routine di marketing oggi?', options:[
-        {l:'A',t:'Non ho una routine — faccio marketing quando mi ricordo o quando ho paura di non avere clienti'},
-        {l:'B',t:'Ho qualche abitudine ma non è strutturata — a volte seguo un piano, a volte no'},
-        {l:'C',t:'Ho una routine settimanale definita per i contenuti, le comunicazioni e le attività di marketing'},
-        {l:'D',t:'Ho processi documentati per ogni attività di marketing che posso delegare o replicare facilmente'}
+        {l:'A',t:'Non ho una routine — faccio marketing quando mi ricordo o quando ho paura di non avere clienti',s:'Marketing solo in modalità emergenza'},
+        {l:'B',t:'Ho qualche abitudine ma non è strutturata — a volte seguo un piano, a volte no',s:'Qualche abitudine ma nessuna struttura reale'},
+        {l:'C',t:'Ho una routine settimanale definita per i contenuti, le comunicazioni e le attività di marketing',s:'Routine settimanale definita e seguita'},
+        {l:'D',t:'Ho processi documentati per ogni attività di marketing che posso delegare o replicare facilmente',s:'Processi documentati e delegabili'}
       ]}
     },
     { name:'Processi gestione interna',
       perception:{ id:'q4_3p', text:'La gestione interna del tuo business — amministrazione, clienti, appuntamenti, pagamenti — è organizzata in modo che non dipenda tutto dalla tua testa?', options:[
-        {l:'A',t:'No — gestisco tutto mentalmente e rischio di perdere cose'},
-        {l:'B',t:'Ho qualche sistema ma non copre tutto — alcune aree sono ancora caotiche'},
-        {l:'C',t:'Sì — ho procedure chiare per la gestione interna del mio business'}
+        {l:'A',t:'No — gestisco tutto mentalmente e rischio di perdere cose',s:'Tutto nella testa — rischi di perdere cose importanti'},
+        {l:'B',t:'Ho qualche sistema ma non copre tutto — alcune aree sono ancora caotiche',s:'Hai qualche sistema ma alcune aree restano caotiche'},
+        {l:'C',t:'Sì — ho procedure chiare per la gestione interna del mio business',s:'La gestione non dipende dalla tua memoria'}
       ]},
       verification:{ id:'q4_3v', text:'Quale di queste cose hai attiva oggi?', options:[
-        {l:'A',t:'Niente di strutturato — uso email, messaggi e memoria per gestire tutto'},
-        {l:'B',t:'Ho qualche strumento (agenda, fogli Excel) ma non ho un sistema integrato'},
-        {l:'C',t:'Ho un CRM o strumento di gestione dove tengo clienti, appuntamenti e comunicazioni'},
-        {l:'D',t:'Ho procedure operative standard per ogni area — qualcuno potrebbe gestire il mio business seguendole'}
+        {l:'A',t:'Niente di strutturato — uso email, messaggi e memoria per gestire tutto',s:'Email, WhatsApp e memoria — il caos quotidiano'},
+        {l:'B',t:'Ho qualche strumento (agenda, fogli Excel) ma non ho un sistema integrato',s:'Excel o agenda ma senza un sistema integrato'},
+        {l:'C',t:'Ho un CRM o strumento di gestione dove tengo clienti, appuntamenti e comunicazioni',s:'CRM attivo con clienti, appuntamenti e comunicazioni'},
+        {l:'D',t:'Ho procedure operative standard per ogni area — qualcuno potrebbe gestire il mio business seguendole',s:'Procedure operative che chiunque potrebbe seguire'}
       ]}
     }
   ],
@@ -1442,41 +1472,41 @@ const MODULES = {
   5: { name:'Pianeta Laboratorio', system:'Sistema Libertà', pillars:[
     { name:'CRM tools',
       perception:{ id:'q5_1p', text:'Hai uno strumento dove tieni traccia di tutti i tuoi contatti, clienti e conversazioni — senza dover ricordare tutto a memoria?', options:[
-        {l:'A',t:'No — uso email, messaggi e memoria. Non ho un sistema per gestire i contatti'},
-        {l:'B',t:'Ho qualcosa (fogli Excel, note) ma non è un sistema vero e proprio'},
-        {l:'C',t:'Sì — ho un CRM o strumento dedicato dove gestisco tutti i miei contatti'}
+        {l:'A',t:'No — uso email, messaggi e memoria. Non ho un sistema per gestire i contatti',s:'Gestisci tutto nella testa — e ogni giorno è un rischio'},
+        {l:'B',t:'Ho qualcosa (fogli Excel, note) ma non è un sistema vero e proprio',s:'Hai qualcosa, ma non è ancora un vero sistema'},
+        {l:'C',t:'Sì — ho un CRM o strumento dedicato dove gestisco tutti i miei contatti',s:'Ogni contatto ha la sua storia e il suo stato aggiornato'}
       ]},
       verification:{ id:'q5_1v', text:'Quale di queste situazioni descrive meglio il tuo sistema contatti oggi?', options:[
-        {l:'A',t:'Gestisco tutto tra email, WhatsApp e memoria — non ho un archivio strutturato'},
-        {l:'B',t:'Ho un foglio Excel o un documento ma non è sempre aggiornato'},
-        {l:'C',t:'Ho un CRM dove registro i contatti, lo stato di ogni trattativa e le note sulle conversazioni'},
-        {l:'D',t:'Ho un CRM integrato con automazioni, tag e pipeline che gestisce i contatti in modo automatico'}
+        {l:'A',t:'Gestisco tutto tra email, WhatsApp e memoria — non ho un archivio strutturato',s:'Archivio tra email, WhatsApp e memoria — instabile'},
+        {l:'B',t:'Ho un foglio Excel o un documento ma non è sempre aggiornato',s:'Foglio Excel che non aggiorni mai abbastanza'},
+        {l:'C',t:'Ho un CRM dove registro i contatti, lo stato di ogni trattativa e le note sulle conversazioni',s:'CRM con contatti, trattative e note sempre aggiornate'},
+        {l:'D',t:'Ho un CRM integrato con automazioni, tag e pipeline che gestisce i contatti in modo automatico',s:'CRM con automazioni, tag e pipeline integrate'}
       ]}
     },
     { name:'Marketing tools',
       perception:{ id:'q5_2p', text:'Gli strumenti che usi per fare marketing — sito, email, social, funnel — sono integrati tra loro o ognuno funziona in modo separato?', options:[
-        {l:'A',t:'Uso strumenti separati che non si parlano tra loro — è caotico e costoso'},
-        {l:'B',t:'Ho qualcosa di integrato ma non tutto — ci sono ancora pezzi scollegati'},
-        {l:'C',t:'Sì — i miei strumenti di marketing sono integrati e lavorano insieme'}
+        {l:'A',t:'Uso strumenti separati che non si parlano tra loro — è caotico e costoso',s:'Strumenti che non si parlano = lavoro doppio ogni giorno'},
+        {l:'B',t:'Ho qualcosa di integrato ma non tutto — ci sono ancora pezzi scollegati',s:'Qualcosa è integrato, ma ci sono ancora pezzi scollegati'},
+        {l:'C',t:'Sì — i miei strumenti di marketing sono integrati e lavorano insieme',s:'I tuoi strumenti lavorano insieme — risparmi tempo'}
       ]},
       verification:{ id:'q5_2v', text:'Quanti strumenti separati stai pagando oggi per gestire il tuo marketing e il tuo business?', options:[
-        {l:'A',t:'Più di 6 strumenti diversi — e spesso non si integrano bene tra loro'},
-        {l:'B',t:'Tra 3 e 6 strumenti — alcuni integrati, altri no'},
-        {l:'C',t:'2-3 strumenti ben integrati che coprono la maggior parte delle mie esigenze'},
-        {l:'D',t:'Un unico strumento che gestisce CRM, email, funnel, corsi e comunicazioni in modo integrato'}
+        {l:'A',t:'Più di 6 strumenti diversi — e spesso non si integrano bene tra loro',s:'Più di 6 tool separati che costano e complicano'},
+        {l:'B',t:'Tra 3 e 6 strumenti — alcuni integrati, altri no',s:'Tra 3 e 6 strumenti, parzialmente integrati'},
+        {l:'C',t:'2-3 strumenti ben integrati che coprono la maggior parte delle mie esigenze',s:'2-3 strumenti ben integrati che coprono il necessario'},
+        {l:'D',t:'Un unico strumento che gestisce CRM, email, funnel, corsi e comunicazioni in modo integrato',s:'Un unico strumento che gestisce tutto in modo integrato'}
       ]}
     },
     { name:'Tools analisi e KPI',
       perception:{ id:'q5_3p', text:'Sai esattamente come sta andando il tuo business — hai numeri chiari su entrate, clienti, tassi di conversione e attività?', options:[
-        {l:'A',t:'No — non monitoro i numeri in modo sistematico'},
-        {l:'B',t:'Monitoro alcune cose ma non ho una visione completa e regolare'},
-        {l:'C',t:'Sì — ho KPI definiti che monitoro regolarmente e su cui baso le mie decisioni'}
+        {l:'A',t:'No — non monitoro i numeri in modo sistematico',s:'Non misuri — prendi decisioni nel buio'},
+        {l:'B',t:'Monitoro alcune cose ma non ho una visione completa e regolare',s:'Vedi alcuni numeri ma non hai il quadro completo'},
+        {l:'C',t:'Sì — ho KPI definiti che monitoro regolarmente e su cui baso le mie decisioni',s:'I numeri guidano le tue decisioni — non l\'umore'}
       ]},
       verification:{ id:'q5_3v', text:'Quale di queste cose fai oggi?', options:[
-        {l:'A',t:'Non guardo i numeri — vado a sensazione su come sta andando il business'},
-        {l:'B',t:'Controllo le entrate ogni tanto ma non ho KPI strutturati'},
-        {l:'C',t:'Monitoro regolarmente: entrate mensili, nuovi contatti, tasso di conversione, clienti attivi'},
-        {l:'D',t:'Ho una dashboard con tutti i KPI chiave che aggiorno settimanalmente per prendere decisioni'}
+        {l:'A',t:'Non guardo i numeri — vado a sensazione su come sta andando il business',s:'Vai a sensazione su come sta andando il business'},
+        {l:'B',t:'Controllo le entrate ogni tanto ma non ho KPI strutturati',s:'Controlli le entrate ma senza KPI strutturati'},
+        {l:'C',t:'Monitoro regolarmente: entrate mensili, nuovi contatti, tasso di conversione, clienti attivi',s:'Monitori entrate, contatti, conversioni e clienti attivi'},
+        {l:'D',t:'Ho una dashboard con tutti i KPI chiave che aggiorno settimanalmente per prendere decisioni',s:'Dashboard settimanale con tutti i KPI chiave'}
       ]}
     }
   ],
@@ -1487,41 +1517,41 @@ const MODULES = {
   6: { name:'Pianeta Moltiplicazione', system:'Sistema Libertà', pillars:[
     { name:'Team e collaboratori',
       perception:{ id:'q6_1p', text:'Hai qualcuno che ti aiuta nel tuo business — anche solo per alcune attività specifiche — oppure fai davvero tutto da solo?', options:[
-        {l:'A',t:'Faccio tutto da solo — non ho nessun collaboratore né figura di supporto'},
-        {l:'B',t:'Ho qualcuno ma in modo informale o saltuario — non è una collaborazione strutturata'},
-        {l:'C',t:'Sì — ho almeno un collaboratore o figura di supporto con ruolo e compiti definiti'}
+        {l:'A',t:'Faccio tutto da solo — non ho nessun collaboratore né figura di supporto',s:'Sei il collo di bottiglia di ogni cosa nel tuo business'},
+        {l:'B',t:'Ho qualcuno ma in modo informale o saltuario — non è una collaborazione strutturata',s:'Qualcuno ti aiuta ma senza ruolo o struttura definita'},
+        {l:'C',t:'Sì — ho almeno un collaboratore o figura di supporto con ruolo e compiti definiti',s:'Hai persone con ruoli chiari che lavorano senza di te'}
       ]},
       verification:{ id:'q6_1v', text:'Come descrivi meglio la tua situazione con i collaboratori oggi?', options:[
-        {l:'A',t:'Ho provato a delegare ma non ha funzionato — ho finito per rifare tutto da solo'},
-        {l:'B',t:'Ho qualcuno che mi aiuta su richiesta ma non ha compiti fissi o responsabilità chiare'},
-        {l:'C',t:'Ho almeno una figura con ruolo definito, compiti chiari e autonomia operativa'},
-        {l:'D',t:'Ho un team strutturato con ruoli, responsabilità e processi che funzionano senza di me'}
+        {l:'A',t:'Ho provato a delegare ma non ha funzionato — ho finito per rifare tutto da solo',s:'Hai provato a delegare ma hai finito per rifare tutto'},
+        {l:'B',t:'Ho qualcuno che mi aiuta su richiesta ma non ha compiti fissi o responsabilità chiare',s:'Qualcuno ti aiuta su richiesta ma senza continuità'},
+        {l:'C',t:'Ho almeno una figura con ruolo definito, compiti chiari e autonomia operativa',s:'Almeno una figura con ruolo, compiti e autonomia'},
+        {l:'D',t:'Ho un team strutturato con ruoli, responsabilità e processi che funzionano senza di me',s:'Team strutturato che funziona senza la tua presenza'}
       ]}
     },
     { name:'AI al proprio servizio',
       perception:{ id:'q6_2p', text:'Usi strumenti di intelligenza artificiale in modo regolare per risparmiare tempo su attività ripetitive del tuo business?', options:[
-        {l:'A',t:'No — non uso l\'AI o la uso raramente senza un metodo preciso'},
-        {l:'B',t:'Uso qualcosa (ChatGPT o altro) ma in modo sporadico, senza un sistema'},
-        {l:'C',t:'Sì — ho integrato strumenti AI nel mio flusso di lavoro quotidiano in modo regolare'}
+        {l:'A',t:'No — non uso l\'AI o la uso raramente senza un metodo preciso',s:'Non usi l\'AI o la usi raramente senza un metodo'},
+        {l:'B',t:'Uso qualcosa (ChatGPT o altro) ma in modo sporadico, senza un sistema',s:'Usi ChatGPT ogni tanto ma senza un flusso definito'},
+        {l:'C',t:'Sì — ho integrato strumenti AI nel mio flusso di lavoro quotidiano in modo regolare',s:'L\'AI fa parte della tua routine di lavoro quotidiana'}
       ]},
       verification:{ id:'q6_2v', text:'Su quali attività usi l\'AI in modo regolare oggi?', options:[
-        {l:'A',t:'Quasi nessuna — non so bene come usarla in modo utile per il mio business'},
-        {l:'B',t:'Solo per scrivere contenuti ogni tanto — niente di sistematico'},
-        {l:'C',t:'Uso l\'AI per contenuti, email, ricerche e almeno un\'altra attività in modo regolare'},
-        {l:'D',t:'Ho automatizzato con AI diverse attività ripetitive — la uso come un collaboratore virtuale'}
+        {l:'A',t:'Quasi nessuna — non so bene come usarla in modo utile per il mio business',s:'Non sai ancora come integrarla nel tuo business'},
+        {l:'B',t:'Solo per scrivere contenuti ogni tanto — niente di sistematico',s:'Solo per i contenuti — niente di sistematico'},
+        {l:'C',t:'Uso l\'AI per contenuti, email, ricerche e almeno un\'altra attività in modo regolare',s:'Usi l\'AI su contenuti, email, ricerche e altro'},
+        {l:'D',t:'Ho automatizzato con AI diverse attività ripetitive — la uso come un collaboratore virtuale',s:'L\'AI automatizza attività ripetitive come un collaboratore'}
       ]}
     },
     { name:'Task management e mindset',
       perception:{ id:'q6_3p', text:'Hai un sistema per gestire le tue attività quotidiane — sai sempre cosa fare prima e non finisci mai la giornata con la sensazione di aver lavorato tanto senza aver fatto le cose davvero importanti?', options:[
-        {l:'A',t:'No — mi perdo spesso nelle urgenze e alla fine del giorno non so bene cosa ho fatto'},
-        {l:'B',t:'Qualche volta riesco a gestirmi, altre no — non è stabile'},
-        {l:'C',t:'Sì — ho un sistema di task management che seguo regolarmente'}
+        {l:'A',t:'No — mi perdo spesso nelle urgenze e alla fine del giorno non so bene cosa ho fatto',s:'Lavori tanto ma non sempre sulle cose che contano'},
+        {l:'B',t:'Qualche volta riesco a gestirmi, altre no — non è stabile',s:'Alcuni giorni vai, altri no — dipende da come ti svegli'},
+        {l:'C',t:'Sì — ho un sistema di task management che seguo regolarmente',s:'Hai un sistema che ti dice cosa fare — e lo segui'}
       ]},
       verification:{ id:'q6_3v', text:'Quale di queste situazioni descrive meglio la tua gestione delle attività oggi?', options:[
-        {l:'A',t:'Gestisco tutto a memoria o con liste informali — spesso dimentico cose importanti'},
-        {l:'B',t:'Ho un sistema (agenda, app) ma non lo seguo in modo costante'},
-        {l:'C',t:'Ho un sistema di task management che uso ogni giorno e che mi aiuta a prioritizzare'},
-        {l:'D',t:'Ho un sistema integrato tra task personali e business con blocchi di tempo pianificati'}
+        {l:'A',t:'Gestisco tutto a memoria o con liste informali — spesso dimentico cose importanti',s:'Lista mentale informale — dimentichi cose importanti'},
+        {l:'B',t:'Ho un sistema (agenda, app) ma non lo seguo in modo costante',s:'Hai un\'app ma non la segui in modo costante'},
+        {l:'C',t:'Ho un sistema di task management che uso ogni giorno e che mi aiuta a prioritizzare',s:'Task manager quotidiano con priorità chiare'},
+        {l:'D',t:'Ho un sistema integrato tra task personali e business con blocchi di tempo pianificati',s:'Sistema integrato con blocchi di tempo pianificati'}
       ]}
     }
   ],
@@ -1532,41 +1562,41 @@ const MODULES = {
   7: { name:'Pianeta Bussola', system:'Sistema Serenità', pillars:[
     { name:'Canali di assistenza h24',
       perception:{ id:'q7_1p', text:'Quando hai un dubbio o un problema nel tuo business — tecnico, strategico o operativo — sai esattamente a chi rivolgerti o dove trovare la risposta?', options:[
-        {l:'A',t:'No — mi arrangio da solo, cerco su Google o aspetto di trovare la risposta'},
-        {l:'B',t:'A volte trovo supporto, a volte no — non ho un riferimento fisso e affidabile'},
-        {l:'C',t:'Sì — ho canali di supporto chiari e so dove trovare risposta quando ne ho bisogno'}
+        {l:'A',t:'No — mi arrangio da solo, cerco su Google o aspetto di trovare la risposta',s:'Quando ti blocchi, sei da solo con Google'},
+        {l:'B',t:'A volte trovo supporto, a volte no — non ho un riferimento fisso e affidabile',s:'A volte trovi aiuto, a volte no — non puoi contarci'},
+        {l:'C',t:'Sì — ho canali di supporto chiari e so dove trovare risposta quando ne ho bisogno',s:'Sai sempre dove cercare supporto quando ne hai bisogno'}
       ]},
       verification:{ id:'q7_1v', text:'Quale di queste situazioni descrive il tuo accesso al supporto oggi?', options:[
-        {l:'A',t:'Cerco su YouTube o Google — non ho nessun supporto dedicato al mio business'},
-        {l:'B',t:'Ho qualche gruppo online o community ma non è sempre utile o tempestivo'},
-        {l:'C',t:'Ho accesso a supporto dedicato (chat, email, community attiva) con tempi di risposta ragionevoli'},
-        {l:'D',t:'Ho supporto prioritario con risposta rapida e accesso a un esperto quando ne ho bisogno'}
+        {l:'A',t:'Cerco su YouTube o Google — non ho nessun supporto dedicato al mio business',s:'YouTube e Google — il supporto più imprevedibile'},
+        {l:'B',t:'Ho qualche gruppo online o community ma non è sempre utile o tempestivo',s:'Community online utile ma lenta o incostante'},
+        {l:'C',t:'Ho accesso a supporto dedicato (chat, email, community attiva) con tempi di risposta ragionevoli',s:'Supporto dedicato con tempi di risposta ragionevoli'},
+        {l:'D',t:'Ho supporto prioritario con risposta rapida e accesso a un esperto quando ne ho bisogno',s:'Accesso prioritario a un esperto quando ne hai bisogno'}
       ]}
     },
     { name:'Knowledge base e tutorial',
       perception:{ id:'q7_2p', text:'Hai accesso a materiali formativi aggiornati che ti aiutano a migliorare le aree del tuo business che non padroneggi ancora?', options:[
-        {l:'A',t:'No — mi formo in modo casuale quando trovo qualcosa di interessante online'},
-        {l:'B',t:'Ho qualcosa ma non è organizzato o aggiornato — non so mai dove trovare quello che mi serve'},
-        {l:'C',t:'Sì — ho accesso a formazione strutturata e aggiornata sulle aree chiave del mio business'}
+        {l:'A',t:'No — mi formo in modo casuale quando trovo qualcosa di interessante online',s:'Ti formi quando trovi qualcosa — non per scelta strategica'},
+        {l:'B',t:'Ho qualcosa ma non è organizzato o aggiornato — non so mai dove trovare quello che mi serve',s:'Hai materiali ma non li trovi quando ti servono'},
+        {l:'C',t:'Sì — ho accesso a formazione strutturata e aggiornata sulle aree chiave del mio business',s:'Sai dove cercare — la formazione è strutturata'}
       ]},
       verification:{ id:'q7_2v', text:'Quale di queste situazioni descrive la tua formazione oggi?', options:[
-        {l:'A',t:'Mi formo guardando video su YouTube o seguendo profili social — niente di strutturato'},
-        {l:'B',t:'Ho comprato qualche corso ma non l\'ho finito o non lo applico sistematicamente'},
-        {l:'C',t:'Ho accesso a formazione strutturata che seguo regolarmente e che applico al mio business'},
-        {l:'D',t:'Ho un percorso formativo continuo con sessioni live, materiali aggiornati e supporto pratico'}
+        {l:'A',t:'Mi formo guardando video su YouTube o seguendo profili social — niente di strutturato',s:'YouTube e social come unica fonte formativa'},
+        {l:'B',t:'Ho comprato qualche corso ma non l\'ho finito o non lo applico sistematicamente',s:'Corsi comprati ma non finiti o non applicati'},
+        {l:'C',t:'Ho accesso a formazione strutturata che seguo regolarmente e che applico al mio business',s:'Formazione strutturata che segui e applichi'},
+        {l:'D',t:'Ho un percorso formativo continuo con sessioni live, materiali aggiornati e supporto pratico',s:'Percorso formativo continuo con sessioni live e supporto'}
       ]}
     },
     { name:'Onboarding',
       perception:{ id:'q7_3p', text:'Quando un nuovo cliente inizia a lavorare con te, ha un\'esperienza di partenza chiara e strutturata — sa cosa fare, cosa aspettarsi e si sente accolto fin dal primo momento?', options:[
-        {l:'A',t:'No — ogni nuovo cliente è un po\' un\'improvvisazione — non ho un processo di avvio'},
-        {l:'B',t:'Ho qualcosa ma non è completo o non funziona sempre bene'},
-        {l:'C',t:'Sì — ho un processo di onboarding definito che do a ogni nuovo cliente'}
+        {l:'A',t:'No — ogni nuovo cliente è un po\' un\'improvvisazione — non ho un processo di avvio',s:'Ogni nuovo cliente è un\'improvvisazione diversa'},
+        {l:'B',t:'Ho qualcosa ma non è completo o non funziona sempre bene',s:'Hai qualcosa ma non funziona sempre bene'},
+        {l:'C',t:'Sì — ho un processo di onboarding definito che do a ogni nuovo cliente',s:'Ogni nuovo cliente inizia allo stesso modo — sempre'}
       ]},
       verification:{ id:'q7_3v', text:'Quale di queste cose hai attiva per i tuoi nuovi clienti?', options:[
-        {l:'A',t:'Niente di strutturato — mando le informazioni man mano che servono'},
-        {l:'B',t:'Ho qualche materiale di benvenuto ma non è un processo completo'},
-        {l:'C',t:'Ho un processo di onboarding con materiali, istruzioni e primo contatto strutturato'},
-        {l:'D',t:'Ho un onboarding automatizzato con sequenze, materiali e check point per i primi 30 giorni'}
+        {l:'A',t:'Niente di strutturato — mando le informazioni man mano che servono',s:'Mandi le informazioni man mano che servono'},
+        {l:'B',t:'Ho qualche materiale di benvenuto ma non è un processo completo',s:'Un po\' di materiale di benvenuto ma non un processo'},
+        {l:'C',t:'Ho un processo di onboarding con materiali, istruzioni e primo contatto strutturato',s:'Onboarding con materiali, istruzioni e primo contatto'},
+        {l:'D',t:'Ho un onboarding automatizzato con sequenze, materiali e check point per i primi 30 giorni',s:'Onboarding automatizzato con check point per 30 giorni'}
       ]}
     }
   ],
@@ -1577,41 +1607,41 @@ const MODULES = {
   8: { name:'Pianeta Villaggio', system:'Sistema Serenità', pillars:[
     { name:'Accademia e corsi',
       perception:{ id:'q8_1p', text:'Hai accesso a una formazione strutturata — corsi, programmi o percorsi — che ti aiuta a costruire le competenze di business che non hai ancora?', options:[
-        {l:'A',t:'No — non ho accesso a formazione strutturata specifica per il mio tipo di business'},
-        {l:'B',t:'Ho accesso a qualcosa ma non è specifico o completo per quello che mi serve'},
-        {l:'C',t:'Sì — ho accesso a formazione specifica, pratica e aggiornata per il mio business'}
+        {l:'A',t:'No — non ho accesso a formazione strutturata specifica per il mio tipo di business',s:'Nessuna formazione specifica per il tuo tipo di business'},
+        {l:'B',t:'Ho accesso a qualcosa ma non è specifico o completo per quello che mi serve',s:'Hai accesso a qualcosa ma non è specifico o completo'},
+        {l:'C',t:'Sì — ho accesso a formazione specifica, pratica e aggiornata per il mio business',s:'Hai formazione pratica, specifica e aggiornata'}
       ]},
       verification:{ id:'q8_1v', text:'Quale di queste situazioni descrive la tua formazione di business oggi?', options:[
-        {l:'A',t:'Seguo contenuti gratuiti online ma non ho un percorso strutturato'},
-        {l:'B',t:'Ho fatto qualche corso ma non era specifico per il mio settore o non l\'ho applicato'},
-        {l:'C',t:'Seguo una formazione strutturata specifica per coach o professionisti con applicazioni pratiche'},
-        {l:'D',t:'Ho accesso a formazione continuativa con sessioni live, materiali pratici e casi studio del mio settore'}
+        {l:'A',t:'Seguo contenuti gratuiti online ma non ho un percorso strutturato',s:'Contenuti gratuiti online — senza un percorso'},
+        {l:'B',t:'Ho fatto qualche corso ma non era specifico per il mio settore o non l\'ho applicato',s:'Qualche corso fatto ma non applicato o non pertinente'},
+        {l:'C',t:'Seguo una formazione strutturata specifica per coach o professionisti con applicazioni pratiche',s:'Formazione strutturata specifica per il tuo settore'},
+        {l:'D',t:'Ho accesso a formazione continuativa con sessioni live, materiali pratici e casi studio del mio settore',s:'Formazione continuativa con live, materiali e casi studio'}
       ]}
     },
     { name:'Community e forum',
       perception:{ id:'q8_2p', text:'Fai parte di una community o gruppo di colleghi — coach, formatori o consulenti — con cui ti confronti regolarmente sul tuo business?', options:[
-        {l:'A',t:'No — lavoro in isolamento, non ho una community professionale attiva'},
-        {l:'B',t:'Faccio parte di qualche gruppo ma non è molto attivo o utile per me'},
-        {l:'C',t:'Sì — ho una community attiva dove mi confronto regolarmente con altri professionisti'}
+        {l:'A',t:'No — lavoro in isolamento, non ho una community professionale attiva',s:'Lavori in isolamento — nessuno con cui confrontarti'},
+        {l:'B',t:'Faccio parte di qualche gruppo ma non è molto attivo o utile per me',s:'Sei in qualche gruppo ma non ti dà molto'},
+        {l:'C',t:'Sì — ho una community attiva dove mi confronto regolarmente con altri professionisti',s:'Hai una community attiva che ti supporta davvero'}
       ]},
       verification:{ id:'q8_2v', text:'Come descriveresti la tua community professionale oggi?', options:[
-        {l:'A',t:'Gruppi Facebook o Telegram che seguo raramente — non ci sono confronti reali'},
-        {l:'B',t:'Una o due community a cui partecipo ogni tanto ma non in modo sistematico'},
-        {l:'C',t:'Una community attiva dove mi confronto, chiedo feedback e ricevo supporto regolare'},
-        {l:'D',t:'Una community professionale selezionata dove ci sono scambi di alto livello e collaborazioni reali'}
+        {l:'A',t:'Gruppi Facebook o Telegram che seguo raramente — non ci sono confronti reali',s:'Gruppi social che leggi raramente — nessun confronto reale'},
+        {l:'B',t:'Una o due community a cui partecipo ogni tanto ma non in modo sistematico',s:'Una o due community saltuarie, non sistematiche'},
+        {l:'C',t:'Una community attiva dove mi confronto, chiedo feedback e ricevo supporto regolare',s:'Community attiva con confronti, feedback e supporto'},
+        {l:'D',t:'Una community professionale selezionata dove ci sono scambi di alto livello e collaborazioni reali',s:'Network selezionato con scambi ad alto valore'}
       ]}
     },
     { name:'Networking e supporto',
       perception:{ id:'q8_3p', text:'Hai un network professionale attivo — persone con cui collabori, ti confronti o che ti mandano clienti in modo reciproco?', options:[
-        {l:'A',t:'No — lavoro principalmente in isolamento, non ho un network professionale attivo'},
-        {l:'B',t:'Ho qualche contatto ma non è un network strutturato e attivo'},
-        {l:'C',t:'Sì — ho un network di professionisti con cui collaboro e mi confronto regolarmente'}
+        {l:'A',t:'No — lavoro principalmente in isolamento, non ho un network professionale attivo',s:'Nessun network professionale — lavori da solo'},
+        {l:'B',t:'Ho qualche contatto ma non è un network strutturato e attivo',s:'Hai qualche contatto ma non è strutturato o attivo'},
+        {l:'C',t:'Sì — ho un network di professionisti con cui collaboro e mi confronto regolarmente',s:'Hai colleghi con cui collabori e ti confronti'}
       ]},
       verification:{ id:'q8_3v', text:'Quale di queste situazioni descrive il tuo networking oggi?', options:[
-        {l:'A',t:'Non faccio networking in modo attivo — aspetto che le connessioni avvengano naturalmente'},
-        {l:'B',t:'Partecipo a qualche evento o gruppo ma non ho relazioni professionali attive'},
-        {l:'C',t:'Ho almeno 3-5 colleghi con cui mi confronto regolarmente e con cui ci sono collaborazioni'},
-        {l:'D',t:'Ho un network strutturato con referral reciproci, collaborazioni e scambio sistematico di opportunità'}
+        {l:'A',t:'Non faccio networking in modo attivo — aspetto che le connessioni avvengano naturalmente',s:'Non fai networking — aspetti che succeda da solo'},
+        {l:'B',t:'Partecipo a qualche evento o gruppo ma non ho relazioni professionali attive',s:'Partecipazioni occasionali senza relazioni attive'},
+        {l:'C',t:'Ho almeno 3-5 colleghi con cui mi confronto regolarmente e con cui ci sono collaborazioni',s:'3-5 colleghi con confronti regolari e collaborazioni'},
+        {l:'D',t:'Ho un network strutturato con referral reciproci, collaborazioni e scambio sistematico di opportunità',s:'Network strutturato con referral e opportunità reciproche'}
       ]}
     }
   ],
@@ -1622,41 +1652,41 @@ const MODULES = {
   9: { name:'Pianeta Scuderia', system:'Sistema Serenità', pillars:[
     { name:'Tutor personale dedicato',
       perception:{ id:'q9_1p', text:'Quando devi implementare qualcosa di tecnico o complesso nel tuo business — un funnel, un\'automazione, una configurazione — riesci a farlo senza bloccarti o perdere giorni a capire come si fa?', options:[
-        {l:'A',t:'No — mi blocco spesso e perdo molto tempo su cose tecniche che non riesco a risolvere'},
-        {l:'B',t:'A volte riesco, a volte no — dipende da quanto è complesso'},
-        {l:'C',t:'Sì — riesco a implementare le cose tecniche senza bloccarmi'}
+        {l:'A',t:'No — mi blocco spesso e perdo molto tempo su cose tecniche che non riesco a risolvere',s:'Le cose tecniche ti bloccano giorni — o settimane intere'},
+        {l:'B',t:'A volte riesco, a volte no — dipende da quanto è complesso',s:'A volte riesci, a volte no — dipende dalla complessità'},
+        {l:'C',t:'Sì — riesco a implementare le cose tecniche senza bloccarmi',s:'Implementi senza bloccarti — il tecnico non è un limite'}
       ]},
       verification:{ id:'q9_1v', text:'Quando ti blocchi su qualcosa di tecnico, cosa fai oggi?', options:[
-        {l:'A',t:'Cerco su YouTube o Google per ore — a volte trovo, a volte no'},
-        {l:'B',t:'Chiedo a qualcuno che conosco ma non è sempre disponibile o non sempre sa aiutarmi'},
-        {l:'C',t:'Ho accesso a supporto tecnico dedicato che mi sblocca in tempi ragionevoli'},
-        {l:'D',t:'Ho qualcuno che non solo mi spiega ma entra con me nel sistema e lo fa insieme a me'}
+        {l:'A',t:'Cerco su YouTube o Google per ore — a volte trovo, a volte no',s:'Ore su YouTube e Google — spesso senza soluzione'},
+        {l:'B',t:'Chiedo a qualcuno che conosco ma non è sempre disponibile o non sempre sa aiutarmi',s:'Chiedi a qualcuno ma non è sempre disponibile'},
+        {l:'C',t:'Ho accesso a supporto tecnico dedicato che mi sblocca in tempi ragionevoli',s:'Hai supporto tecnico che ti sblocca in tempi ragionevoli'},
+        {l:'D',t:'Ho qualcuno che non solo mi spiega ma entra con me nel sistema e lo fa insieme a me',s:'Qualcuno entra con te nel sistema e lo fa insieme a te'}
       ]}
     },
     { name:'Done With You',
       perception:{ id:'q9_2p', text:'Hai mai avuto accesso a un esperto che lavora insieme a te in diretta — non solo ti spiega cosa fare ma lo fa con te, schermata condivisa, finché non è fatto?', options:[
-        {l:'A',t:'No — ho sempre dovuto implementare tutto da solo'},
-        {l:'B',t:'Una o due volte, ma non in modo sistematico o continuativo'},
-        {l:'C',t:'Sì — ho accesso regolare a supporto operativo diretto con qualcuno che lavora con me'}
+        {l:'A',t:'No — ho sempre dovuto implementare tutto da solo',s:'Hai sempre implementato tutto da solo'},
+        {l:'B',t:'Una o due volte, ma non in modo sistematico o continuativo',s:'Una o due volte, non in modo continuativo'},
+        {l:'C',t:'Sì — ho accesso regolare a supporto operativo diretto con qualcuno che lavora con me',s:'Hai accesso regolare a chi lavora operativamente con te'}
       ]},
       verification:{ id:'q9_2v', text:'Cosa ti ha dato di più quel tipo di supporto operativo diretto?', options:[
-        {l:'A',t:'Non ne ho mai avuto — non so cosa mi darebbe'},
-        {l:'B',t:'Mi ha aiutato una volta sola su una cosa specifica ma non è continuativo'},
-        {l:'C',t:'Mi ha permesso di implementare cose che da solo non avrei mai fatto'},
-        {l:'D',t:'Ha cambiato il modo in cui lavoro — adesso sono molto più veloce nell\'implementare'}
+        {l:'A',t:'Non ne ho mai avuto — non so cosa mi darebbe',s:'Non ne hai mai avuto — non sai cosa ti darebbe'},
+        {l:'B',t:'Mi ha aiutato una volta sola su una cosa specifica ma non è continuativo',s:'Ti ha aiutato una volta su una cosa specifica'},
+        {l:'C',t:'Mi ha permesso di implementare cose che da solo non avrei mai fatto',s:'Ti ha permesso di fare cose che da solo non avresti fatto'},
+        {l:'D',t:'Ha cambiato il modo in cui lavoro — adesso sono molto più veloce nell\'implementare',s:'Ha cambiato il modo in cui implementi — sei molto più veloce'}
       ]}
     },
     { name:'Done For You',
       perception:{ id:'q9_3p', text:'Nel tuo business ci sono attività operative che vorresti delegare completamente — non imparare a farle, ma farle fare a qualcuno di esperto direttamente al posto tuo?', options:[
-        {l:'A',t:'Sì, molte cose — ma non so a chi delegarle o non mi fido di farlo'},
-        {l:'B',t:'Qualcosa sì, ma non ho ancora trovato il modo giusto per farlo'},
-        {l:'C',t:'Ho già delegato le attività principali a persone o servizi di fiducia'}
+        {l:'A',t:'Sì, molte cose — ma non so a chi delegarle o non mi fido di farlo',s:'Vuoi delegare ma non sai a chi o non ti fidi ancora'},
+        {l:'B',t:'Qualcosa sì, ma non ho ancora trovato il modo giusto per farlo',s:'Qualcosa sì, ma non hai ancora trovato il modo'},
+        {l:'C',t:'Ho già delegato le attività principali a persone o servizi di fiducia',s:'Le attività principali le hai già delegate a persone di fiducia'}
       ]},
       verification:{ id:'q9_3v', text:'Quale di queste situazioni descrive la tua capacità di delegare oggi?', options:[
-        {l:'A',t:'Faccio tutto da solo perché è più veloce che spiegare a qualcun altro'},
-        {l:'B',t:'Ho provato a delegare ma non mi sono trovato bene — preferisco controllare tutto'},
-        {l:'C',t:'Ho delegato alcune attività specifiche a collaboratori o freelance di fiducia'},
-        {l:'D',t:'Ho un sistema di delega strutturato dove so esattamente cosa delegare, a chi e come verificarlo'}
+        {l:'A',t:'Faccio tutto da solo perché è più veloce che spiegare a qualcun altro',s:'Più veloce da solo — non vale il tempo di spiegare'},
+        {l:'B',t:'Ho provato a delegare ma non mi sono trovato bene — preferisco controllare tutto',s:'Hai provato ma hai finito per riprendere il controllo'},
+        {l:'C',t:'Ho delegato alcune attività specifiche a collaboratori o freelance di fiducia',s:'Hai delegato attività specifiche a collaboratori di fiducia'},
+        {l:'D',t:'Ho un sistema di delega strutturato dove so esattamente cosa delegare, a chi e come verificarlo',s:'Sistema di delega strutturato con chi, cosa e come verificare'}
       ]}
     }
   ],
@@ -1768,7 +1798,10 @@ function renderOptions(options) {
     card.dataset.letter = opt.l;
     card.innerHTML = `
       <div class="option-badge">${opt.l}</div>
-      <div class="option-text">${opt.t}</div>
+      <div class="option-content">
+        <div class="option-text">${opt.t}</div>
+        ${opt.s ? `<div class="option-subtext">${opt.s}</div>` : ''}
+      </div>
       <div class="option-check">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>`;
@@ -1907,6 +1940,7 @@ function showPillarPerception(m, pIdx) {
   state.history.push({type:'perception', m, pIdx});
   showModuleCard(m);
   showPillarTag(pillar.name);
+  document.getElementById('q-context-row').textContent = `${mod.name} — Pilastro ${pIdx+1} di 3`;
   document.getElementById('q-sub').style.display = 'none';
   document.getElementById('open-wrap').style.display = 'none';
   document.getElementById('q-text').textContent = perc.text;
@@ -1976,6 +2010,7 @@ function handleModuleContinue() {
     const sub = document.getElementById('q-sub');
     sub.textContent = '↳ Domanda di approfondimento';
     sub.style.display = 'block';
+    document.getElementById('q-context-row').textContent = `${MODULES[currentModule].name} — Pilastro ${currentPillarIndex+1} di 3`;
     document.getElementById('open-wrap').style.display = 'none';
     document.getElementById('q-text').textContent = pillar.verification.text;
     renderOptions(pillar.verification.options);
