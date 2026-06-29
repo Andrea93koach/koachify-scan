@@ -1149,58 +1149,44 @@ html, body {
 ═══════════════════════════════════════════ */
 #screen-clarity { padding: 0; min-height: 100%; }
 
-.clarity-hero {
+/* Header personalizzato */
+.cm-header {
   background: var(--navy);
-  padding: 28px 20px 36px;
+  padding: 24px 20px 22px;
   position: relative;
   overflow: hidden;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
-.clarity-hero::after {
+.cm-header::after {
   content: '';
   position: absolute;
-  bottom: -40px; right: -40px;
-  width: 160px; height: 160px;
+  bottom: -30px; right: -30px;
+  width: 130px; height: 130px;
   border-radius: 50%;
-  background: rgba(136,192,87,0.08);
+  background: rgba(136,192,87,0.07);
+  pointer-events: none;
 }
-.clarity-hero::before {
-  content: '';
-  position: absolute;
-  top: -30px; left: -30px;
-  width: 120px; height: 120px;
-  border-radius: 50%;
-  background: rgba(136,192,87,0.05);
-}
-
-.clarity-label {
-  font-size: 10px;
-  font-weight: 700;
+.cm-header-chip {
+  font-size: 9px;
+  font-weight: 800;
   color: var(--green);
   letter-spacing: 2px;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   position: relative;
 }
-.clarity-main-title {
-  font-size: 30px;
+.cm-header-title {
+  font-size: 22px;
   font-weight: 900;
   color: var(--white);
-  margin-bottom: 4px;
-  position: relative;
-}
-.clarity-arch-name {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--green);
+  line-height: 1.25;
   margin-bottom: 6px;
   position: relative;
 }
-.clarity-arch-fascia {
+.cm-header-title span { color: var(--green); }
+.cm-header-meta {
   font-size: 11px;
-  color: var(--gray-light);
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 500;
   position: relative;
 }
 
@@ -1228,28 +1214,146 @@ html, body {
 .planet-grid {
   display: grid;
   grid-template-columns: repeat(3,1fr);
-  gap: 10px;
-  margin-bottom: 28px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 .planet-cell {
   background: var(--white);
   border-radius: var(--radius-md);
-  padding: 14px 8px 12px;
+  padding: 14px 6px 12px;
   text-align: center;
   box-shadow: var(--shadow-sm);
   border: 1.5px solid var(--border);
-  transition: transform 0.2s;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.38s ease, transform 0.38s ease;
 }
-.planet-cell-icon { font-size: 18px; margin-bottom: 6px; }
+.planet-cell.revealed { opacity: 1; transform: translateY(0); }
+.planet-cell-circle {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  margin: 0 auto 7px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+}
 .planet-cell-name {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 700;
   color: var(--navy);
-  line-height: 1.3;
-  margin-bottom: 8px;
+  line-height: 1.25;
+  margin-bottom: 5px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
+.planet-cell-score {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--navy);
+  line-height: 1;
+}
+.planet-cell-score span {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+/* System score bar */
+.system-score-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--navy);
+  border-radius: 10px;
+  padding: 9px 14px;
+  margin-bottom: 18px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.system-score-row.revealed { opacity: 1; }
+.system-score-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.75);
+  letter-spacing: 0.3px;
+}
+.system-score-value {
+  font-size: 15px;
+  font-weight: 900;
+  color: #88C057;
+}
+/* Universe map */
+.universe-map-wrap {
+  position: relative;
+  width: 100%;
+  margin-bottom: 8px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  cursor: crosshair;
+}
+.universe-map-img { width: 100%; height: auto; display: block; }
+.universe-map-svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.universe-map-debug {
+  position: absolute;
+  bottom: 8px; left: 8px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  pointer-events: none;
+}
+.map-debug-hint {
+  font-size: 10px;
+  color: var(--text-soft);
+  text-align: center;
+  margin-top: 4px;
+  margin-bottom: 20px;
+}
+/* Insight box */
+.insight-box {
+  background: var(--navy);
+  border-radius: var(--radius-md);
+  padding: 18px 18px 20px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.insight-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6BA03E, #88C057);
+}
+.insight-box-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: #88C057;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+}
+.insight-box-text {
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.65;
+  font-style: italic;
+}
+/* CTA microcopy */
+.cta-microcopy {
+  font-size: 11px;
+  color: var(--text-soft);
+  line-height: 1.6;
+  margin-top: 12px;
+  padding: 0 4px;
+}
+/* sem badge (kept for bridges) */
 .sem-badge {
   display: inline-flex;
   align-items: center;
@@ -1262,11 +1366,7 @@ html, body {
 .sem-badge-red { background: var(--red-soft); color: var(--red); }
 .sem-badge-yellow { background: var(--yellow-soft); color: #b07a00; }
 .sem-badge-green { background: var(--sem-green-soft); color: #1a8a48; }
-.sem-dot-small {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+.sem-dot-small { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
 /* Strength / Priority rows */
 .result-row {
@@ -1703,34 +1803,79 @@ html, body {
 
     <!-- ══ CLARITY MAP ══ -->
     <div class="screen" id="screen-clarity">
-      <div class="clarity-hero">
-        <div class="clarity-label">La tua</div>
-        <div class="clarity-main-title">Clarity Map</div>
-        <div class="clarity-arch-name" id="clarity-archetype-name"></div>
-        <div class="clarity-arch-fascia" id="clarity-archetype-fascia"></div>
+
+      <!-- Header personalizzato -->
+      <div class="cm-header">
+        <div class="cm-header-chip">Clarity Map</div>
+        <div class="cm-header-title">La Clarity Map di <span id="cm-nome">—</span></div>
+        <div class="cm-header-meta" id="cm-meta">—</div>
       </div>
+
       <div class="clarity-body">
 
-        <div class="clarity-section-title" style="margin-bottom:14px">9 Aree analizzate</div>
-        <div class="planet-grid" id="planet-grid"></div>
+        <!-- Griglia 3×3 con score e reveal animation -->
+        <div class="clarity-section-title">Le 9 aree analizzate</div>
 
+        <div class="planet-grid" id="planet-grid-row1"></div>
+        <div class="system-score-row" id="system-score-row1">
+          <span class="system-score-label">Sistema Prosperità</span>
+          <span class="system-score-value" id="cm-score-s1">—</span>
+        </div>
+
+        <div class="planet-grid" id="planet-grid-row2"></div>
+        <div class="system-score-row" id="system-score-row2">
+          <span class="system-score-label">Sistema Libertà</span>
+          <span class="system-score-value" id="cm-score-s2">—</span>
+        </div>
+
+        <div class="planet-grid" id="planet-grid-row3"></div>
+        <div class="system-score-row" id="system-score-row3">
+          <span class="system-score-label">Sistema Serenità</span>
+          <span class="system-score-value" id="cm-score-s3">—</span>
+        </div>
+
+        <!-- Mappa Universo Koachify -->
+        <div class="clarity-section-title">Mappa del tuo Universo</div>
+        <div class="universe-map-wrap" id="universe-map-wrap" onclick="handleMapClick(event)">
+          <img class="universe-map-img" src="universo-koachify.png" id="universe-map-img"
+               onerror="this.style.display='none';document.getElementById('universe-map-placeholder').style.display='flex'">
+          <div id="universe-map-placeholder" style="display:none;min-height:180px;align-items:center;justify-content:center;background:var(--bg);color:var(--text-soft);font-size:13px;text-align:center;padding:24px;flex-direction:column;gap:8px">
+            <div style="font-size:28px">🗺️</div>
+            <div>Inserire <strong>universo-koachify.png</strong> nella cartella</div>
+          </div>
+          <svg class="universe-map-svg" id="universe-map-svg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="universe-map-debug" id="universe-map-debug" style="display:none"></div>
+        </div>
+        <div class="map-debug-hint">📍 Modalità debug attiva — clicca sulla mappa per ottenere le coordinate da Console</div>
+
+        <!-- Box Insight (placeholder — popolato da IA in Punto 8) -->
+        <div class="clarity-section-title">Analisi approfondita</div>
+        <div class="insight-box">
+          <div class="insight-box-title">Il tuo blocco principale</div>
+          <div class="insight-box-text" id="cm-insight-text">[Report generato dall'analisi — disponibile dopo integrazione IA]</div>
+        </div>
+
+        <!-- Punti di Forza -->
         <div id="strengths-wrap" style="display:none">
-          <div class="clarity-section-title">Punti di forza</div>
+          <div class="clarity-section-title">I tuoi Punti di Forza</div>
           <div id="strength-list"></div>
         </div>
 
+        <!-- Priorità d'Azione -->
         <div id="priorities-wrap" style="display:none">
-          <div class="clarity-section-title" style="margin-top:8px">Priorità d'azione</div>
+          <div class="clarity-section-title">Le tue Priorità d'Azione</div>
           <div id="priority-list"></div>
         </div>
 
-        <div class="clarity-section-title" style="margin-top:8px">Il tuo profilo</div>
+        <!-- Profilo Archetipo -->
+        <div class="clarity-section-title">Il tuo profilo</div>
         <div class="arch-text-card" id="archetype-text-box"></div>
 
+        <!-- CTA -->
         <div class="cta-block">
           <a href="https://koachify.it/clarity-call" target="_blank" rel="noopener" style="text-decoration:none">
             <button class="btn-primary">
-              Prenota la tua Clarity Call
+              Prenota la tua Clarity Call gratuita
               <div class="btn-arrow">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </div>
@@ -1741,10 +1886,7 @@ html, body {
             <span>30 minuti</span><div class="cta-dot"></div>
             <span>Senza impegno</span>
           </div>
-          <button class="btn-share" onclick="shareResults()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-            Condividi la tua Clarity Map
-          </button>
+          <div class="cta-microcopy">Il nostro team ha già accesso alla tua Clarity Map. La call parte da dove il check-up si è fermato.</div>
         </div>
 
       </div>
@@ -2897,42 +3039,127 @@ function afterBridge() {
 // ═══════════════════════════════════════════════════════════
 // CLARITY MAP
 // ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// CLARITY MAP — helper functions
+// ═══════════════════════════════════════════════════════════
+function getPlanetScore(m) {
+  const scores = [1,2,3].map(p => semToScore(state.pillarSemafori[`m${m}p${p}`] || 'yellow'));
+  return Math.round(scores.reduce((a,b)=>a+b,0)/3);
+}
+
+const PILASTRI_COORDS = {
+  'p1_1':{x:0,y:0},'p1_2':{x:0,y:0},'p1_3':{x:0,y:0},
+  'p2_1':{x:0,y:0},'p2_2':{x:0,y:0},'p2_3':{x:0,y:0},
+  'p3_1':{x:0,y:0},'p3_2':{x:0,y:0},'p3_3':{x:0,y:0},
+  'p4_1':{x:0,y:0},'p4_2':{x:0,y:0},'p4_3':{x:0,y:0},
+  'p5_1':{x:0,y:0},'p5_2':{x:0,y:0},'p5_3':{x:0,y:0},
+  'p6_1':{x:0,y:0},'p6_2':{x:0,y:0},'p6_3':{x:0,y:0},
+  'p7_1':{x:0,y:0},'p7_2':{x:0,y:0},'p7_3':{x:0,y:0},
+  'p8_1':{x:0,y:0},'p8_2':{x:0,y:0},'p8_3':{x:0,y:0},
+  'p9_1':{x:0,y:0},'p9_2':{x:0,y:0},'p9_3':{x:0,y:0}
+};
+
+function handleMapClick(event) {
+  const wrap = document.getElementById('universe-map-wrap');
+  const rect = wrap.getBoundingClientRect();
+  const svg = document.getElementById('universe-map-svg');
+  const vb = svg.viewBox.baseVal;
+  const x = Math.round((event.clientX - rect.left) / rect.width * vb.width);
+  const y = Math.round((event.clientY - rect.top) / rect.height * vb.height);
+  const dbg = document.getElementById('universe-map-debug');
+  if (dbg) { dbg.textContent = `x:${x}  y:${y}`; dbg.style.display = 'block'; }
+  console.log(`[MapDebug] 'p?_?':{x:${x},y:${y}}`);
+}
+
+function renderUniversoMap() {
+  const svg = document.getElementById('universe-map-svg');
+  if (!svg) return;
+  svg.innerHTML = '';
+  Object.entries(PILASTRI_COORDS).forEach(([key, coord], idx) => {
+    if (coord.x === 0 && coord.y === 0) return;
+    const parts = key.split('_');
+    const p = parseInt(parts[0].substring(1));
+    const pil = parseInt(parts[1]);
+    const sem = state.pillarSemafori[`m${p}p${pil}`] || 'yellow';
+    const color = sem==='red'?'#E53935':sem==='yellow'?'#F0A500':'#88C057';
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx', coord.x);
+    c.setAttribute('cy', coord.y);
+    c.setAttribute('r', '14');
+    c.setAttribute('fill', color);
+    c.setAttribute('stroke', 'white');
+    c.setAttribute('stroke-width', '2');
+    c.style.opacity = '0';
+    c.style.transition = `opacity 0.3s ease ${idx*100}ms`;
+    svg.appendChild(c);
+    setTimeout(() => { c.style.opacity = '1'; }, idx*100 + 100);
+  });
+}
+
 function showClarityMap() {
   state.archetipo = determineArchetype();
   completeSession();
   const arch = ARCHETIPI[state.archetipo];
-  document.getElementById('clarity-archetype-name').textContent = arch.name;
-  document.getElementById('clarity-archetype-fascia').textContent = arch.fascia;
 
-  // Grid
-  const grid = document.getElementById('planet-grid');
-  grid.innerHTML = '';
-  PLANET_NAMES.forEach((name, i) => {
-    const sem = state.planetSemafori[`p${i+1}`] || 'yellow';
-    const labels = {red:'Critico', yellow:'Da sviluppare', green:'Solido'};
-    const cell = document.createElement('div');
-    cell.className = 'planet-cell';
-    cell.innerHTML = `
-      <div class="planet-cell-icon">${PLANET_ICONS[i]}</div>
-      <div class="planet-cell-name">${name}</div>
-      <div class="sem-badge sem-badge-${sem}">
-        <div class="sem-dot-small" style="background:${sem==='red'?'#C0392B':sem==='yellow'?'#F39C12':'#27AE60'}"></div>
-        ${labels[sem]}
-      </div>`;
-    grid.appendChild(cell);
+  // Header personalizzato
+  const nome = (state.leadData && state.leadData.nome) ? state.leadData.nome : '';
+  document.getElementById('cm-nome').textContent = nome || 'Anonimo';
+  const d = new Date();
+  const ds = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
+  document.getElementById('cm-meta').textContent = `Analisi completata il ${ds} — Archetipo: ${arch.name}`;
+
+  // Griglia 3×3 con score e sistema
+  const SEM_COLOR = {red:'#E53935', yellow:'#F0A500', green:'#88C057'};
+  const ROWS = [
+    {planets:[1,2,3], gridId:'planet-grid-row1', scoreId:'cm-score-s1', rowId:'system-score-row1'},
+    {planets:[4,5,6], gridId:'planet-grid-row2', scoreId:'cm-score-s2', rowId:'system-score-row2'},
+    {planets:[7,8,9], gridId:'planet-grid-row3', scoreId:'cm-score-s3', rowId:'system-score-row3'}
+  ];
+  const allCells = [];
+  ROWS.forEach(row => {
+    const grid = document.getElementById(row.gridId);
+    grid.innerHTML = '';
+    row.planets.forEach(m => {
+      const sem = state.planetSemafori[`p${m}`] || 'yellow';
+      const score = getPlanetScore(m);
+      const cell = document.createElement('div');
+      cell.className = 'planet-cell';
+      cell.innerHTML = `
+        <div class="planet-cell-circle" style="background:${SEM_COLOR[sem]}"></div>
+        <div class="planet-cell-name">${PLANET_NAMES[m-1]}</div>
+        <div class="planet-cell-score">${score}<span>/100</span></div>`;
+      grid.appendChild(cell);
+      allCells.push(cell);
+    });
+    // System score
+    const sysScore = calcSystemScore(row.planets[0], row.planets[1], row.planets[2]);
+    document.getElementById(row.scoreId).textContent = `${sysScore}/100`;
   });
+
+  // Reveal animation
+  allCells.forEach((cell, i) => {
+    setTimeout(() => cell.classList.add('revealed'), 300 + i * 150);
+  });
+  [0,1,2].forEach(i => {
+    setTimeout(() => {
+      document.getElementById(ROWS[i].rowId)?.classList.add('revealed');
+    }, 300 + (i*3 + 2) * 150 + 200);
+  });
+
+  // Universe map circles (after grid completes)
+  setTimeout(() => renderUniversoMap(), 300 + 8*150 + 400);
 
   // Strengths
   const sl = document.getElementById('strength-list');
   sl.innerHTML = '';
-  let hasS = false;
+  let hasS = false; let sc = 0;
   PLANET_NAMES.forEach((name,i) => {
-    if (state.planetSemafori[`p${i+1}`]==='green') {
-      hasS = true;
+    if (state.planetSemafori[`p${i+1}`]==='green' && sc < 3) {
+      hasS = true; sc++;
       sl.innerHTML += `<div class="result-row">
-        <div class="result-row-icon green-bg">${PLANET_ICONS[i]}</div>
+        <div class="result-row-icon green-bg" style="font-size:16px">${PLANET_ICONS[i]}</div>
         <div class="result-row-label">${name}</div>
-        <div class="result-row-badge strength">✓ Solido</div>
+        <div class="result-row-badge strength">&#10003; Solido</div>
       </div>`;
     }
   });
@@ -2946,7 +3173,7 @@ function showClarityMap() {
     if (state.planetSemafori[`p${i+1}`]==='red' && pc < 3) {
       hasP = true; pc++;
       pl.innerHTML += `<div class="result-row">
-        <div class="result-row-icon red-bg">${PLANET_ICONS[i]}</div>
+        <div class="result-row-icon red-bg" style="font-size:16px">${PLANET_ICONS[i]}</div>
         <div class="result-row-label">${name}</div>
         <div class="result-row-badge priority">#${pc} Priorità</div>
       </div>`;
@@ -2958,7 +3185,7 @@ function showClarityMap() {
   document.getElementById('archetype-text-box').innerHTML = `<p>${arch.text}</p>`;
 
   setTopbar(false, null);
-  setProgress(100);
+  setProgress(null);
   setBtnVisible(false);
   showScreen('screen-clarity');
 }
