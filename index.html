@@ -126,19 +126,43 @@ html, body {
    LINEAR PROGRESS BAR
 ═══════════════════════════════════════════ */
 #progress-bar-wrap {
-  padding: 0 16px 10px;
+  padding: 0 16px 12px;
+  flex-shrink: 0;
+}
+#progress-bar-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+}
+#progress-bar-label-text {
+  font-size: 11px;
+  color: var(--text-soft);
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 78%;
+}
+#progress-bar-pct {
+  font-size: 11px;
+  font-weight: 800;
+  color: #6BA03E;
+  min-width: 30px;
+  text-align: right;
   flex-shrink: 0;
 }
 #progress-bar-track {
-  height: 5px;
+  height: 6px;
   background: var(--border);
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
 }
 #progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--green-dark), var(--green));
-  border-radius: 3px;
+  background: linear-gradient(90deg, #6BA03E, #88C057);
+  border-radius: 4px;
   transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
 }
 
@@ -1391,6 +1415,10 @@ html, body {
 
   <!-- PROGRESS BAR -->
   <div id="progress-bar-wrap" style="visibility:hidden">
+    <div id="progress-bar-info">
+      <span id="progress-bar-label-text"></span>
+      <span id="progress-bar-pct"></span>
+    </div>
     <div id="progress-bar-track">
       <div id="progress-bar-fill" style="width:0%"></div>
     </div>
@@ -2379,12 +2407,14 @@ function setTopbar(showBack, counterText) {
   if (counterText) { counter.textContent = counterText; counter.style.visibility = 'visible'; }
   else { counter.style.visibility = 'hidden'; }
 }
-function setProgress(pct) {
+function setProgress(pct, label) {
   const wrap = document.getElementById('progress-bar-wrap');
   if (pct === null) { wrap.style.display = 'none'; return; }
   wrap.style.display = '';
   wrap.style.visibility = 'visible';
   document.getElementById('progress-bar-fill').style.width = pct + '%';
+  document.getElementById('progress-bar-label-text').textContent = label || '';
+  document.getElementById('progress-bar-pct').textContent = label ? pct + '%' : '';
 }
 function setBtnLabel(text, disabled) {
   document.getElementById('btn-label').textContent = text;
@@ -2668,7 +2698,7 @@ function startModule(m) {
   state.phase = 'module';
   setTopbarVisible(true);
   setTopbar(true, `${m}/9`);
-  setProgress(Math.round((m-1)/9*100));
+  setProgress(Math.round((m-1)/9*100), `${MODULES[m].name} — ${MODULES[m].system}`);
   showPillarPerception(m, 0);
 }
 
@@ -2965,7 +2995,7 @@ function goBack() {
     awaitingVerification=false; awaitingOpenConditional=false;
     state.phase='module';
     setTopbar(true,`${last.m}/9`);
-    setProgress(Math.round((last.m-1)/9*100));
+    setProgress(Math.round((last.m-1)/9*100), `${MODULES[last.m].name} — ${MODULES[last.m].system}`);
     showPillarPerception(last.m,last.pIdx);
     state.history.pop(); state.history.push(last);
     return;
@@ -2974,7 +3004,7 @@ function goBack() {
     currentModule=last.m; currentPillarIndex=last.pIdx;
     awaitingVerification=false; state.phase='module';
     setTopbar(true,`${last.m}/9`);
-    setProgress(Math.round((last.m-1)/9*100));
+    setProgress(Math.round((last.m-1)/9*100), `${MODULES[last.m].name} — ${MODULES[last.m].system}`);
     showPillarPerception(last.m,last.pIdx);
     return;
   }
