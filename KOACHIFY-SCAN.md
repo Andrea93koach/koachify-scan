@@ -1,8 +1,8 @@
 # Koachify Scan — Quiz Funnel Interattivo
 
-**Ultimo aggiornamento:** 27.06.2026  
-**Versione:** v1.5  
-**Stato:** In sviluppo attivo — Bridge 1/2/3 + Gate Email + Elaborazione + Supabase integrato (debug pendente)
+**Ultimo aggiornamento:** 29.06.2026  
+**Versione:** v1.7  
+**Stato:** In sviluppo attivo — Punti 1/2/3/4/5/6 completati, Supabase attivo, Punto 8 (OpenAI) e Punto 9 (SVG map) da fare
 
 ---
 
@@ -183,12 +183,12 @@ Documento di riferimento: `KoachifyScan_Prompt_ClaudeCode.pdf`
 | # | Punto | Stato | Note |
 |---|-------|-------|------|
 | 1 | UX/UI card risposta + breadcrumb + 189 sottotitoli | ✅ Completato | Push GitHub 26.06.2026 |
-| 2 | Progress bar con riga dinamica + percentuale | 🔲 Da fare | Saltato, da implementare |
+| 2 | Progress bar con riga dinamica + percentuale | ✅ Completato | 29.06.2026 |
 | 3 | Bridge 1/2/3 nelle 3 posizioni con strutture indicate | ✅ Completato | 27.06.2026 |
 | 4 | Gate email (Nome/Email/Telefono + microcopy + trust) | ✅ Completato | 27.06.2026 |
 | 5 | Schermata elaborazione 8.5s con checklist animata | ✅ Completato | 27.06.2026 |
-| 6 | Clarity Map finale: score sistemi + reveal animato + output IA | 🔲 Da fare | — |
-| 7 | Integrazione Supabase | ⚠️ Debug pendente | Codice inserito, dati non arrivano |
+| 6 | Clarity Map finale: score sistemi + reveal animato + mappa SVG | ✅ Completato | 29.06.2026 |
+| 7 | Integrazione Supabase | ✅ Attivo | Fix cripto.randomUUID, archetipo, 4 tabelle popolate |
 | 8 | Integrazione OpenAI GPT-4o | 🔲 Da fare | API key da fornire |
 | 9 | Mappa SVG Universo con semafori + calibrazione coords | 🔲 Da fare | — |
 
@@ -357,14 +357,9 @@ Welcome
 
 ## TODO operativi
 
-- [ ] **Debug Supabase** — aprire F12 Console durante test e leggere errori; verificare che CDN `@supabase/supabase-js@2` carichi prima dell'init
-- [ ] **Push GitHub** — portare live le versioni v1.4/v1.5 quando Supabase funziona
-- [ ] **Punto 2 PDF** — progress bar con riga dinamica + percentuale + gradiente esplicito
-- [ ] **Punto 6 PDF** — Clarity Map: score XX/100 per sistema, reveal 150ms, sezioni forza/priorità migliorate
-- [ ] **Punto 8 PDF** — OpenAI GPT-4o (API key da fornire)
-- [ ] **Punto 9 PDF** — Mappa SVG Universo con semafori overlay
+- [ ] **Punto 8 PDF** — OpenAI GPT-4o: analisi personalizzata nel box "Il tuo blocco principale" (API key da fornire)
+- [ ] **Punto 9 PDF** — Calibrare PILASTRI_COORDS: inserire universo-koachify.png nella cartella, aprire quiz, cliccare sulla mappa in debug mode e annotare le 27 coordinate dalla Console
 - [ ] **Testimonianze** — inserire testi reali in Bridge 1 e Bridge 3 (ora PLACEHOLDER)
-- [ ] **CTA Clarity Call** — collegare URL reale `https://koachify.it/clarity-call`
 - [ ] **Deploy dominio** — pubblicare su dominio/subdominio Koachify quando approvato
 
 ---
@@ -379,3 +374,5 @@ Welcome
 | v1.3 | 26.06.2026 | Punto 1 PDF: card con subtitoli (189 testi), breadcrumb contestuale, hover/selected states, push GitHub Pages |
 | v1.4 | 27.06.2026 | Bridge 1 (doppia — Prosperità), Bridge 2 (singola — Libertà), Bridge 3 (doppia — Serenità + griglia blur) |
 | v1.5 | 27.06.2026 | Gate Email, Schermata Elaborazione 8.5s, Supabase integrato (debug pendente), copy testimonianze aggiornato |
+| v1.6 | 29.06.2026 | Supabase fix (crypto.randomUUID, archetipo pre-calcolato), progress bar dinamica (Punto 2), serve.ps1 |
+| v1.7 | 29.06.2026 | Clarity Map redesign completo (Punto 6): header personalizzato, griglia 3x3 con score e reveal, score sistemi, mappa SVG + debug, insight box, CTA aggiornata |
