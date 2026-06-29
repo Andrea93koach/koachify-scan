@@ -6,6 +6,7 @@
 <title>Koachify Scan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ═══════════════════════════════════════════
    RESET & ROOT
@@ -151,8 +152,12 @@ html, body {
   display: flex;
   flex-direction: column;
 }
-/* Bridge, welcome, clarity CAN scroll */
+/* Bridge, welcome, clarity, gate, elaborazione CAN scroll */
 #content-area:has(#screen-bridge.active),
+#content-area:has(#screen-bridge1.active),
+#content-area:has(#screen-bridge2.active),
+#content-area:has(#screen-bridge3.active),
+#content-area:has(#screen-gate-email.active),
 #content-area:has(#screen-welcome.active),
 #content-area:has(#screen-clarity.active) {
   overflow-y: auto;
@@ -742,6 +747,357 @@ html, body {
 }
 
 /* ═══════════════════════════════════════════
+   BRIDGE 1 — SISTEMA PROSPERITÀ (doppia schermata)
+═══════════════════════════════════════════ */
+#screen-bridge1 { padding: 0; min-height: 100%; background: #e8f4e8; }
+
+.b1-page {
+  min-height: 100%;
+  padding: 24px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #e8f4e8;
+}
+.b1-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--green);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 20px;
+  align-self: flex-start;
+}
+.b1-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.35;
+}
+.b1-stat-box {
+  background: white;
+  border: 2px solid var(--green);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  font-style: italic;
+}
+.b1-anticipazione {
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.7;
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+}
+.b1-spacer { flex: 1; min-height: 8px; }
+.b1-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 4px;
+}
+.b1-progress-track {
+  flex: 1;
+  height: 5px;
+  background: rgba(40,62,74,0.12);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.b1-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6BA03E, #88C057);
+  border-radius: 3px;
+}
+.b1-progress-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #5a8e30;
+  white-space: nowrap;
+}
+/* Page B — testimonianza */
+.b1-back-btn {
+  background: none;
+  border: none;
+  color: var(--navy);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font);
+  opacity: 0.75;
+}
+.b1-testi-headline {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.3;
+}
+.b1-testi-headline em {
+  color: var(--green-dark);
+  font-style: normal;
+}
+.b1-testi-subheadline {
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.6;
+  margin-top: 6px;
+}
+.b1-testi-card {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 18px 16px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.b1-testi-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.b1-testi-photo {
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--navy) 0%, #6BA03E 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+.b1-testi-meta { display: flex; flex-direction: column; gap: 3px; }
+.b1-testi-name { font-size: 14px; font-weight: 700; color: var(--navy); }
+.b1-testi-role { font-size: 12px; color: var(--gray-mid); }
+.b1-quote-wrap { position: relative; padding-top: 8px; }
+.b1-quote-mark {
+  font-size: 56px;
+  line-height: 0.8;
+  color: var(--green);
+  font-family: Georgia, serif;
+  opacity: 0.35;
+  position: absolute;
+  top: 0;
+  left: -2px;
+}
+.b1-quote-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  font-style: italic;
+  padding-left: 30px;
+  min-height: 60px;
+}
+.b1-testi-context {
+  font-size: 12px;
+  color: var(--gray-mid);
+  font-style: italic;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+/* ═══════════════════════════════════════════
+   BRIDGE 3 — SISTEMA SERENITÀ (doppia schermata)
+═══════════════════════════════════════════ */
+#screen-bridge3 { padding: 0; min-height: 100%; background: #e8f4e8; }
+
+.b3-subtitle {
+  font-size: 15px;
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+.b3-blurred-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  filter: blur(5px) saturate(0.9);
+  pointer-events: none;
+  user-select: none;
+}
+.b3-grid-cell {
+  border-radius: 10px;
+  padding: 10px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.b3-grid-cell.sem-red    { background: var(--red-soft); }
+.b3-grid-cell.sem-yellow { background: var(--yellow-soft); }
+.b3-grid-cell.sem-green  { background: var(--sem-green-soft); }
+.b3-grid-cell-icon { font-size: 16px; }
+.b3-grid-cell-name {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--navy);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.b3-sem-dot { width: 10px; height: 10px; border-radius: 50%; }
+.b3-unlock-text {
+  font-size: 14px;
+  color: var(--text-soft);
+  text-align: center;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════
+   GATE EMAIL
+═══════════════════════════════════════════ */
+#screen-gate-email { padding: 0; min-height: 100%; }
+
+.gate-container {
+  padding: 28px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 100%;
+}
+.gate-headline {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+.gate-subtitle {
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.65;
+}
+.gate-fields { display: flex; flex-direction: column; gap: 12px; }
+.gate-field { display: flex; flex-direction: column; gap: 5px; }
+.gate-field-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.gate-field input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-family: var(--font);
+  color: var(--text);
+  background: white;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.gate-field input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(136,192,87,0.14);
+}
+.gate-field input::placeholder { color: var(--gray-light); }
+.gate-field input.invalid { border-color: var(--red); }
+.gate-microcopy {
+  font-size: 12px;
+  color: var(--gray-mid);
+  text-align: center;
+  line-height: 1.6;
+}
+.gate-trust {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--gray-mid);
+  font-weight: 500;
+  padding-bottom: 4px;
+}
+
+/* ═══════════════════════════════════════════
+   SCHERMATA ELABORAZIONE
+═══════════════════════════════════════════ */
+#screen-elaborazione { padding: 0; min-height: 100%; background: var(--navy); }
+
+.elab-container {
+  min-height: 100%;
+  padding: 48px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  background: var(--navy);
+}
+.elab-icon {
+  font-size: 52px;
+  animation: elab-pulse 2.2s ease-in-out infinite;
+}
+@keyframes elab-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.82; }
+}
+.elab-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: white;
+  text-align: center;
+  line-height: 1.3;
+}
+.elab-bar-wrap { width: 100%; }
+.elab-bar-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.14);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.elab-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6BA03E, #88C057);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.7s ease;
+}
+.elab-checklist { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+.elab-check-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.elab-check-item.visible { opacity: 1; transform: translateY(0); }
+.elab-check-icon {
+  width: 28px; height: 28px; min-width: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+.elab-check-icon.done    { background: var(--green); color: white; }
+.elab-check-icon.loading { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); font-size: 16px; }
+.elab-check-text { font-size: 15px; color: white; font-weight: 500; }
+.elab-footer-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+  line-height: 1.65;
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════
    MODULE 0 INTRO
 ═══════════════════════════════════════════ */
 .m0-header {
@@ -1138,6 +1494,185 @@ html, body {
       </div>
     </div>
 
+    <!-- ══ BRIDGE 1 — SISTEMA PROSPERITÀ (DOPPIA SCHERMATA) ══ -->
+    <div class="screen" id="screen-bridge1">
+      <!-- PAGINA A -->
+      <div class="b1-page" id="b1-page-a">
+        <div class="b1-badge">✓ Sistema Prosperità analizzato</div>
+        <div class="b1-title">Hai appena esaminato le 3 aree che determinano il tuo fatturato.</div>
+        <div class="b1-stat-box">
+          "Il 68% dei coach che completano questa sezione scopre che il vero blocco non è la visibilità — è la struttura dell'offerta o la mancanza di un sistema di vendita continuativo."
+        </div>
+        <div class="b1-anticipazione">
+          Nella prossima sezione analizziamo come gestisci il tuo tempo e la tua operatività. È spesso qui che si nasconde il blocco più silenzioso — quello che ti fa lavorare tanto senza vedere i risultati.
+        </div>
+        <div class="b1-spacer"></div>
+        <div class="b1-progress-row">
+          <div class="b1-progress-track">
+            <div class="b1-progress-fill" style="width:33%"></div>
+          </div>
+          <span class="b1-progress-label">Sistema 1 di 3</span>
+        </div>
+      </div>
+      <!-- PAGINA B — Testimonianza -->
+      <div class="b1-page" id="b1-page-b" style="display:none">
+        <button class="b1-back-btn" onclick="showBridge1('a')">← Torna indietro</button>
+        <div>
+          <div class="b1-testi-headline">Non sei solo... e abbiamo analizzato <em>moltissimi casi</em> come il tuo</div>
+          <div class="b1-testi-subheadline">Guarda cosa dice chi si trovava nella tua stessa situazione sul fronte del fatturato e dell'acquisizione clienti — prima di fare il check-up e farsi affiancare dal team Koachify</div>
+        </div>
+        <div class="b1-testi-card">
+          <div class="b1-testi-top">
+            <div class="b1-testi-photo">👤</div>
+            <div class="b1-testi-meta">
+              <div class="b1-testi-name">[NOME CLIENTE]</div>
+              <div class="b1-testi-role">[Ruolo / Professione]</div>
+            </div>
+          </div>
+          <div class="b1-quote-wrap">
+            <div class="b1-quote-mark">"</div>
+            <div class="b1-quote-text">[TESTIMONIANZA PROSPERITÀ — verrà inserita dall'utente]</div>
+          </div>
+          <div class="b1-testi-context">Questa era la situazione prima di lavorare sul Sistema Prosperità.</div>
+        </div>
+        <div class="b1-spacer"></div>
+        <div class="b1-progress-row">
+          <div class="b1-progress-track">
+            <div class="b1-progress-fill" style="width:33%"></div>
+          </div>
+          <span class="b1-progress-label">Sistema 1 di 3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ BRIDGE 2 — SISTEMA LIBERTÀ (SCHERMATA SINGOLA) ══ -->
+    <div class="screen" id="screen-bridge2">
+      <div class="b1-page" id="b2-page">
+        <div class="b1-badge">✓ Sistema Libertà analizzato</div>
+        <div class="b1-title">Hai analizzato come gestisci tempo, strumenti e team.</div>
+        <div class="b1-stat-box">
+          "I professionisti con un sistema operativo strutturato generano in media 2.3x rispetto a chi lavora ancora a intuito — indipendentemente dal fatturato attuale."
+        </div>
+        <div class="b1-anticipazione">
+          Ultima sezione: analizziamo il sistema di supporto e le risorse a tua disposizione. È l'area più sottovalutata — e spesso quella con l'impatto maggiore sulla qualità della vita.
+        </div>
+        <div class="b1-spacer"></div>
+        <div class="b1-progress-row">
+          <div class="b1-progress-track">
+            <div class="b1-progress-fill" style="width:67%"></div>
+          </div>
+          <span class="b1-progress-label">Sistema 2 di 3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ BRIDGE 3 — SISTEMA SERENITÀ (DOPPIA SCHERMATA) ══ -->
+    <div class="screen" id="screen-bridge3">
+      <!-- PAGINA A: griglia sfocata -->
+      <div class="b1-page" id="b3-page-a">
+        <div class="b1-badge">✓ Analisi completata — 27 pilastri esaminati</div>
+        <div class="b1-title">La tua Clarity Map è pronta.</div>
+        <div class="b3-subtitle">Abbiamo identificato i tuoi pattern specifici su tutte e 9 le aree del tuo business.</div>
+        <div class="b3-blurred-grid" id="b3-grid"></div>
+        <div class="b3-unlock-text">Inserisci i tuoi dati per sbloccare la diagnosi completa.</div>
+        <div class="b1-spacer"></div>
+        <div class="b1-progress-row">
+          <div class="b1-progress-track">
+            <div class="b1-progress-fill" style="width:100%"></div>
+          </div>
+          <span class="b1-progress-label">Analisi completa ✓</span>
+        </div>
+      </div>
+      <!-- PAGINA B: testimonianza finale -->
+      <div class="b1-page" id="b3-page-b" style="display:none">
+        <button class="b1-back-btn" onclick="showBridge3('a')">← Torna indietro</button>
+        <div>
+          <div class="b1-testi-headline">Non sei solo... e abbiamo analizzato <em>moltissimi casi</em> come il tuo</div>
+          <div class="b1-testi-subheadline">Guarda cosa dice chi si trovava esattamente dove sei tu ora — prima di ricevere la sua Clarity Map e farsi affiancare dal team Koachify</div>
+        </div>
+        <div class="b1-testi-card">
+          <div class="b1-testi-top">
+            <div class="b1-testi-photo">👤</div>
+            <div class="b1-testi-meta">
+              <div class="b1-testi-name">[NOME CLIENTE]</div>
+              <div class="b1-testi-role">[Ruolo / Professione]</div>
+            </div>
+          </div>
+          <div class="b1-quote-wrap">
+            <div class="b1-quote-mark">"</div>
+            <div class="b1-quote-text">[TESTIMONIANZA FORTE — impatto della chiarezza e della diagnosi]</div>
+          </div>
+          <div class="b1-testi-context">Ecco cosa ha visto nella sua Clarity Map — e cosa è cambiato dopo.</div>
+        </div>
+        <div class="b1-spacer"></div>
+        <div class="b1-progress-row">
+          <div class="b1-progress-track">
+            <div class="b1-progress-fill" style="width:100%"></div>
+          </div>
+          <span class="b1-progress-label">Analisi completa ✓</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ GATE EMAIL ══ -->
+    <div class="screen" id="screen-gate-email">
+      <div class="gate-container">
+        <div>
+          <div class="gate-headline">La tua Clarity Map è pronta. Dove te la mandiamo?</div>
+          <div class="gate-subtitle">Abbiamo identificato i tuoi blocchi e i tuoi punti di forza. Inserisci i tuoi dati per sbloccare la diagnosi completa.</div>
+        </div>
+        <div class="gate-fields">
+          <div class="gate-field">
+            <label class="gate-field-label">Il tuo nome</label>
+            <input type="text" id="gate-nome" placeholder="Mario Rossi" autocomplete="given-name" oninput="this.classList.remove('invalid')">
+          </div>
+          <div class="gate-field">
+            <label class="gate-field-label">Email professionale</label>
+            <input type="email" id="gate-email" placeholder="mario@esempio.it" autocomplete="email" oninput="this.classList.remove('invalid')">
+          </div>
+          <div class="gate-field">
+            <label class="gate-field-label">WhatsApp o telefono</label>
+            <input type="tel" id="gate-telefono" placeholder="+39 333 123 4567" autocomplete="tel">
+          </div>
+        </div>
+        <div class="gate-microcopy">La ricevi anche via email così puoi rileggere quando vuoi.<br>Nessuno spam, mai.</div>
+        <div class="gate-trust">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          I tuoi dati sono al sicuro · Privacy Policy
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ELABORAZIONE ══ -->
+    <div class="screen" id="screen-elaborazione">
+      <div class="elab-container">
+        <div class="elab-icon">🔍</div>
+        <div class="elab-title">Analizzando i tuoi risultati...</div>
+        <div class="elab-bar-wrap">
+          <div class="elab-bar-track">
+            <div class="elab-bar-fill" id="elab-bar-fill"></div>
+          </div>
+        </div>
+        <div class="elab-checklist">
+          <div class="elab-check-item" id="elab-item-1">
+            <div class="elab-check-icon done">✓</div>
+            <div class="elab-check-text">27 pilastri elaborati</div>
+          </div>
+          <div class="elab-check-item" id="elab-item-2">
+            <div class="elab-check-icon done">✓</div>
+            <div class="elab-check-text">Archetipo identificato</div>
+          </div>
+          <div class="elab-check-item" id="elab-item-3">
+            <div class="elab-check-icon loading">⟳</div>
+            <div class="elab-check-text">Generando la tua Clarity Map...</div>
+          </div>
+        </div>
+        <div class="elab-footer-text">
+          Il tuo profilo richiede un'analisi approfondita.<br>Stiamo elaborando le priorità d'azione più rilevanti per la tua situazione.
+        </div>
+      </div>
+    </div>
+
     <!-- ══ CLARITY MAP ══ -->
     <div class="screen" id="screen-clarity">
       <div class="clarity-hero">
@@ -1225,9 +1760,102 @@ const state = {
   openAnswers: {},
   _selectedLetter: null,
   _afterBridgeModule: null,
-  _backAvailable: false
+  _backAvailable: false,
+  leadData: null,
+  sessionId: null
 };
 let _autoAdvanceTimer = null;
+
+// ═══════════════════════════════════════════════════════════
+// SUPABASE — integrazione dati
+// ═══════════════════════════════════════════════════════════
+const SUPA_URL = 'https://qwxbuqabguvmpzcebygr.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3eGJ1cWFiZ3V2bXB6Y2VieWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1Njg5MDksImV4cCI6MjA5ODE0NDkwOX0.yFQ0dMj9_L3YNDQEI6WF7LnUBHRXtmpCmIwsHBJrpiE';
+let db = null;
+try {
+  if (window.supabase && window.supabase.createClient) {
+    db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  }
+} catch(e) { console.warn('[Supabase] init:', e); }
+
+function semToScore(sem) {
+  return sem === 'green' ? 100 : sem === 'yellow' ? 50 : 0;
+}
+function calcSystemScore(p1, p2, p3) {
+  return Math.round(
+    (semToScore(state.planetSemafori[`p${p1}`] || 'yellow') +
+     semToScore(state.planetSemafori[`p${p2}`] || 'yellow') +
+     semToScore(state.planetSemafori[`p${p3}`] || 'yellow')) / 3
+  );
+}
+
+async function createSession() {
+  if (!db) return;
+  try {
+    localStorage.removeItem('ks_session_id');
+    const id = crypto.randomUUID();
+    const { error } = await db.from('quiz_sessions')
+      .insert([{ id, status: 'in_progress' }]);
+    if (!error) {
+      state.sessionId = id;
+      localStorage.setItem('ks_session_id', id);
+    } else {
+      console.warn('[Supabase] createSession:', error);
+    }
+  } catch(e) { console.warn('[Supabase] createSession:', e); }
+}
+
+async function saveAnswer(pianeta, pilastro, tipo, risposta, semaforo) {
+  if (!db || !state.sessionId) return;
+  try {
+    await db.from('quiz_answers').insert([{
+      session_id: state.sessionId,
+      pianeta, pilastro, tipo, risposta,
+      semaforo: semaforo || null
+    }]);
+  } catch(e) { console.warn('[Supabase] saveAnswer:', e); }
+}
+
+async function completeSession() {
+  if (!db || !state.sessionId) return;
+  try {
+    await db.from('quiz_sessions').update({
+      completed_at: new Date().toISOString(),
+      status: 'completed',
+      archetipo: ARCHETIPI[state.archetipo] ? ARCHETIPI[state.archetipo].name : null,
+      score_prosperita: calcSystemScore(1, 2, 3),
+      score_liberta:    calcSystemScore(4, 5, 6),
+      score_serenita:   calcSystemScore(7, 8, 9)
+    }).eq('id', state.sessionId);
+  } catch(e) { console.warn('[Supabase] completeSession:', e); }
+}
+
+async function saveLeadData() {
+  if (!db || !state.sessionId || !state.leadData) return;
+  try {
+    await db.from('quiz_leads').insert([{
+      session_id: state.sessionId,
+      nome:      state.leadData.nome,
+      email:     state.leadData.email,
+      telefono:  state.leadData.telefono,
+      archetipo: ARCHETIPI[state.archetipo] ? ARCHETIPI[state.archetipo].name : null
+    }]);
+    const rows = PLANET_NAMES.map((name, i) => {
+      const m = i + 1;
+      const sem = state.planetSemafori[`p${m}`] || 'yellow';
+      return {
+        session_id: state.sessionId,
+        pianeta:    name,
+        semaforo:   sem,
+        score:      semToScore(sem),
+        pilastro_1: state.pillarSemafori[`m${m}p1`] || null,
+        pilastro_2: state.pillarSemafori[`m${m}p2`] || null,
+        pilastro_3: state.pillarSemafori[`m${m}p3`] || null
+      };
+    });
+    await db.from('clarity_map').insert(rows);
+  } catch(e) { console.warn('[Supabase] saveLeadData:', e); }
+}
 
 // ═══════════════════════════════════════════════════════════
 // CONSTANTS
@@ -1858,6 +2486,7 @@ function startQuiz() {
   state.phase = 'module0';
   setTopbar(false, null);
   setProgress(null);
+  createSession();
   showModule0Question(0);
 }
 
@@ -1896,9 +2525,122 @@ function showModule0Question(idx) {
 // HANDLE CONTINUE
 // ═══════════════════════════════════════════════════════════
 function handleContinue() {
-  if (state.phase === 'module0') { handleModule0Continue(); return; }
-  if (state.phase === 'module') { handleModuleContinue(); return; }
-  if (state.phase === 'bridge') { afterBridge(); return; }
+  if (state.phase === 'module0')   { handleModule0Continue(); return; }
+  if (state.phase === 'module')    { handleModuleContinue(); return; }
+  if (state.phase === 'bridge')    { afterBridge(); return; }
+  if (state.phase === 'bridge1a')  { showBridge1('b'); return; }
+  if (state.phase === 'bridge1b')  { afterBridge1(); return; }
+  if (state.phase === 'bridge2')   { afterBridge2(); return; }
+  if (state.phase === 'bridge3a')  { showBridge3('b'); return; }
+  if (state.phase === 'bridge3b')  { showGateEmail(); return; }
+  if (state.phase === 'gate-email'){ submitGateEmail(); return; }
+}
+
+function renderBridge3Grid() {
+  const grid = document.getElementById('b3-grid');
+  grid.innerHTML = '';
+  const semColors = {red:'#C0392B', yellow:'#F39C12', green:'#27AE60'};
+  PLANET_NAMES.forEach((name, i) => {
+    const sem = state.planetSemafori[`p${i+1}`] || 'yellow';
+    const cell = document.createElement('div');
+    cell.className = `b3-grid-cell sem-${sem}`;
+    cell.innerHTML = `
+      <div class="b3-grid-cell-icon">${PLANET_ICONS[i]}</div>
+      <div class="b3-grid-cell-name">${name}</div>
+      <div class="b3-sem-dot" style="background:${semColors[sem]}"></div>`;
+    grid.appendChild(cell);
+  });
+}
+
+function showBridge3(page) {
+  if (page === 'a') {
+    document.getElementById('b3-page-a').style.display = 'flex';
+    document.getElementById('b3-page-b').style.display = 'none';
+    state.phase = 'bridge3a';
+    setBtnLabel('Sblocca la mia Clarity Map →', false);
+  } else {
+    document.getElementById('b3-page-a').style.display = 'none';
+    document.getElementById('b3-page-b').style.display = 'flex';
+    state.phase = 'bridge3b';
+    setBtnLabel('Sblocca la mia Clarity Map →', false);
+  }
+  document.getElementById('content-area').scrollTop = 0;
+}
+
+function showGateEmail() {
+  state.phase = 'gate-email';
+  setTopbarVisible(false);
+  setProgress(null);
+  setBtnLabel('Sblocca la mia Clarity Map →', false);
+  setBtnVisible(true);
+  showScreen('screen-gate-email');
+}
+
+function submitGateEmail() {
+  const nomeEl  = document.getElementById('gate-nome');
+  const emailEl = document.getElementById('gate-email');
+  const nome  = nomeEl.value.trim();
+  const email = emailEl.value.trim();
+  let valid = true;
+  if (!nome)  { nomeEl.classList.add('invalid');  valid = false; }
+  if (!email) { emailEl.classList.add('invalid'); valid = false; }
+  if (!valid) return;
+  state.leadData = {
+    nome,
+    email,
+    telefono: document.getElementById('gate-telefono').value.trim()
+  };
+  state.archetipo = determineArchetype();
+  saveLeadData();
+  showElaborazione();
+}
+
+function showElaborazione() {
+  state.phase = 'elaborazione';
+  setTopbarVisible(false);
+  setProgress(null);
+  setBtnVisible(false);
+  showScreen('screen-elaborazione');
+  // Reset
+  ['elab-item-1','elab-item-2','elab-item-3'].forEach(id =>
+    document.getElementById(id).classList.remove('visible'));
+  const fill = document.getElementById('elab-bar-fill');
+  fill.style.transition = 'none';
+  fill.style.width = '0%';
+  // Force reflow then re-enable transition
+  void fill.offsetWidth;
+  fill.style.transition = 'width 0.7s ease';
+  // Sequenza check items + barra
+  setTimeout(() => { document.getElementById('elab-item-1').classList.add('visible'); fill.style.width = '30%'; }, 600);
+  setTimeout(() => { document.getElementById('elab-item-2').classList.add('visible'); fill.style.width = '65%'; }, 2800);
+  setTimeout(() => { document.getElementById('elab-item-3').classList.add('visible'); fill.style.width = '88%'; }, 5200);
+  setTimeout(() => { fill.style.width = '100%'; }, 7200);
+  setTimeout(() => { showClarityMap(); }, 8500);
+}
+
+function showBridge1(page) {
+  if (page === 'a') {
+    document.getElementById('b1-page-a').style.display = 'flex';
+    document.getElementById('b1-page-b').style.display = 'none';
+    state.phase = 'bridge1a';
+    setBtnLabel('Continua →', false);
+  } else {
+    document.getElementById('b1-page-a').style.display = 'none';
+    document.getElementById('b1-page-b').style.display = 'flex';
+    state.phase = 'bridge1b';
+    setBtnLabel("Continua l'analisi →", false);
+  }
+  document.getElementById('content-area').scrollTop = 0;
+}
+
+function afterBridge1() {
+  markAdvanced();
+  startModule(4);
+}
+
+function afterBridge2() {
+  markAdvanced();
+  startModule(7);
 }
 
 function handleModule0Continue() {
@@ -1969,6 +2711,7 @@ function handleModuleContinue() {
     const percLetter = state.answers[pillar.perception.id];
     const sem = scoreSemaforo(percLetter, letter);
     state.pillarSemafori[`m${currentModule}p${currentPillarIndex+1}`] = sem;
+    saveAnswer(currentModule, currentPillarIndex+1, 'verifica', letter, sem);
     if (isBias(percLetter, letter)) state.biasFlags[`m${currentModule}`] = true;
     state._selectedLetter = null;
     awaitingVerification = false;
@@ -2002,6 +2745,7 @@ function handleModuleContinue() {
 
   if (letter === 'A') {
     state.pillarSemafori[`m${currentModule}p${currentPillarIndex+1}`] = 'red';
+    saveAnswer(currentModule, currentPillarIndex+1, 'percezione', letter, 'red');
     markAdvanced();
     advanceAfterPillar();
   } else {
@@ -2037,6 +2781,55 @@ function finishModule(m) {
     state.pillarSemafori[`m${m}p3`]
   ];
   state.planetSemafori[`p${m}`] = scorePlanet(sems[0], sems[1], sems[2]);
+
+  // Bridge 2: fine Sistema Libertà (dopo Pianeta 6 — Moltiplicazione)
+  if (m === 6) {
+    state.phase = 'bridge2';
+    state._afterBridgeModule = m;
+    setTopbarVisible(true);
+    setTopbar(true, null);
+    state._backAvailable = true;
+    updateBackBtn();
+    setProgress(null);
+    showScreen('screen-bridge2');
+    setBtnLabel("Continua l'analisi →", false);
+    setBtnVisible(true);
+    return;
+  }
+
+  // Bridge 3: fine Sistema Serenità (dopo Pianeta 9 — Scuderia)
+  if (m === 9) {
+    state.phase = 'bridge3a';
+    state._afterBridgeModule = m;
+    setTopbarVisible(false);
+    setProgress(null);
+    state._backAvailable = false;
+    updateBackBtn();
+    renderBridge3Grid();
+    showScreen('screen-bridge3');
+    document.getElementById('b3-page-a').style.display = 'flex';
+    document.getElementById('b3-page-b').style.display = 'none';
+    setBtnLabel('Sblocca la mia Clarity Map →', false);
+    setBtnVisible(true);
+    return;
+  }
+
+  // Bridge 1: fine Sistema Prosperità (dopo Pianeta 3 — Viaggio)
+  if (m === 3) {
+    state.phase = 'bridge1a';
+    state._afterBridgeModule = m;
+    setTopbarVisible(false);
+    setProgress(null);
+    state._backAvailable = false;
+    updateBackBtn();
+    showScreen('screen-bridge1');
+    document.getElementById('b1-page-a').style.display = 'flex';
+    document.getElementById('b1-page-b').style.display = 'none';
+    setBtnLabel('Continua →', false);
+    setBtnVisible(true);
+    return;
+  }
+
   const mod = MODULES[m];
   if (mod.bridges) {
     const bKey = state.planetSemafori[`p${m}`];
@@ -2051,8 +2844,7 @@ function finishModule(m) {
     document.getElementById('bridge-next-label').textContent =
       m < 9 ? `Prossima: ${MODULE_NAMES[m+1]} →` : 'Calcolo Clarity Map...';
     setTopbarVisible(false);
-    setProgress(null);   // hide progress bar wrap entirely in bridge
-    // update bridge progress dots
+    setProgress(null);
     const pct = Math.round(m/9*100);
     document.getElementById('bridge-progress-fill').style.width = pct + '%';
     document.getElementById('bridge-progress-label').textContent = `${m} di 9`;
@@ -2077,6 +2869,7 @@ function afterBridge() {
 // ═══════════════════════════════════════════════════════════
 function showClarityMap() {
   state.archetipo = determineArchetype();
+  completeSession();
   const arch = ARCHETIPI[state.archetipo];
   document.getElementById('clarity-archetype-name').textContent = arch.name;
   document.getElementById('clarity-archetype-fascia').textContent = arch.fascia;
