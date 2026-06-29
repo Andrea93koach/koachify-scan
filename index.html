@@ -1258,16 +1258,20 @@ html, body {
 /* System score bar */
 .system-score-row {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   background: var(--navy);
   border-radius: 10px;
-  padding: 9px 14px;
+  padding: 10px 14px;
   margin-bottom: 18px;
   opacity: 0;
   transition: opacity 0.4s ease;
 }
 .system-score-row.revealed { opacity: 1; }
+.system-score-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .system-score-label {
   font-size: 11px;
   font-weight: 700;
@@ -1278,6 +1282,137 @@ html, body {
   font-size: 15px;
   font-weight: 900;
   color: #88C057;
+}
+.system-score-sintesi {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.5;
+  margin-top: 5px;
+  font-style: italic;
+  display: none;
+}
+/* Insight box — blocco principale strutturato */
+.insight-box-pianeta {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.insight-box-perche {
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.65;
+  margin-bottom: 10px;
+}
+.insight-box-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.insight-box-bullets li {
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.7);
+  padding-left: 14px;
+  position: relative;
+  line-height: 1.5;
+}
+.insight-box-bullets li::before {
+  content: '\2192';
+  position: absolute;
+  left: 0;
+  color: #88C057;
+  font-weight: 700;
+}
+.insight-box-sblocca {
+  font-size: 12px;
+  color: #88C057;
+  font-weight: 600;
+  line-height: 1.5;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+/* Priority full card */
+.priority-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--red);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 10px;
+}
+.priority-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.priority-card-num {
+  background: var(--red-soft);
+  color: var(--red);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+.priority-card-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.priority-card-why {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.priority-card-action {
+  background: #F7F9FA;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  color: var(--navy);
+  font-weight: 600;
+  line-height: 1.55;
+  margin-bottom: 6px;
+  border-left: 3px solid #27AE60;
+}
+.priority-card-result {
+  font-size: 11.5px;
+  color: var(--text-soft);
+  font-style: italic;
+  line-height: 1.45;
+}
+/* Report narrativo */
+.report-narrativo-box {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1.5px solid var(--border);
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.8;
+}
+/* Prossimo passo */
+.prossimo-passo-box {
+  background: linear-gradient(135deg, #1B2A3E 0%, #2C3E50 100%);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.65;
+  font-style: italic;
 }
 /* Universe map */
 .universe-map-wrap {
@@ -1404,6 +1539,12 @@ html, body {
 }
 .result-row-badge.strength { background: var(--sem-green-soft); color: #1a8a48; }
 .result-row-badge.priority { background: var(--red-soft); color: var(--red); }
+.result-row-body { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.result-row-action {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
 
 /* Archetype text box */
 .arch-text-card {
@@ -1818,20 +1959,29 @@ html, body {
 
         <div class="planet-grid" id="planet-grid-row1"></div>
         <div class="system-score-row" id="system-score-row1">
-          <span class="system-score-label">Sistema Prosperità</span>
-          <span class="system-score-value" id="cm-score-s1">—</span>
+          <div class="system-score-top">
+            <span class="system-score-label">Sistema Prosperità</span>
+            <span class="system-score-value" id="cm-score-s1">—</span>
+          </div>
+          <div class="system-score-sintesi" id="cm-sintesi-s1"></div>
         </div>
 
         <div class="planet-grid" id="planet-grid-row2"></div>
         <div class="system-score-row" id="system-score-row2">
-          <span class="system-score-label">Sistema Libertà</span>
-          <span class="system-score-value" id="cm-score-s2">—</span>
+          <div class="system-score-top">
+            <span class="system-score-label">Sistema Libertà</span>
+            <span class="system-score-value" id="cm-score-s2">—</span>
+          </div>
+          <div class="system-score-sintesi" id="cm-sintesi-s2"></div>
         </div>
 
         <div class="planet-grid" id="planet-grid-row3"></div>
         <div class="system-score-row" id="system-score-row3">
-          <span class="system-score-label">Sistema Serenità</span>
-          <span class="system-score-value" id="cm-score-s3">—</span>
+          <div class="system-score-top">
+            <span class="system-score-label">Sistema Serenità</span>
+            <span class="system-score-value" id="cm-score-s3">—</span>
+          </div>
+          <div class="system-score-sintesi" id="cm-sintesi-s3"></div>
         </div>
 
         <!-- Mappa Universo Koachify -->
@@ -1843,16 +1993,18 @@ html, body {
             <div style="font-size:28px">🗺️</div>
             <div>Inserire <strong>universo-koachify.png</strong> nella cartella</div>
           </div>
-          <svg class="universe-map-svg" id="universe-map-svg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet"></svg>
+          <svg class="universe-map-svg" id="universe-map-svg" viewBox="0 0 1000 600" preserveAspectRatio="none"></svg>
           <div class="universe-map-debug" id="universe-map-debug" style="display:none"></div>
         </div>
         <div class="map-debug-hint">📍 Modalità debug attiva — clicca sulla mappa per ottenere le coordinate da Console</div>
 
-        <!-- Box Insight (placeholder — popolato da IA in Punto 8) -->
+        <!-- Box Insight — blocco principale -->
         <div class="clarity-section-title">Analisi approfondita</div>
         <div class="insight-box">
-          <div class="insight-box-title">Il tuo blocco principale</div>
-          <div class="insight-box-text" id="cm-insight-text">[Report generato dall'analisi — disponibile dopo integrazione IA]</div>
+          <div class="insight-box-title" id="cm-blocco-pianeta">Il tuo blocco principale</div>
+          <div class="insight-box-perche" id="cm-blocco-perche"></div>
+          <ul class="insight-box-bullets" id="cm-blocco-bullets"></ul>
+          <div class="insight-box-sblocca" id="cm-blocco-sblocca"></div>
         </div>
 
         <!-- Punti di Forza -->
@@ -1870,6 +2022,17 @@ html, body {
         <!-- Profilo Archetipo -->
         <div class="clarity-section-title">Il tuo profilo</div>
         <div class="arch-text-card" id="archetype-text-box"></div>
+
+        <!-- Report narrativo IA -->
+        <div id="report-narrativo-wrap" style="display:none">
+          <div class="clarity-section-title">La tua diagnosi</div>
+          <div class="report-narrativo-box" id="cm-report-narrativo"></div>
+        </div>
+
+        <!-- Prossimo passo IA -->
+        <div id="prossimo-passo-wrap" style="display:none">
+          <div class="prossimo-passo-box" id="cm-prossimo-passo"></div>
+        </div>
 
         <!-- CTA -->
         <div class="cta-block">
@@ -1935,6 +2098,129 @@ const state = {
   sessionId: null
 };
 let _autoAdvanceTimer = null;
+
+// ═══════════════════════════════════════════════════════════
+// OPENAI — integrazione report IA
+// ═══════════════════════════════════════════════════════════
+const OPENAI_KEY = 'sk-proj-stYce-0RaX_Qi9psX08e_g8dTO_-rWn950uB0apsF8ClV7nYQPNeDaROJe33k82P3yOx' +
+  'YlN9CST3BlbkFJy2ISfBQDnVOU4nBBC4uJ5-HZAUYVbff2sgDrtjJUOrfgynnRoGVQgwzGb17DWXwbrAkQdYSmEA';
+let _aiReport = null;
+let _aiReportPromise = null;
+
+const _FAT_LABELS = {
+  A:'Non ho ancora entrate regolari',
+  B:'0-1.500 euro/mese',
+  C:'1.500-5.000 euro/mese',
+  D:'5.000-15.000 euro/mese',
+  E:'15.000-50.000 euro/mese',
+  F:'Oltre 50.000 euro/mese'
+};
+
+async function generateAIReport() {
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), 15000);
+  try {
+    const SEM_IT = {red:'ROSSO', yellow:'GIALLO', green:'VERDE'};
+    const SYS   = ['Prosperità','Prosperità','Prosperità','Libertà','Libertà','Libertà','Serenità','Serenità','Serenità'];
+    const nome  = (state.leadData && state.leadData.nome) || 'Anonimo';
+    const arch  = ARCHETIPI[state.archetipo]?.name || 'Non determinato';
+    const fat   = _FAT_LABELS[state.fatturato] || 'Non specificato';
+
+    const planetLines = PLANET_NAMES.map((name, i) => {
+      const m  = i + 1;
+      const sem = state.planetSemafori[`p${m}`] || 'yellow';
+      const sc  = getPlanetScore(m);
+      const p1  = SEM_IT[state.pillarSemafori[`m${m}p1`] || 'yellow'];
+      const p2  = SEM_IT[state.pillarSemafori[`m${m}p2`] || 'yellow'];
+      const p3  = SEM_IT[state.pillarSemafori[`m${m}p3`] || 'yellow'];
+      return `- ${name} (${SYS[i]}): ${SEM_IT[sem]} score ${sc}/100 | pilastri: ${p1}/${p2}/${p3}`;
+    }).join('\n');
+
+    const s1 = calcSystemScore(1,2,3);
+    const s2 = calcSystemScore(4,5,6);
+    const s3 = calcSystemScore(7,8,9);
+
+    const userMsg = `Nome: ${nome}, Archetipo: ${arch}, Fatturato: ${fat}.
+
+Risultati per pianeta:
+${planetLines}
+
+Score sistemi: Prosperità ${s1}/100 / Libertà ${s2}/100 / Serenità ${s3}/100`;
+
+    const sysPrompt = `Sei un analista esperto della metodologia Universo Koachify. Hai accesso ai risultati del check-up di un coach o professionista online italiano. Genera un report diagnostico completo e personalizzato in italiano.
+
+METODOLOGIA: 3 Sistemi Solari (Prosperità = pianeti 1-3, Libertà = pianeti 4-6, Serenità = pianeti 7-9) con 9 Pianeti e 27 Pilastri. Semafori: ROSSO = blocco critico / GIALLO = parziale / VERDE = strutturato.
+
+Rispondi SOLO con questo JSON valido, senza testo prima o dopo:
+{
+  "archetipo_titolo": "nome preciso dell'archetipo",
+  "archetipo_descrizione": "3 righe personalizzate max 60 parole. Parla direttamente alla situazione specifica. Cita il fatturato dichiarato e almeno un pianeta critico emerso. Tono: qualcuno che conosce la situazione da vicino, non una descrizione generica.",
+  "sistema_prosperita": { "score": <intero 0-100 coerente con i dati ricevuti>, "sintesi": "1 frase situazionale max 25 parole — traduce il numero in situazione concreta, non in giudizio astratto" },
+  "sistema_liberta":    { "score": <intero 0-100>, "sintesi": "1 frase situazionale max 25 parole" },
+  "sistema_serenita":   { "score": <intero 0-100>, "sintesi": "1 frase situazionale max 25 parole" },
+  "blocco_principale": {
+    "pianeta": "nome esatto del pianeta con semaforo ROSSO più impattante sul business",
+    "perche_principale": "2 righe che spiegano perché questo blocco e non un altro — impatto sul business complessivo",
+    "come_si_manifesta": [
+      "situazione concreta riconoscibile max 15 parole — deve far pensare: sì, è quello che mi succede",
+      "situazione concreta riconoscibile max 15 parole",
+      "situazione concreta riconoscibile max 15 parole"
+    ],
+    "cosa_sblocca": "1 frase sul risultato atteso se risolve questo blocco"
+  },
+  "punti_di_forza": [
+    { "pianeta": "nome", "score": <intero>, "significato": "cosa produce concretamente avere questo pianeta verde nella loro attività — non complimenti, situazioni reali" }
+  ],
+  "priorita_azione": [
+    { "numero": 1, "pianeta": "nome", "perche_adesso": "1 frase che giustifica questa priorità rispetto alle altre", "azione_concreta": "cosa fare lunedì mattina — specifico e misurabile, max 30 parole", "risultato_atteso": "cosa cambia, 1 frase" },
+    { "numero": 2, "pianeta": "nome", "perche_adesso": "...", "azione_concreta": "...", "risultato_atteso": "..." },
+    { "numero": 3, "pianeta": "nome", "perche_adesso": "...", "azione_concreta": "...", "risultato_atteso": "..." }
+  ],
+  "report_narrativo": "180-220 parole esatte. Testo continuo senza elenchi. Struttura: apertura empatica che cattura l'essenza senza giudicare (fai sentire l'utente capito); sviluppo diagnostico che collega i blocchi principali tra loro spiegando perché il business è fermo o cresce lentamente nonostante l'impegno — questa è la parte più importante, deve sembrare una diagnosi fatta da qualcuno che conosce la situazione da vicino; chiusura con proiezione realistica a 90 giorni se affronta le priorità nell'ordine giusto — no promesse, no numeri inventati. Usa il nome dell'utente almeno una volta. Tempo presente per la situazione attuale, condizionale per i risultati.",
+  "prossimo_passo": "1 frase max 35 parole personalizzata sull'archetipo che crea un ponte specifico tra questo report e la Clarity Call — non una call-to-action generica"
+}
+
+REGOLE INDEROGABILI:
+- Non usare MAI: ecosistema, scalabilità, all-in-one, paradigma, sinergico, ottimizzare, massimizzare, implementare
+- Non usare superlativi: fondamentale, imprescindibile, cruciale
+- Non citare mai Koachify come prodotto/piattaforma nel testo
+- I numeri score nei sistemi devono essere coerenti con gli score per pianeta ricevuti in input
+- Linguaggio parlato, diretto, concreto — nessun concetto astratto
+- Punti di forza: solo pianeti con semaforo VERDE. Se non ce ne sono, restituisci array vuoto.
+- Priorità d'azione: i 3 pianeti con semaforo ROSSO più critici in ordine di impatto sul business`;
+
+    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer ' + OPENAI_KEY },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [{role:'system',content:sysPrompt},{role:'user',content:userMsg}],
+        temperature: 0.7,
+        max_tokens: 2000,
+        response_format: {type:'json_object'}
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(tid);
+    if (!resp.ok) throw new Error('OpenAI ' + resp.status);
+    const data = await resp.json();
+    const report = JSON.parse(data.choices[0].message.content);
+
+    // Salva su Supabase
+    if (db && state.sessionId) {
+      try {
+        await db.from('quiz_leads')
+          .update({ report_text: report.report_narrativo, archetipo: report.archetipo_titolo })
+          .eq('session_id', state.sessionId);
+      } catch(e) { console.warn('[Supabase] update report:', e); }
+    }
+    return report;
+  } catch(e) {
+    clearTimeout(tid);
+    console.warn('[AI] report failed:', e);
+    return null;
+  }
+}
 
 // ═══════════════════════════════════════════════════════════
 // SUPABASE — integrazione dati
@@ -2773,21 +3059,24 @@ function showElaborazione() {
   setProgress(null);
   setBtnVisible(false);
   showScreen('screen-elaborazione');
+  // Avvia chiamata IA — 15s di attesa danno tempo sufficiente per la risposta
+  _aiReport = null;
+  _aiReportPromise = generateAIReport();
+  _aiReportPromise.then(r => { _aiReport = r; });
   // Reset
   ['elab-item-1','elab-item-2','elab-item-3'].forEach(id =>
     document.getElementById(id).classList.remove('visible'));
   const fill = document.getElementById('elab-bar-fill');
   fill.style.transition = 'none';
   fill.style.width = '0%';
-  // Force reflow then re-enable transition
   void fill.offsetWidth;
   fill.style.transition = 'width 0.7s ease';
-  // Sequenza check items + barra
-  setTimeout(() => { document.getElementById('elab-item-1').classList.add('visible'); fill.style.width = '30%'; }, 600);
-  setTimeout(() => { document.getElementById('elab-item-2').classList.add('visible'); fill.style.width = '65%'; }, 2800);
-  setTimeout(() => { document.getElementById('elab-item-3').classList.add('visible'); fill.style.width = '88%'; }, 5200);
-  setTimeout(() => { fill.style.width = '100%'; }, 7200);
-  setTimeout(() => { showClarityMap(); }, 8500);
+  // Sequenza 15s: item1 @1s, item2 @5s, item3 @9.5s, 100% @13s, map @15s
+  setTimeout(() => { document.getElementById('elab-item-1').classList.add('visible'); fill.style.width = '28%'; }, 1000);
+  setTimeout(() => { document.getElementById('elab-item-2').classList.add('visible'); fill.style.width = '60%'; }, 5000);
+  setTimeout(() => { document.getElementById('elab-item-3').classList.add('visible'); fill.style.width = '85%'; }, 9500);
+  setTimeout(() => { fill.style.width = '100%'; }, 13000);
+  setTimeout(() => { showClarityMap(); }, 15000);
 }
 
 function showBridge1(page) {
@@ -3047,17 +3336,19 @@ function getPlanetScore(m) {
   return Math.round(scores.reduce((a,b)=>a+b,0)/3);
 }
 
-const PILASTRI_COORDS = {
-  'p1_1':{x:0,y:0},'p1_2':{x:0,y:0},'p1_3':{x:0,y:0},
-  'p2_1':{x:0,y:0},'p2_2':{x:0,y:0},'p2_3':{x:0,y:0},
-  'p3_1':{x:0,y:0},'p3_2':{x:0,y:0},'p3_3':{x:0,y:0},
-  'p4_1':{x:0,y:0},'p4_2':{x:0,y:0},'p4_3':{x:0,y:0},
-  'p5_1':{x:0,y:0},'p5_2':{x:0,y:0},'p5_3':{x:0,y:0},
-  'p6_1':{x:0,y:0},'p6_2':{x:0,y:0},'p6_3':{x:0,y:0},
-  'p7_1':{x:0,y:0},'p7_2':{x:0,y:0},'p7_3':{x:0,y:0},
-  'p8_1':{x:0,y:0},'p8_2':{x:0,y:0},'p8_3':{x:0,y:0},
-  'p9_1':{x:0,y:0},'p9_2':{x:0,y:0},'p9_3':{x:0,y:0}
-};
+// Coordinate SVG dei 9 pianeti (viewBox 0 0 1000 600, preserveAspectRatio=none)
+// Stimate da screenshot — usa debug click mode per affinare: clicca sul pianeta, leggi Console
+const PLANET_COORDS = [
+  {x: 98, y:200},  // 1 Attrazione
+  {x:159, y:200},  // 2 Conversione
+  {x:128, y:268},  // 3 Viaggio
+  {x:349, y:200},  // 4 Architettura
+  {x:412, y:200},  // 5 Laboratorio
+  {x:379, y:268},  // 6 Moltiplicazione
+  {x:599, y:200},  // 7 Bussola
+  {x:661, y:200},  // 8 Villaggio
+  {x:629, y:268}   // 9 Scuderia
+];
 
 function handleMapClick(event) {
   const wrap = document.getElementById('universe-map-wrap');
@@ -3068,31 +3359,54 @@ function handleMapClick(event) {
   const y = Math.round((event.clientY - rect.top) / rect.height * vb.height);
   const dbg = document.getElementById('universe-map-debug');
   if (dbg) { dbg.textContent = `x:${x}  y:${y}`; dbg.style.display = 'block'; }
-  console.log(`[MapDebug] 'p?_?':{x:${x},y:${y}}`);
+  console.log(`[MapDebug] Pianeta ?: {x:${x},y:${y}}`);
 }
 
 function renderUniversoMap() {
   const svg = document.getElementById('universe-map-svg');
   if (!svg) return;
   svg.innerHTML = '';
-  Object.entries(PILASTRI_COORDS).forEach(([key, coord], idx) => {
-    if (coord.x === 0 && coord.y === 0) return;
-    const parts = key.split('_');
-    const p = parseInt(parts[0].substring(1));
-    const pil = parseInt(parts[1]);
-    const sem = state.pillarSemafori[`m${p}p${pil}`] || 'yellow';
-    const color = sem==='red'?'#E53935':sem==='yellow'?'#F0A500':'#88C057';
+  const SEM_COLOR = {red:'#E53935', yellow:'#F0A500', green:'#88C057'};
+  PLANET_COORDS.forEach((coord, i) => {
+    const m   = i + 1;
+    const sem = state.planetSemafori[`p${m}`] || 'yellow';
+    const col = SEM_COLOR[sem];
+    const g   = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.style.opacity = '0';
+    g.style.transition = `opacity 0.4s ease ${i*120}ms`;
+
+    // Alone luminoso
+    const glow = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    glow.setAttribute('cx', coord.x);
+    glow.setAttribute('cy', coord.y);
+    glow.setAttribute('r', '22');
+    glow.setAttribute('fill', col);
+    glow.setAttribute('opacity', '0.25');
+    g.appendChild(glow);
+
+    // Cerchio principale
     const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
     c.setAttribute('cx', coord.x);
     c.setAttribute('cy', coord.y);
     c.setAttribute('r', '14');
-    c.setAttribute('fill', color);
+    c.setAttribute('fill', col);
     c.setAttribute('stroke', 'white');
-    c.setAttribute('stroke-width', '2');
-    c.style.opacity = '0';
-    c.style.transition = `opacity 0.3s ease ${idx*100}ms`;
-    svg.appendChild(c);
-    setTimeout(() => { c.style.opacity = '1'; }, idx*100 + 100);
+    c.setAttribute('stroke-width', '2.5');
+    g.appendChild(c);
+
+    // Numero pianeta
+    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x', coord.x);
+    t.setAttribute('y', coord.y + 5);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', '11');
+    t.setAttribute('font-weight', '800');
+    t.setAttribute('fill', 'white');
+    t.textContent = m;
+    g.appendChild(t);
+
+    svg.appendChild(g);
+    setTimeout(() => { g.style.opacity = '1'; }, i*120 + 200);
   });
 }
 
@@ -3181,8 +3495,112 @@ function showClarityMap() {
   });
   document.getElementById('priorities-wrap').style.display = hasP ? '' : 'none';
 
-  // Archetype text
+  // ── Archetipo description (fallback locale, sovrascritta da AI) ──
   document.getElementById('archetype-text-box').innerHTML = `<p>${arch.text}</p>`;
+
+  // ── Stato loading nelle sezioni AI ───────────────────────────────
+  document.getElementById('cm-blocco-pianeta').textContent = 'Il tuo blocco principale';
+  const _loadingPerche = document.getElementById('cm-blocco-perche');
+  _loadingPerche.style.cssText = 'font-style:italic;opacity:0.45';
+  _loadingPerche.textContent = 'Preparazione analisi personalizzata...';
+
+  // ── Applica il report AI al DOM (chiamata sia sincrona che lazy) ──
+  function applyAIReport(r) {
+    if (!r) {
+      _loadingPerche.style.cssText = '';
+      _loadingPerche.textContent = '';
+      return;
+    }
+    // Archetipo
+    document.getElementById('archetype-text-box').innerHTML = r.archetipo_descrizione
+      ? `<p>${r.archetipo_descrizione}</p>`
+      : document.getElementById('archetype-text-box').innerHTML;
+
+    // Sintesi sistemi
+    [{id:'cm-sintesi-s1',src:r.sistema_prosperita},{id:'cm-sintesi-s2',src:r.sistema_liberta},{id:'cm-sintesi-s3',src:r.sistema_serenita}]
+      .forEach(s => {
+        const el = document.getElementById(s.id);
+        if (el && s.src && s.src.sintesi) { el.textContent = s.src.sintesi; el.style.display = ''; }
+      });
+
+    // Blocco principale
+    const bp = r.blocco_principale;
+    if (bp && typeof bp === 'object') {
+      const piEl = document.getElementById('cm-blocco-pianeta');
+      if (piEl) piEl.textContent = bp.pianeta ? bp.pianeta + ' — Blocco principale' : 'Il tuo blocco principale';
+      const percheEl = document.getElementById('cm-blocco-perche');
+      if (percheEl) { percheEl.style.cssText = ''; percheEl.textContent = bp.perche_principale || ''; }
+      const bullEl = document.getElementById('cm-blocco-bullets');
+      if (bullEl && bp.come_si_manifesta && bp.come_si_manifesta.length)
+        bullEl.innerHTML = bp.come_si_manifesta.map(b => `<li>${b}</li>`).join('');
+      const sbEl = document.getElementById('cm-blocco-sblocca');
+      if (sbEl && bp.cosa_sblocca) sbEl.textContent = bp.cosa_sblocca;
+    }
+
+    // Punti di forza
+    if (r.punti_di_forza && r.punti_di_forza.length > 0) {
+      const sl2 = document.getElementById('strength-list');
+      sl2.innerHTML = '';
+      r.punti_di_forza.slice(0,3).forEach(item => {
+        const pi = PLANET_NAMES.findIndex(n =>
+          n.toLowerCase().includes((item.pianeta||'').toLowerCase()) ||
+          (item.pianeta||'').toLowerCase().includes(n.toLowerCase()));
+        const icon = pi >= 0 ? PLANET_ICONS[pi] : '⭐';
+        const scoreStr = item.score ? ` — ${item.score}/100` : '';
+        sl2.innerHTML += `<div class="result-row">
+          <div class="result-row-icon green-bg" style="font-size:16px">${icon}</div>
+          <div class="result-row-body">
+            <div class="result-row-label">${item.pianeta}${scoreStr}</div>
+            <div class="result-row-action">${item.significato || ''}</div>
+          </div>
+          <div class="result-row-badge strength">&#10003;</div>
+        </div>`;
+      });
+      document.getElementById('strengths-wrap').style.display = sl2.innerHTML ? '' : 'none';
+    }
+
+    // Priorità d'azione — card complete
+    if (r.priorita_azione && r.priorita_azione.length > 0) {
+      const pl2 = document.getElementById('priority-list');
+      pl2.innerHTML = '';
+      r.priorita_azione.slice(0,3).forEach((item, idx) => {
+        const pi = PLANET_NAMES.findIndex(n =>
+          n.toLowerCase().includes((item.pianeta||'').toLowerCase()) ||
+          (item.pianeta||'').toLowerCase().includes(n.toLowerCase()));
+        const icon = pi >= 0 ? PLANET_ICONS[pi] : '🎯';
+        pl2.innerHTML += `<div class="priority-card">
+          <div class="priority-card-header">
+            <span style="font-size:18px">${icon}</span>
+            <div class="priority-card-num">Priorità ${idx+1}</div>
+            <div class="priority-card-name">${item.pianeta}</div>
+          </div>
+          <div class="priority-card-why">${item.perche_adesso || ''}</div>
+          <div class="priority-card-action">${item.azione_concreta || ''}</div>
+          <div class="priority-card-result">${item.risultato_atteso || ''}</div>
+        </div>`;
+      });
+      document.getElementById('priorities-wrap').style.display = pl2.innerHTML ? '' : 'none';
+    }
+
+    // Report narrativo
+    if (r.report_narrativo) {
+      document.getElementById('cm-report-narrativo').textContent = r.report_narrativo;
+      document.getElementById('report-narrativo-wrap').style.display = '';
+    }
+
+    // Prossimo passo
+    if (r.prossimo_passo) {
+      document.getElementById('cm-prossimo-passo').textContent = r.prossimo_passo;
+      document.getElementById('prossimo-passo-wrap').style.display = '';
+    }
+  }
+
+  // Applica subito se già pronto, altrimenti aggiorna il DOM quando arriva
+  if (_aiReport) {
+    applyAIReport(_aiReport);
+  } else if (_aiReportPromise) {
+    _aiReportPromise.then(r => { _aiReport = r; applyAIReport(r); });
+  }
 
   setTopbar(false, null);
   setProgress(null);
