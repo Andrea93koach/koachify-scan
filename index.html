@@ -203,12 +203,13 @@ html, body {
   display: none;
   flex-direction: column;
   padding: 0;
+  background: var(--navy);
 }
 #screen-welcome.active { display: flex; }
 
 .welcome-hero {
   background: var(--navy);
-  padding: 32px 24px 40px;
+  padding: 32px 24px 24px;
   text-align: center;
 }
 .welcome-kochi-ring {
@@ -240,6 +241,8 @@ html, body {
 }
 
 .welcome-body {
+  background: var(--bg);
+  border-radius: 20px 20px 0 0;
   padding: 24px 20px 32px;
   flex: 1;
   display: flex;
@@ -2082,7 +2085,7 @@ html, body {
 
         <!-- CTA -->
         <div class="cta-block">
-          <a href="https://koachify.it/clarity-call" target="_blank" rel="noopener" style="text-decoration:none">
+          <a href="https://promo.koachify.it/scan-clarity-call" target="_blank" rel="noopener" style="text-decoration:none">
             <button class="btn-primary">
               Prenota la tua Clarity Call gratuita
               <div class="btn-arrow">
