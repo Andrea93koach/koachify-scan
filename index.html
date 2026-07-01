@@ -2259,7 +2259,7 @@ REGOLE INDEROGABILI:
     if (db && state.sessionId) {
       try {
         await db.from('quiz_leads')
-          .update({ report_text: report.report_narrativo, archetipo: report.archetipo_titolo })
+          .update({ report_text: JSON.stringify(report), archetipo: report.archetipo_titolo })
           .eq('session_id', state.sessionId);
       } catch(e) { console.warn('[Supabase] update report:', e); }
     }
@@ -2360,6 +2360,84 @@ async function saveLeadData() {
     });
     await db.from('clarity_map').insert(rows);
   } catch(e) { console.warn('[Supabase] saveLeadData:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// GHL WEBHOOK + REPORT URL CONDIVISO
+// ═══════════════════════════════════════════════════════════
+const _GHL_HOOK = 'https://services.leadconnectorhq.com/hooks/jqOTU47ZX031Nj5k6Ztn/' +
+  'webhook-trigger/7fdc9dcc-54ce-4ea1-b448-a9fda3d114c9';
+
+function buildReportUrl() {
+  if (!state.sessionId) return null;
+  return 'https://andrea93koach.github.io/koachify-scan/?report=' + state.sessionId;
+}
+
+async function sendToGHL(reportUrl) {
+  if (!state.leadData) return;
+  const archName = ARCHETIPI[state.archetipo] ? ARCHETIPI[state.archetipo].name : '';
+  const tagSlug  = archName.toLowerCase()
+    .replace(/[àáâãäå]/g,'a').replace(/[èéêë]/g,'e')
+    .replace(/[ìíîï]/g,'i').replace(/[òóôõö]/g,'o')
+    .replace(/[ùúûü]/g,'u').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  try {
+    await fetch(_GHL_HOOK, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName:       state.leadData.nome,
+        email:           state.leadData.email,
+        phone:           state.leadData.telefono || '',
+        source:          'Koachify Scan',
+        tags:            ['koachify-scan', 'archetipo-' + tagSlug],
+        archetipo:       archName,
+        clarity_map_url: reportUrl || '',
+        session_id:      state.sessionId || ''
+      })
+    });
+  } catch(e) { console.warn('[GHL]', e); }
+}
+
+// Carica Clarity Map da URL condiviso (?report=UUID)
+async function loadSharedReport(sessionId) {
+  if (!db) return false;
+  try {
+    const { data: lead } = await db.from('quiz_leads')
+      .select('*').eq('session_id', sessionId).maybeSingle();
+    const { data: mapRows } = await db.from('clarity_map')
+      .select('*').eq('session_id', sessionId);
+    if (!lead || !mapRows || !mapRows.length) return false;
+
+    // Ricostruisce state
+    state.sessionId = sessionId;
+    state.leadData  = { nome: lead.nome || '', email: lead.email || '', telefono: lead.telefono || '' };
+    let archId = 1;
+    for (const [k, v] of Object.entries(ARCHETIPI)) {
+      if (v.name === lead.archetipo) { archId = parseInt(k); break; }
+    }
+    state.archetipo = archId;
+    mapRows.forEach(row => {
+      const idx = PLANET_NAMES.indexOf(row.pianeta) + 1;
+      if (idx > 0) {
+        state.planetSemafori[`p${idx}`] = row.semaforo;
+        if (row.pilastro_1) state.pillarSemafori[`m${idx}p1`] = row.pilastro_1;
+        if (row.pilastro_2) state.pillarSemafori[`m${idx}p2`] = row.pilastro_2;
+        if (row.pilastro_3) state.pillarSemafori[`m${idx}p3`] = row.pilastro_3;
+      }
+    });
+
+    // Report AI — JSON completo o fallback solo narrativo
+    if (lead.report_text) {
+      try { _aiReport = JSON.parse(lead.report_text); }
+      catch(e) { _aiReport = { report_narrativo: lead.report_text }; }
+    }
+
+    setTopbar(false, null);
+    setProgress(null);
+    setBtnVisible(false);
+    showClarityMap();
+    return true;
+  } catch(e) { console.warn('[SharedReport]', e); return false; }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2977,6 +3055,27 @@ let awaitingOpenConditional = false;
 // ENTRY POINT
 // ═══════════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
+  // Controlla se è un URL report condiviso (?report=UUID)
+  const _urlReport = new URLSearchParams(window.location.search).get('report');
+  if (_urlReport) {
+    setBtnVisible(false);
+    setTopbar(false, null);
+    setProgress(null);
+    loadSharedReport(_urlReport).then(ok => {
+      if (!ok) {
+        // Fallback: quiz normale se UUID non trovato
+        setBtnLabel('Inizia il check-up');
+        document.getElementById('btn-continue').disabled = false;
+        document.getElementById('btn-continue').onclick = () => {
+          document.getElementById('btn-continue').onclick = handleContinue;
+          startQuiz();
+        };
+        setBtnVisible(true);
+      }
+    });
+    return;
+  }
+  // Flusso normale
   setBtnLabel('Inizia il check-up');
   document.getElementById('btn-continue').disabled = false;
   document.getElementById('btn-continue').onclick = () => {
@@ -3098,7 +3197,9 @@ function submitGateEmail() {
     telefono: document.getElementById('gate-telefono').value.trim()
   };
   state.archetipo = determineArchetype();
+  const _reportUrl = buildReportUrl();
   saveLeadData();
+  sendToGHL(_reportUrl);   // fire-and-forget verso GHL
   showElaborazione();
 }
 
