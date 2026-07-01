@@ -49,6 +49,7 @@ html, body {
   background: var(--bg);
   color: var(--text);
   overflow: hidden;
+  overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -60,14 +61,14 @@ html, body {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  width: min(560px, 100vw);
+  width: min(680px, 100vw);
   margin: 0 auto;
   background: var(--bg);
   position: relative;
   overflow: hidden;
 }
 
-@media (min-width: 561px) {
+@media (min-width: 681px) {
   #app {
     box-shadow: 0 4px 60px rgba(0,0,0,0.14);
     border-radius: 20px;
@@ -533,6 +534,51 @@ html, body {
   border-color: var(--green);
 }
 .option-card.selected .option-check svg { opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   TOUCH DEVICES — disabilita hover sticky
+═══════════════════════════════════════════ */
+@media (hover: none) {
+  .option-card:hover {
+    border-color: var(--border);
+    border-left: 2px solid var(--border);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+    transform: none;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SCHERMI BASSI — layout compatto senza scroll
+═══════════════════════════════════════════ */
+@media (max-height: 700px) {
+  #topbar          { min-height: 46px; padding: 5px 14px; }
+  #topbar-logo img { height: 34px; }
+  #topbar-counter  { font-size: 11px; padding: 5px 10px; }
+  #progress-bar-wrap { padding: 0 14px 8px; }
+  #screen-question { padding: 6px 14px 8px; }
+  .q-module-card   { padding: 8px 12px; margin-bottom: 7px; }
+  .q-module-icon   { width: 30px; height: 30px; font-size: 14px; border-radius: 8px; }
+  .q-module-name   { font-size: 12px; }
+  .q-pillar-tag    { padding: 3px 8px; margin-bottom: 6px; font-size: 9px; }
+  .q-context-row   { font-size: 9px; margin-bottom: 3px; }
+  .q-text          { font-size: 13px; line-height: 1.35; margin-bottom: 7px; }
+  .q-sub-text      { font-size: 10px; margin-bottom: 5px; }
+  .options-list    { gap: 5px; }
+  .option-card     { padding: 7px 11px; }
+  .option-badge    { width: 24px; height: 24px; font-size: 11px; border-radius: 6px; }
+  .option-check    { width: 17px; height: 17px; }
+  .option-text     { font-size: 12px; line-height: 1.3; }
+  .option-subtext  { font-size: 10px; }
+  #bottom-action   { padding: 7px 14px 10px; }
+  .btn-primary     { padding: 13px; font-size: 14px; }
+}
+@media (max-height: 600px) {
+  .q-module-card { display: none; }
+  .q-text        { font-size: 12px; }
+  .option-text   { font-size: 11px; }
+  .option-subtext { display: none; }
+}
 
 /* ═══════════════════════════════════════════
    OPEN TEXT QUESTION
