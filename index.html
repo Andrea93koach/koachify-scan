@@ -1097,6 +1097,54 @@ html, body {
   padding-bottom: 4px;
 }
 
+/* Privacy checkbox */
+.gate-privacy-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0 2px;
+}
+.gate-privacy-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  margin-top: 2px;
+  background: var(--white);
+  transition: background 0.15s, border-color 0.15s;
+  position: relative;
+}
+.gate-privacy-checkbox:checked {
+  background: var(--green);
+  border-color: var(--green);
+}
+.gate-privacy-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 6px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+.gate-privacy-checkbox.invalid {
+  border-color: var(--red);
+  background: var(--red-soft);
+}
+.gate-privacy-label {
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
 /* ═══════════════════════════════════════════
    SCHERMATA ELABORAZIONE
 ═══════════════════════════════════════════ */
@@ -1952,6 +2000,10 @@ html, body {
             <input type="tel" id="gate-telefono" placeholder="+39 333 123 4567" autocomplete="tel">
           </div>
         </div>
+        <div class="gate-privacy-wrap">
+          <input type="checkbox" id="gate-privacy" class="gate-privacy-checkbox" onchange="this.classList.remove('invalid')">
+          <label for="gate-privacy" class="gate-privacy-label">Dichiaro di aver letto e compreso l'Informativa sulla Privacy e autorizzo il trattamento dei miei dati personali secondo quanto previsto dal Regolamento UE 2016/679, GDPR, e dalla normativa vigente in materia di protezione dei dati personali.</label>
+        </div>
         <div class="gate-microcopy">La ricevi anche via email così puoi rileggere quando vuoi.<br>Nessuno spam, mai.</div>
         <div class="gate-trust">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -2384,15 +2436,16 @@ async function sendToGHL(reportUrl) {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        firstName:       state.leadData.nome,
-        email:           state.leadData.email,
-        phone:           state.leadData.telefono || '',
-        telefono:        state.leadData.telefono || '',
-        source:          'Koachify Scan',
-        tags:            ['koachify-scan', 'archetipo-' + tagSlug],
-        archetipo:       archName,
-        clarity_map_url: reportUrl || '',
-        session_id:      state.sessionId || ''
+        firstName:                 state.leadData.nome,
+        email:                     state.leadData.email,
+        phone:                     state.leadData.telefono || '',
+        telefono:                  state.leadData.telefono || '',
+        source:                    'Koachify Scan',
+        tags:                      ['koachify-scan', 'archetipo-' + tagSlug],
+        archetipo:                 archName,
+        clarity_map_url:           reportUrl || '',
+        session_id:                state.sessionId || '',
+        privacy_policy_accettata:  state.leadData.privacy_accettata ? 'true' : 'false'
       })
     });
   } catch(e) { console.warn('[GHL]', e); }
@@ -3183,18 +3236,21 @@ function showGateEmail() {
 }
 
 function submitGateEmail() {
-  const nomeEl  = document.getElementById('gate-nome');
-  const emailEl = document.getElementById('gate-email');
+  const nomeEl    = document.getElementById('gate-nome');
+  const emailEl   = document.getElementById('gate-email');
+  const privacyEl = document.getElementById('gate-privacy');
   const nome  = nomeEl.value.trim();
   const email = emailEl.value.trim();
   let valid = true;
-  if (!nome)  { nomeEl.classList.add('invalid');  valid = false; }
-  if (!email) { emailEl.classList.add('invalid'); valid = false; }
+  if (!nome)              { nomeEl.classList.add('invalid');    valid = false; }
+  if (!email)             { emailEl.classList.add('invalid');   valid = false; }
+  if (!privacyEl.checked) { privacyEl.classList.add('invalid'); valid = false; }
   if (!valid) return;
   state.leadData = {
     nome,
     email,
-    telefono: document.getElementById('gate-telefono').value.trim()
+    telefono:         document.getElementById('gate-telefono').value.trim(),
+    privacy_accettata: true
   };
   state.archetipo = determineArchetype();
   const _reportUrl = buildReportUrl();
