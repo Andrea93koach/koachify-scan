@@ -1,7 +1,7 @@
 # Koachify Scan — Quiz Funnel Interattivo
 
-**Ultimo aggiornamento:** 01.07.2026  
-**Versione:** v3.0  
+**Ultimo aggiornamento:** 03.07.2026  
+**Versione:** v3.1  
 **Stato:** Attivo in produzione — embed su GHL (promo.koachify.it). Pendente: calibrazione PLANET_COORDS.
 
 ---
@@ -54,7 +54,7 @@ powershell -ExecutionPolicy Bypass -File serve.ps1
 | Bridge 1 | Dopo Pianeta 3 | Doppia schermata — Sistema Prosperità completato |
 | Bridge 2 | Dopo Pianeta 6 | Singola schermata — Sistema Libertà completato |
 | Bridge 3 | Dopo Pianeta 9 | Doppia schermata — Sistema Serenità + griglia blur |
-| Gate Email | Prima della mappa | Nome / Email / Telefono → sblocca Clarity Map |
+| Gate Email | Prima della mappa | Nome / Email / Telefono + checkbox privacy GDPR → sblocca Clarity Map |
 | Elaborazione | 15s animata | Checklist sequenziale animata, chiamata AI in background |
 | Clarity Map | Risultato finale | Archetipo + griglia 3×3 + diagnosi AI + mappa Universo + CTA |
 
@@ -107,7 +107,7 @@ state.pillarSemafori   // "m1p1"…"m9p3" → red/yellow/green
 state.planetSemafori   // "p1"…"p9" → semaforo pianeta aggregato
 state.biasFlags        // "m1"…"m9" → true se bias rilevato
 state.archetipo        // 1/2/3/4
-state.leadData         // { nome, email, telefono }
+state.leadData         // { nome, email, telefono, privacy_accettata: true }
 state.sessionId        // UUID Supabase
 state._backAvailable   // true = l'utente può tornare indietro di 1 step
 state.history[]        // stack navigazione per goBack()
@@ -191,17 +191,20 @@ CREATE POLICY "shared_report_select" ON clarity_map
 **Payload inviato:**
 ```json
 {
-  "firstName":       "Nome del lead",
-  "email":           "email@esempio.it",
-  "phone":           "+39 333 ...",
-  "telefono":        "+39 333 ...",
-  "source":          "Koachify Scan",
-  "tags":            ["koachify-scan", "archetipo-il-tuttofare-esausto"],
-  "archetipo":       "Il Tuttofare Esausto",
-  "clarity_map_url": "https://andrea93koach.github.io/koachify-scan/?report=UUID",
-  "session_id":      "UUID"
+  "firstName":                "Nome del lead",
+  "email":                    "email@esempio.it",
+  "phone":                    "+39 333 ...",
+  "telefono":                 "+39 333 ...",
+  "source":                   "Koachify Scan",
+  "tags":                     ["koachify-scan", "archetipo-il-tuttofare-esausto"],
+  "archetipo":                "Il Tuttofare Esausto",
+  "clarity_map_url":          "https://andrea93koach.github.io/koachify-scan/?report=UUID",
+  "session_id":               "UUID",
+  "privacy_policy_accettata": "true"
 }
 ```
+
+**Note campo privacy:** sempre `"true"` in quanto la checkbox è obbligatoria per procedere. In GHL: crea Custom Field `privacy_policy_accettata` (tipo Text) e mappalo nell'azione "Aggiorna Contatto" dell'automazione.
 
 **URL report condiviso:** `https://andrea93koach.github.io/koachify-scan/?report=UUID`  
 Quando aperto, il quiz carica i dati dal DB (quiz_leads + clarity_map) e mostra direttamente la Clarity Map completa del lead senza rifare il quiz.
@@ -286,6 +289,9 @@ Schermate chiare → `logo-scuro.svg` / Welcome navy → `logo-bianco.svg`. Swap
 ### Welcome screen
 Hero navy senza border-radius + body con `border-radius: 20px 20px 0 0` — effetto card che emerge, nessuna "barra blu" visibile.
 
+### Barra blu definitivo fix (v3.1)
+Root cause: `#screen-question { display: flex; }` aveva specificità ID `(1,0,0)` che batteva `.screen { display: none; }` con specificità classe `(0,1,0)` — quindi la schermata domande era sempre renderizzata in background, mostrando la `q-module-card` navy come barra scura. Fix: rimosso `display: flex` dal blocco `#screen-question {}` senza `.active`; ora `.screen { display: none; }` opera senza interferenze.
+
 ---
 
 ## Roadmap — Stato implementazione
@@ -305,6 +311,7 @@ Hero navy senza border-radius + body con `border-radius: 20px 20px 0 0` — effe
 | 11 | UX fix: desktop 680px, compact mobile, no-scroll | ✅ | 01.07.2026 |
 | 12 | Fix welcome screen barra blu + CTA link | ✅ | 01.07.2026 |
 | 13 | GHL webhook + URL report condiviso | ✅ | 01.07.2026 |
+| 14 | Fix barra blu definitivo (CSS specificity) + checkbox privacy GDPR | ✅ | 03.07.2026 |
 
 ---
 
@@ -334,7 +341,7 @@ Hero navy senza border-radius + body con `border-radius: 20px 20px 0 0` — effe
 **Repository:** https://github.com/Andrea93koach/koachify-scan  
 **Live:** https://andrea93koach.github.io/koachify-scan/  
 **Branch:** master → auto-deploy su GitHub Pages  
-**Ultimo push:** 01.07.2026 (v3.0)
+**Ultimo push:** 03.07.2026 (v3.1)
 
 ---
 
@@ -354,3 +361,4 @@ Hero navy senza border-radius + body con `border-radius: 20px 20px 0 0` — effe
 | v1.9 | 29.06.2026 | Fix padding option card, universo-koachify.png aggiunto |
 | v2.0 | 01.07.2026 | Testimonianze reali Bridge 1/3 con foto profilo AI (Martina R. + Luca B.) |
 | v3.0 | 01.07.2026 | Desktop 680px, compact mobile, fix hover touch, fix barra blu welcome, CTA link promo.koachify.it/scan-clarity-call, GHL webhook + URL report condiviso (?report=UUID), Supabase SELECT policy |
+| v3.1 | 03.07.2026 | Fix definitivo barra blu (CSS specificity #screen-question), checkbox privacy GDPR obbligatoria nel gate email, campo privacy_policy_accettata nel webhook GHL |
