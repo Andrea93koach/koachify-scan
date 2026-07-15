@@ -1,7 +1,7 @@
 # Koachify Scan — Quiz Funnel Interattivo
 
-**Ultimo aggiornamento:** 03.07.2026  
-**Versione:** v3.1  
+**Ultimo aggiornamento:** 15.07.2026  
+**Versione:** v3.2  
 **Stato:** Attivo in produzione — embed su GHL (promo.koachify.it). Pendente: calibrazione PLANET_COORDS.
 
 ---
@@ -211,6 +211,23 @@ Quando aperto, il quiz carica i dati dal DB (quiz_leads + clarity_map) e mostra 
 
 ---
 
+## Meta Pixel (Facebook Ads)
+
+**Pixel ID:** `3347471732101097`  
+**Codice base:** in `<head>` di `index.html`, subito dopo `<title>` — traccia `PageView` a ogni caricamento pagina (inclusi refresh/embed iframe GHL).  
+**Evento `Lead`:** in `submitGateEmail()` (index.html), lanciato subito dopo la validazione del gate email (nome/email/telefono/privacy) e prima di `showElaborazione()` — corrisponde al momento in cui l'utente completa l'opt-in a fine quiz, prima di vedere la Clarity Map.
+
+```js
+fbq('track', 'Lead', {
+  content_name: 'Koachify Scan',
+  content_category: 'quiz_completato'
+});
+```
+
+**Nota:** se in futuro si vuole il matching avanzato (email/telefono hashati), passare `em`/`ph` come parametri aggiuntivi a `fbq('track', 'Lead', {...})` — attualmente non implementato.
+
+---
+
 ## Embed su GoHighLevel
 
 **Widget HTML da incollare nel page builder GHL:**
@@ -312,6 +329,7 @@ Root cause: `#screen-question { display: flex; }` aveva specificità ID `(1,0,0)
 | 12 | Fix welcome screen barra blu + CTA link | ✅ | 01.07.2026 |
 | 13 | GHL webhook + URL report condiviso | ✅ | 01.07.2026 |
 | 14 | Fix barra blu definitivo (CSS specificity) + checkbox privacy GDPR | ✅ | 03.07.2026 |
+| 15 | Meta Pixel (PageView base + evento Lead su opt-in gate email) | ✅ | 15.07.2026 |
 
 ---
 
@@ -362,3 +380,4 @@ Root cause: `#screen-question { display: flex; }` aveva specificità ID `(1,0,0)
 | v2.0 | 01.07.2026 | Testimonianze reali Bridge 1/3 con foto profilo AI (Martina R. + Luca B.) |
 | v3.0 | 01.07.2026 | Desktop 680px, compact mobile, fix hover touch, fix barra blu welcome, CTA link promo.koachify.it/scan-clarity-call, GHL webhook + URL report condiviso (?report=UUID), Supabase SELECT policy |
 | v3.1 | 03.07.2026 | Fix definitivo barra blu (CSS specificity #screen-question), checkbox privacy GDPR obbligatoria nel gate email, campo privacy_policy_accettata nel webhook GHL |
+| v3.2 | 15.07.2026 | Meta Pixel installato (ID 3347471732101097): codice base PageView in `<head>`, evento `Lead` in `submitGateEmail()` dopo opt-in completato |
