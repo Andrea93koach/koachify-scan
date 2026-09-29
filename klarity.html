@@ -2645,8 +2645,12 @@ function vaiAllaMappa() {
 // la fa la Edge Function lato server: se la facesse il browser, un
 // utente che chiude il tab a 40 secondi non riceverebbe mai nulla.
 // ═══════════════════════════════════════════════════════════
+// Webhook dedicato al Klarity Quiz. Il Koachify Scan ne ha uno suo: i due
+// funnel non devono entrare dalla stessa porta del CRM, altrimenti per
+// distinguerli servirebbe leggere un campo del payload — e prima o poi
+// qualcuno ci sbaglia.
 const _GHL_HOOK = 'https://services.leadconnectorhq.com/hooks/jqOTU47ZX031Nj5k6Ztn/' +
-  'webhook-trigger/7fdc9dcc-54ce-4ea1-b448-a9fda3d114c9';
+  'webhook-trigger/u1iK1HKH6aXnqHGUet8Q';
 
 // L'indirizzo da mandare al CRM e da mettere nell'email. Con il doppio embed
 // deve puntare alla landing, non all'iframe nudo: è lì che la persona trova
