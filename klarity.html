@@ -1474,17 +1474,6 @@ body.scrollable #content-area {
   text-align: center;
 }
 
-/* ── Banner per le mappe della versione precedente ───────── */
-.legacy-banner {
-  font-size: 12px;
-  color: var(--text-soft);
-  background: var(--yellow-soft);
-  border: 1px solid var(--yellow);
-  border-radius: var(--radius-sm);
-  padding: 9px 13px;
-  margin-bottom: 18px;
-  text-align: center;
-}
 
 /* Schermi bassi: le chip non stanno insieme a textarea e bottone,
    quindi si collassano dietro un toggle. */
@@ -1727,10 +1716,6 @@ body.modalita-report .screen.active { animation: none; }
 
       <div class="clarity-body">
 
-        <!-- Banner per le mappe generate dalla versione precedente del quiz -->
-        <div class="legacy-banner" id="legacy-banner" style="display:none">
-          Mappa generata con la versione precedente del check-up.
-        </div>
 
         <!-- I 9 semafori: griglia 3×3 + score per Sistema. Calcolati in locale,
              visibili subito, senza aspettare il motore. -->
@@ -3170,23 +3155,14 @@ function applicaReport(r) {
 
 // ═══════════════════════════════════════════════════════════
 // REPORT CONDIVISO ?report=UUID
-// Due rami: prima le mappe Klarity, poi quelle della versione
-// precedente. I link già distribuiti devono continuare ad aprirsi.
-// ═══════════════════════════════════════════════════════════
-const LEGACY_PLANET_NAMES = ['Attrazione','Conversione','Viaggio','Architettura',
-  'Laboratorio','Moltiplicazione','Bussola','Villaggio','Scuderia'];
-const LEGACY_PLANET_ICONS = ['🌱','💰','🗺️','🏗️','🔬','✖️','🧭','🏘️','🏎️'];
-
-// Etichette con cui disegnare la griglia e la mappa. Normalmente sono quelle
-// di oggi; sulle mappe storiche si usano quelle di allora.
 //
-// Non è un dettaglio cosmetico: il vecchio «Moltiplicazione» misurava team,
-// intelligenza artificiale e gestione dei task — tre cose che nel modello
-// nuovo stanno in Pianeti diversi. Mostrare quel punteggio sotto l'etichetta
-// «Koachif-AI» racconterebbe al lead un dato che non ha mai dato.
-let etichette = null;   // null = usa PIANETI
-const etichettaPianeta = (i) => etichette ? etichette.nomi[i] : PIANETI[i].nome;
-const emojiPianeta     = (i) => etichette ? etichette.emoji[i] : PIANETI[i].emoji;
+// Solo mappe Klarity. Il Koachify Scan è un altro strumento, con le sue
+// pagine e i suoi dati: i link che ha distribuito puntano alla radice
+// (index.html) e continuano a essere gestiti da lì. Qui dentro non si legge
+// nulla delle sue tabelle — i due quiz non si mescolano.
+// ═══════════════════════════════════════════════════════════
+const etichettaPianeta = (i) => PIANETI[i].nome;
+const emojiPianeta     = (i) => PIANETI[i].emoji;
 
 async function loadKlarityMappa(uuid) {
   if (!db) return false;
@@ -3226,34 +3202,6 @@ async function loadKlarityMappa(uuid) {
   // quiz, prima di reindirizzare, non lo avvia.
   showElaborazione();
   return true;
-}
-
-async function loadLegacyReport(uuid) {
-  if (!db) return false;
-  try {
-    const { data, error } = await db.rpc('get_legacy_report', { p_session: uuid });
-    if (error || !data || !data.nome) return false;
-    const righe = data.clarity_map || [];
-    if (!righe.length) return false;
-
-    const inv = { rosso:'red', giallo:'yellow', verde:'green',
-                  red:'red', yellow:'yellow', green:'green' };
-    righe.forEach(riga => {
-      const i = LEGACY_PLANET_NAMES.indexOf(riga.pianeta);
-      if (i >= 0) state.semafori[PIANETI[i].key] = inv[riga.semaforo] || 'yellow';
-    });
-    state.lead = { nome: data.nome };
-    state.report = { mappa_md: data.report_text || '', source:'none' };
-
-    // Nomi di allora: questa persona ha risposto a quelle domande, non a
-    // queste. Il banner dichiara che la mappa è di una versione precedente.
-    etichette = { nomi: LEGACY_PLANET_NAMES, emoji: LEGACY_PLANET_ICONS };
-    renderMappa();
-    document.getElementById('legacy-banner').style.display = '';
-    document.getElementById('cm-meta').textContent =
-      'Check-up del ' + new Date(data.creato_il).toLocaleDateString('it-IT');
-    return true;
-  } catch (e) { console.warn('[Report legacy]', e); return false; }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -3298,7 +3246,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setProgress(null);
     attivaModalitaEmbed();
     if (await loadKlarityMappa(uuid)) return;
-    if (await loadLegacyReport(uuid)) return;
     // UUID sconosciuto: si ricade sul quiz normale.
     document.body.classList.remove('modalita-report');
     setBtnVisible(true);
