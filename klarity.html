@@ -1,0 +1,3317 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Koachify Scan</title>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '3347471732101097');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=3347471732101097&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ═══════════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:        #88C057;
+  --green-dark:   #6FA344;
+  --green-soft:   #F0F9E8;
+  --green-mid:    #D4EBB8;
+  --navy:         #283E4A;
+  --navy-light:   #344F5E;
+  --bg:           #F4F6F5;
+  --white:        #FFFFFF;
+  --text:         #1A2B32;
+  --text-soft:    #4A6370;
+  --gray-mid:     #6B8A96;
+  --gray-light:   #C8D6DC;
+  --border:       #E2ECEB;
+  --red:          #C0392B;
+  --red-soft:     #FDECEA;
+  --yellow:       #F39C12;
+  --yellow-soft:  #FEF3DC;
+  --sem-green:    #27AE60;
+  --sem-green-soft: #E8F8EF;
+  --bridge-bg:    #E8F4E8;
+  --shadow-sm:    0 2px 8px rgba(40,62,74,0.08);
+  --shadow-md:    0 4px 20px rgba(40,62,74,0.12);
+  --shadow-lg:    0 8px 32px rgba(40,62,74,0.16);
+  --radius-sm:    10px;
+  --radius-md:    16px;
+  --radius-lg:    24px;
+  --font:         'Inter', system-ui, -apple-system, sans-serif;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════════ */
+#app {
+  height: 100dvh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: min(680px, 100vw);
+  margin: 0 auto;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 681px) {
+  #app {
+    box-shadow: 0 4px 60px rgba(0,0,0,0.14);
+    border-radius: 20px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   TOP BAR
+═══════════════════════════════════════════ */
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  min-height: 58px;
+  flex-shrink: 0;
+  background: var(--bg);
+}
+#topbar-back {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--white);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+}
+#topbar-back:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+#topbar-back svg { width: 18px; height: 18px; }
+#topbar-back.hidden { opacity: 0; pointer-events: none; }
+
+#topbar-logo img {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+#topbar-counter {
+  background: var(--navy);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  min-width: 52px;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════
+   LINEAR PROGRESS BAR
+═══════════════════════════════════════════ */
+#progress-bar-wrap {
+  padding: 0 16px 12px;
+  flex-shrink: 0;
+}
+#progress-bar-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+}
+#progress-bar-label-text {
+  font-size: 11px;
+  color: var(--text-soft);
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 78%;
+}
+#progress-bar-pct {
+  font-size: 11px;
+  font-weight: 800;
+  color: #6BA03E;
+  min-width: 30px;
+  text-align: right;
+  flex-shrink: 0;
+}
+#progress-bar-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+#progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6BA03E, #88C057);
+  border-radius: 4px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ═══════════════════════════════════════════
+   CONTENT AREA
+═══════════════════════════════════════════ */
+#content-area {
+  flex: 1;
+  overflow: hidden; /* default: no scroll */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+/* Le schermate lunghe possono scorrere; le domande a scelta no.
+   `body.scrollable` è il fallback impostato da JS per Safari <15.4 e
+   Firefox <121, dove :has() non è supportato. */
+#content-area:has(#screen-welcome.active),
+#content-area:has(#screen-dati.active),
+#content-area:has(#screen-mappa.active),
+/* le domande aperte hanno textarea + chip: lì lo scroll serve */
+#content-area:has(#open-wrap.show),
+body.scrollable #content-area {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ═══════════════════════════════════════════
+   SCREEN BASE
+═══════════════════════════════════════════ */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ═══════════════════════════════════════════
+   WELCOME SCREEN
+═══════════════════════════════════════════ */
+#screen-welcome {
+  min-height: 100%;
+  display: none;
+  flex-direction: column;
+  padding: 0;
+  background: var(--navy);
+}
+#screen-welcome.active { display: flex; }
+
+.welcome-hero {
+  background: var(--navy);
+  padding: 32px 24px 24px;
+  text-align: center;
+}
+.welcome-kochi-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(136,192,87,0.15);
+  border: 2px solid rgba(136,192,87,0.4);
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+.welcome-title {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: 3px;
+  margin-bottom: 6px;
+}
+.welcome-title span { color: var(--green); }
+.welcome-subtitle {
+  font-size: 13px;
+  color: var(--gray-light);
+  line-height: 1.5;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.welcome-body {
+  background: var(--bg);
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 32px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.welcome-payoff {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.welcome-payoff p {
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+.welcome-payoff strong { color: var(--navy); }
+
+.welcome-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.welcome-pill {
+  background: var(--green-soft);
+  border: 1px solid var(--green-mid);
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.welcome-areas {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+}
+.welcome-area-chip {
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 10px 6px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--navy);
+  box-shadow: var(--shadow-sm);
+  line-height: 1.3;
+  word-break: break-word;
+}
+.welcome-area-chip span { display: block; font-size: 16px; margin-bottom: 4px; }
+
+/* ═══════════════════════════════════════════
+   BOTTOM ACTION AREA
+═══════════════════════════════════════════ */
+#bottom-action {
+  flex-shrink: 0;
+  padding: 10px 16px 14px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+#btn-go-back {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray);
+  cursor: pointer;
+  text-align: center;
+  letter-spacing: 0.2px;
+  transition: color 0.15s;
+}
+#btn-go-back:hover { color: var(--navy); }
+
+/* ═══════════════════════════════════════════
+   QUESTION SCREEN — NO SCROLL, FULL HEIGHT
+═══════════════════════════════════════════ */
+#screen-question {
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 8px 16px 10px;
+}
+#screen-question.active { display: flex; animation: slideIn 0.3s cubic-bezier(0.4,0,0.2,1); }
+
+/* Planet/Module header card */
+.q-module-card {
+  background: var(--navy);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.q-module-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(136,192,87,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.q-module-info {}
+.q-module-system {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 1px;
+}
+.q-module-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.2;
+}
+
+/* Pillar tag */
+.q-pillar-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--green-soft);
+  border: 1px solid var(--green-mid);
+  color: var(--navy);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+.q-pillar-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+/* Breadcrumb contestuale sopra la domanda */
+.q-context-row {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gray-mid);
+  margin-bottom: 5px;
+  flex-shrink: 0;
+}
+
+/* Question text */
+.q-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.45;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+.q-sub-text {
+  font-size: 11px;
+  color: var(--gray-mid);
+  margin-bottom: 8px;
+  font-style: italic;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════
+   ANSWER CARDS — flex fill, no scroll
+═══════════════════════════════════════════ */
+.options-list {
+  flex: 1;          /* fills all remaining space */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-height: 0;    /* allow shrink below content size */
+}
+
+.option-card {
+  flex: 1;          /* each card grows equally */
+  min-height: 0;
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.option-card:active { transform: scale(0.985); }
+.option-card:hover {
+  border-color: var(--green);
+  border-left: 3px solid var(--green);
+  background: #f5fbf0;
+  box-shadow: var(--shadow-md);
+}
+.option-card.selected {
+  border-color: var(--green);
+  border-left: 3px solid var(--green);
+  background: #f0f9e8;
+  box-shadow: 0 0 0 1px var(--green), var(--shadow-sm);
+}
+
+/* Left: letter badge */
+.option-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gray-mid);
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.option-card.selected .option-badge {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--white);
+}
+
+.option-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.option-text {
+  font-size: 13px;
+  color: var(--navy);
+  line-height: 1.35;
+  font-weight: 600;
+}
+.option-subtext {
+  font-size: 11px;
+  color: #6B7F8A;
+  line-height: 1.3;
+  font-weight: 400;
+}
+.option-card.selected .option-text { color: var(--navy); font-weight: 700; }
+.option-card.selected .option-subtext { color: #5a6f7a; }
+
+/* Right: checkmark indicator */
+.option-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.option-check svg {
+  width: 10px; height: 10px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.option-card.selected .option-check {
+  background: var(--green);
+  border-color: var(--green);
+}
+.option-card.selected .option-check svg { opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   TOUCH DEVICES — disabilita hover sticky
+═══════════════════════════════════════════ */
+@media (hover: none) {
+  .option-card:hover {
+    border-color: var(--border);
+    border-left: 2px solid var(--border);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+    transform: none;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SCHERMI BASSI — layout compatto senza scroll
+═══════════════════════════════════════════ */
+@media (max-height: 700px) {
+  #topbar          { min-height: 46px; padding: 5px 14px; }
+  #topbar-logo img { height: 34px; }
+  #topbar-counter  { font-size: 11px; padding: 5px 10px; }
+  #progress-bar-wrap { padding: 0 14px 8px; }
+  #screen-question { padding: 6px 14px 8px; }
+  .q-module-card   { padding: 8px 12px; margin-bottom: 7px; }
+  .q-module-icon   { width: 30px; height: 30px; font-size: 14px; border-radius: 8px; }
+  .q-module-name   { font-size: 12px; }
+  .q-pillar-tag    { padding: 3px 8px; margin-bottom: 6px; font-size: 9px; }
+  .q-context-row   { font-size: 9px; margin-bottom: 3px; }
+  .q-text          { font-size: 13px; line-height: 1.35; margin-bottom: 7px; }
+  .q-sub-text      { font-size: 10px; margin-bottom: 5px; }
+  .options-list    { gap: 5px; }
+  .option-card     { padding: 7px 11px; }
+  .option-badge    { width: 24px; height: 24px; font-size: 11px; border-radius: 6px; }
+  .option-check    { width: 17px; height: 17px; }
+  .option-text     { font-size: 12px; line-height: 1.3; }
+  .option-subtext  { font-size: 10px; }
+  #bottom-action   { padding: 7px 14px 10px; }
+  .btn-primary     { padding: 13px; font-size: 14px; }
+}
+@media (max-height: 600px) {
+  .q-module-card { display: none; }
+  .q-text        { font-size: 12px; }
+  .option-text   { font-size: 11px; }
+  .option-subtext { display: none; }
+}
+
+/* ═══════════════════════════════════════════
+   OPEN TEXT QUESTION
+═══════════════════════════════════════════ */
+#open-wrap { flex: 1; display: none; flex-direction: column; min-height: 0; }
+#open-wrap.show { display: flex; }
+.open-input {
+  width: 100%;
+  flex: 1;
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--text);
+  resize: none;
+  min-height: 0;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.open-input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(136,192,87,0.2);
+}
+.char-count-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--gray-mid);
+}
+.open-optional-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--gray-mid);
+  margin-bottom: 10px;
+}
+
+/* ═══════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════ */
+.btn-primary {
+  width: 100%;
+  background: var(--green);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 17px;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 4px 16px rgba(136,192,87,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary:hover {
+  background: var(--green-dark);
+  box-shadow: 0 6px 20px rgba(136,192,87,0.45);
+}
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled {
+  background: var(--border);
+  color: var(--gray-mid);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn-arrow {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-arrow svg { width: 10px; height: 10px; }
+
+/* ═══════════════════════════════════════════
+   GATE EMAIL
+═══════════════════════════════════════════ */
+#screen-gate-email { padding: 0; min-height: 100%; }
+
+.gate-container {
+  padding: 28px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 100%;
+}
+.gate-headline {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+.gate-subtitle {
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.65;
+}
+.gate-fields { display: flex; flex-direction: column; gap: 12px; }
+.gate-field { display: flex; flex-direction: column; gap: 5px; }
+.gate-field-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.gate-field input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-family: var(--font);
+  color: var(--text);
+  background: white;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.gate-field input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(136,192,87,0.14);
+}
+.gate-field input::placeholder { color: var(--gray-light); }
+.gate-field input.invalid { border-color: var(--red); }
+.gate-microcopy {
+  font-size: 12px;
+  color: var(--gray-mid);
+  text-align: center;
+  line-height: 1.6;
+}
+.gate-trust {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--gray-mid);
+  font-weight: 500;
+  padding-bottom: 4px;
+}
+
+/* Privacy checkbox */
+.gate-privacy-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0 2px;
+}
+.gate-privacy-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  margin-top: 2px;
+  background: var(--white);
+  transition: background 0.15s, border-color 0.15s;
+  position: relative;
+}
+.gate-privacy-checkbox:checked {
+  background: var(--green);
+  border-color: var(--green);
+}
+.gate-privacy-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 6px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg);
+}
+.gate-privacy-checkbox.invalid {
+  border-color: var(--red);
+  background: var(--red-soft);
+}
+.gate-privacy-label {
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════
+   SCHERMATA ELABORAZIONE
+═══════════════════════════════════════════ */
+#screen-elaborazione { padding: 0; min-height: 100%; background: var(--navy); }
+
+.elab-container {
+  min-height: 100%;
+  padding: 48px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  background: var(--navy);
+}
+.elab-icon {
+  font-size: 52px;
+  animation: elab-pulse 2.2s ease-in-out infinite;
+}
+@keyframes elab-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.82; }
+}
+.elab-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: white;
+  text-align: center;
+  line-height: 1.3;
+}
+.elab-bar-wrap { width: 100%; }
+.elab-bar-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.14);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.elab-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6BA03E, #88C057);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.7s ease;
+}
+.elab-checklist { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+.elab-check-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.elab-check-item.visible { opacity: 1; transform: translateY(0); }
+.elab-check-icon {
+  width: 28px; height: 28px; min-width: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+.elab-check-icon.done    { background: var(--green); color: white; }
+.elab-check-icon.loading { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.6); font-size: 16px; }
+.elab-check-text { font-size: 15px; color: white; font-weight: 500; }
+.elab-footer-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+  line-height: 1.65;
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════
+   MODULE 0 INTRO
+═══════════════════════════════════════════ */
+.m0-header {
+  background: var(--navy);
+  padding: 20px;
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+}
+.m0-header-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--green);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.m0-header-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+/* ═══════════════════════════════════════════
+   CLARITY MAP
+═══════════════════════════════════════════ */
+#screen-clarity { padding: 0; min-height: 100%; }
+
+/* Header personalizzato */
+.cm-header {
+  background: var(--navy);
+  padding: 24px 20px 22px;
+  position: relative;
+  overflow: hidden;
+}
+.cm-header::after {
+  content: '';
+  position: absolute;
+  bottom: -30px; right: -30px;
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  background: rgba(136,192,87,0.07);
+  pointer-events: none;
+}
+.cm-header-chip {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--green);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  position: relative;
+}
+.cm-header-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--white);
+  line-height: 1.25;
+  margin-bottom: 6px;
+  position: relative;
+}
+.cm-header-title span { color: var(--green); }
+.cm-header-meta {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 500;
+  position: relative;
+}
+
+.clarity-body { padding: 24px 20px 40px; }
+
+.clarity-section-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.clarity-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Planet grid */
+.planet-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.planet-cell {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 14px 6px 12px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  border: 1.5px solid var(--border);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.38s ease, transform 0.38s ease;
+}
+.planet-cell.revealed { opacity: 1; transform: translateY(0); }
+.planet-cell-circle {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  margin: 0 auto 7px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+}
+.planet-cell-name {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.25;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.planet-cell-score {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--navy);
+  line-height: 1;
+}
+.planet-cell-score span {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+/* System score bar */
+.system-score-row {
+  display: flex;
+  flex-direction: column;
+  background: var(--navy);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.system-score-row.revealed { opacity: 1; }
+.system-score-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.system-score-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.75);
+  letter-spacing: 0.3px;
+}
+.system-score-value {
+  font-size: 15px;
+  font-weight: 900;
+  color: #88C057;
+}
+.system-score-sintesi {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.5;
+  margin-top: 5px;
+  font-style: italic;
+  display: none;
+}
+/* Insight box — blocco principale strutturato */
+.insight-box-pianeta {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.insight-box-perche {
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.65;
+  margin-bottom: 10px;
+}
+.insight-box-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.insight-box-bullets li {
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.7);
+  padding-left: 14px;
+  position: relative;
+  line-height: 1.5;
+}
+.insight-box-bullets li::before {
+  content: '\2192';
+  position: absolute;
+  left: 0;
+  color: #88C057;
+  font-weight: 700;
+}
+.insight-box-sblocca {
+  font-size: 12px;
+  color: #88C057;
+  font-weight: 600;
+  line-height: 1.5;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+/* Priority full card */
+.priority-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--red);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 10px;
+}
+.priority-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.priority-card-num {
+  background: var(--red-soft);
+  color: var(--red);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+.priority-card-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.priority-card-why {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.priority-card-action {
+  background: #F7F9FA;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  color: var(--navy);
+  font-weight: 600;
+  line-height: 1.55;
+  margin-bottom: 6px;
+  border-left: 3px solid #27AE60;
+}
+.priority-card-result {
+  font-size: 11.5px;
+  color: var(--text-soft);
+  font-style: italic;
+  line-height: 1.45;
+}
+/* Report narrativo */
+.report-narrativo-box {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1.5px solid var(--border);
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.8;
+}
+/* Prossimo passo */
+.prossimo-passo-box {
+  background: linear-gradient(135deg, #1B2A3E 0%, #2C3E50 100%);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.65;
+  font-style: italic;
+}
+/* Universe map */
+/* Mappa dell'Universo — SVG generato interamente da renderUniversoSVG().
+   Niente immagine di sfondo: le coordinate sono esatte per costruzione,
+   quindi non c'è più nulla da calibrare a mano. */
+.universe-map-wrap {
+  width: 100%;
+  margin-bottom: 20px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  background: var(--navy);
+}
+.universe-map-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.um-sistema-label { font-size: 26px; font-weight: 800; letter-spacing: 1.5px; }
+.um-sistema-sub   { font-size: 19px; font-weight: 500; opacity: .62; }
+.um-pianeta-nome  { font-size: 22px; font-weight: 700; }
+.um-pianeta-num   { font-size: 20px; font-weight: 800; }
+.um-legenda       { font-size: 19px; font-weight: 600; opacity: .75; }
+
+/* Insight box */
+.insight-box {
+  background: var(--navy);
+  border-radius: var(--radius-md);
+  padding: 18px 18px 20px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.insight-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6BA03E, #88C057);
+}
+.insight-box-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: #88C057;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+}
+.insight-box-text {
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.65;
+  font-style: italic;
+}
+/* CTA microcopy */
+.cta-microcopy {
+  font-size: 11px;
+  color: var(--text-soft);
+  line-height: 1.6;
+  margin-top: 12px;
+  padding: 0 4px;
+}
+/* sem badge (kept for bridges) */
+.sem-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.sem-badge-red { background: var(--red-soft); color: var(--red); }
+.sem-badge-yellow { background: var(--yellow-soft); color: #b07a00; }
+.sem-badge-green { background: var(--sem-green-soft); color: #1a8a48; }
+.sem-dot-small { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* Strength / Priority rows */
+.result-row {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 10px;
+}
+.result-row-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.result-row-icon.green-bg { background: var(--sem-green-soft); }
+.result-row-icon.red-bg { background: var(--red-soft); }
+.result-row-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+  flex: 1;
+}
+.result-row-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+.result-row-badge.strength { background: var(--sem-green-soft); color: #1a8a48; }
+.result-row-badge.priority { background: var(--red-soft); color: var(--red); }
+.result-row-body { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.result-row-action {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+/* Archetype text box */
+.arch-text-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.arch-text-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--green), var(--green-dark));
+}
+.arch-text-card p {
+  font-size: 14px;
+  color: var(--text-soft);
+  line-height: 1.75;
+  padding-left: 8px;
+}
+
+/* CTA */
+.cta-block { text-align: center; }
+.cta-reassurance {
+  font-size: 12px;
+  color: var(--gray-mid);
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.cta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--gray-mid); }
+.btn-share {
+  width: 100%;
+  background: none;
+  color: var(--navy);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 15px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: border-color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-share:hover { border-color: var(--navy); background: rgba(40,62,74,0.04); }
+
+/* ═══════════════════════════════════════════
+   KLARITY — COMPONENTI NUOVI
+═══════════════════════════════════════════ */
+
+/* ── Chip di esempio (D13, D15) ─────────────────────────────
+   Parenti visive di .option-card ma <button>, per la tastiera. */
+.example-chips-wrap { margin-bottom: 10px; }
+/* Le chip prendono l'altezza che serve; è la textarea a cedere spazio.
+   Sulle domande aperte lo scroll della schermata è già abilitato. */
+.example-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.example-chip {
+  font-family: var(--font);
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-align: left;
+  color: var(--text-soft);
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 7px 13px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.example-chip:hover  { border-color: var(--green); color: var(--text); }
+.example-chip:active { transform: scale(.98); }
+.example-chip.selected {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--text);
+  font-weight: 600;
+}
+.example-chip:focus-visible { outline: 2px solid var(--green-dark); outline-offset: 2px; }
+/* Il toggle compare solo sugli schermi bassi, dove le chip non ci stanno. */
+.example-toggle {
+  display: none;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green-dark);
+  background: none;
+  border: none;
+  padding: 2px 0 8px;
+  cursor: pointer;
+}
+
+/* ── Campo dati: facoltativo ed errore ───────────────────── */
+.gate-field-optional {
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--gray-mid);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.gate-field-error {
+  display: none;
+  font-size: 11.5px;
+  color: var(--red);
+  margin-top: 4px;
+}
+.gate-field-error.show { display: block; }
+
+/* ── Bottone secondario (la 2ª CTA) ──────────────────────── */
+.btn-secondary {
+  width: 100%;
+  font-family: var(--font);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--navy);
+  background: var(--white);
+  border: 1.5px solid var(--gray-light);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.btn-secondary:hover  { border-color: var(--navy); background: rgba(40,62,74,.04); }
+.btn-secondary:active { transform: scale(.99); }
+
+/* ── La Mappa: markdown renderizzato ─────────────────────── */
+.mappa-md {
+  font-size: 14.5px;
+  line-height: 1.68;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.mappa-md h1 {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--navy);
+  margin: 26px 0 12px;
+}
+.mappa-md h2 {
+  font-size: 16.5px;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 26px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--green-mid);
+}
+.mappa-md h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 20px 0 6px;
+}
+.mappa-md p  { margin: 0 0 12px; }
+.mappa-md ul { margin: 0 0 14px; padding-left: 20px; }
+.mappa-md li { margin-bottom: 6px; }
+.mappa-md strong { font-weight: 700; color: var(--navy); }
+.mappa-md em     { font-style: italic; }
+.mappa-md hr     { border: 0; border-top: 1px solid var(--border); margin: 22px 0; }
+.mappa-md blockquote {
+  margin: 0 0 14px;
+  padding: 12px 16px;
+  background: var(--green-soft);
+  border-left: 4px solid var(--green);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-style: italic;
+  color: var(--text-soft);
+}
+.mappa-loading {
+  font-style: italic;
+  color: var(--text-soft);
+  opacity: .55;
+  padding: 18px 0;
+  text-align: center;
+}
+
+/* ── Banner per le mappe della versione precedente ───────── */
+.legacy-banner {
+  font-size: 12px;
+  color: var(--text-soft);
+  background: var(--yellow-soft);
+  border: 1px solid var(--yellow);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+/* Schermi bassi: le chip non stanno insieme a textarea e bottone,
+   quindi si collassano dietro un toggle. */
+/* Quando ci sono le chip la textarea non deve mangiarsi lo spazio. */
+#open-wrap.has-chips .open-input { flex: 0 1 auto; min-height: 116px; }
+
+/* Schermi bassi: chip e textarea insieme non ci stanno, quindi le chip
+   si collassano dietro un toggle. */
+@media (max-height: 680px) {
+  .example-toggle { display: block; }
+  .example-chips  { display: none; }
+  .example-chips.open { display: flex; }
+}
+
+/* ── Modalità report dentro un embed ────────────────────────
+   Il quiz vive in una finestra alta quanto lo schermo e non scorre. La
+   Mappa dentro una landing deve fare il contrario: crescere quanto serve e
+   lasciare che sia la pagina esterna a scorrere, altrimenti si finisce con
+   due barre di scorrimento annidate. */
+body.modalita-report,
+body.modalita-report #app {
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+}
+body.modalita-report #app {
+  width: 100%;
+  max-width: 100%;
+  box-shadow: none;
+  border-radius: 0;
+}
+body.modalita-report #content-area {
+  overflow: visible;
+  height: auto;
+}
+body.modalita-report #topbar,
+body.modalita-report #quiz-footer,
+body.modalita-report #bottom-action { display: none; }
+body.modalita-report .screen.active { animation: none; }
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+#quiz-footer {
+  text-align: center;
+  padding: 6px 16px 8px;
+  font-size: 10px;
+  color: var(--gray-light);
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════ */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.screen.active { animation: slideIn 0.3s cubic-bezier(0.4,0,0.2,1); }
+#screen-welcome.active { animation: slideInUp 0.4s cubic-bezier(0.4,0,0.2,1); }
+
+/* ═══════════════════════════════════════════
+   DESKTOP SHADOW FRAME
+═══════════════════════════════════════════ */
+@media (min-width: 520px) {
+  body { display: flex; align-items: center; justify-content: center; background: #e0e8e5; }
+  #app { border-radius: 32px; overflow: hidden; box-shadow: var(--shadow-lg); height: 90vh; max-height: 840px; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <button id="topbar-back" class="hidden" onclick="goBackOne()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--navy)">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+    <div id="topbar-logo">
+      <img src="logo-scuro.svg" alt="Koachify" id="logo-img">
+    </div>
+    <div id="topbar-counter" style="visibility:hidden">1/9</div>
+  </div>
+
+  <!-- PROGRESS BAR -->
+  <div id="progress-bar-wrap" style="visibility:hidden">
+    <div id="progress-bar-info">
+      <span id="progress-bar-label-text"></span>
+      <span id="progress-bar-pct"></span>
+    </div>
+    <div id="progress-bar-track">
+      <div id="progress-bar-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content-area">
+
+    <!-- ══ WELCOME ══ -->
+    <div class="screen active" id="screen-welcome">
+      <div class="welcome-hero">
+        <div class="welcome-kochi-ring">🔭</div>
+        <img src="logo-bianco.svg" alt="Koachify" style="height:28px;width:auto;margin:0 auto 10px;display:block;">
+        <div class="welcome-title" style="font-size:22px;letter-spacing:4px;">KLARITY QUIZ</div>
+        <div class="welcome-subtitle">Il check-up per coach, formatori, consulenti e terapeuti online</div>
+      </div>
+      <div class="welcome-body">
+        <div class="welcome-payoff">
+          <p>Scopri la <strong>Mappa del tuo Business in 2 minuti</strong>. 16 domande semplici, zero tecnicismi. Alla fine ricevi la fotografia dei 9 Pianeti del tuo business: dove sei forte, dove stai perdendo soldi e tempo, e da dove ripartire.</p>
+        </div>
+        <div class="welcome-pills">
+          <div class="welcome-pill">⏱ 2–3 minuti</div>
+          <div class="welcome-pill">🪐 9 Pianeti</div>
+          <div class="welcome-pill">🆓 Gratuito</div>
+        </div>
+        <div class="welcome-areas">
+          <div class="welcome-area-chip"><span>🌱</span>Attrazione</div>
+          <div class="welcome-area-chip"><span>💰</span>Conversione</div>
+          <div class="welcome-area-chip"><span>🗺️</span>Viaggio</div>
+          <div class="welcome-area-chip"><span>🏗️</span>Architettura</div>
+          <div class="welcome-area-chip"><span>⚙️</span>Parte pratica</div>
+          <div class="welcome-area-chip"><span>🤖</span>Intelligenza artificiale</div>
+          <div class="welcome-area-chip"><span>🧭</span>Bussola</div>
+          <div class="welcome-area-chip"><span>🏘️</span>Villaggio</div>
+          <div class="welcome-area-chip"><span>🏎️</span>Scuderia</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DOMANDA — riusata per tutte e 17 ══ -->
+    <div class="screen" id="screen-question">
+      <!-- Header di Sistema (solo sulle domande dei 9 Pianeti) -->
+      <div class="q-module-card" id="q-module-card" style="display:none">
+        <div class="q-module-icon" id="q-module-icon">🌱</div>
+        <div class="q-module-info">
+          <div class="q-module-system" id="q-module-system">Sistema Prosperità</div>
+          <div class="q-module-name" id="q-module-name">Pianeta Attrazione</div>
+        </div>
+      </div>
+
+      <!-- Riga di contesto / incoraggiamento -->
+      <div class="q-context-row" id="q-context-row"></div>
+
+      <!-- Testo della domanda -->
+      <div class="q-text" id="q-text"></div>
+
+      <!-- Sottotitolo (istruzioni per le aperte) -->
+      <div class="q-sub-text" id="q-sub" style="display:none"></div>
+
+      <!-- Opzioni a scelta -->
+      <div class="options-list" id="options-list"></div>
+
+      <!-- Risposta aperta -->
+      <div id="open-wrap">
+        <div class="open-optional-tag" id="open-optional-tag">✏️ Risposta facoltativa</div>
+
+        <!-- Chip di esempio: pre-compilano il campo, restano modificabili -->
+        <div class="example-chips-wrap" id="example-chips-wrap" style="display:none">
+          <button type="button" class="example-toggle" id="example-toggle" onclick="toggleChips()">
+            <span id="example-toggle-label">Vedi 6 esempi</span>
+          </button>
+          <div class="example-chips" id="example-chips"></div>
+        </div>
+
+        <textarea class="open-input" id="open-input" maxlength="300"
+                  placeholder="Scrivi qui la tua risposta…"
+                  oninput="onOpenInput()"></textarea>
+        <div class="char-count-row"><span id="char-count">0</span>/<span id="char-max">300</span></div>
+      </div>
+    </div>
+
+    <!-- ══ D17 · I DATI ══ -->
+    <div class="screen" id="screen-dati">
+      <div class="gate-container">
+        <div>
+          <div class="gate-headline">Fatto! La tua Mappa dei 9 Pianeti è pronta. Dove te la mandiamo?</div>
+          <div class="gate-subtitle">Ci mettiamo un minuto a comporla su misura per te. Intanto dicci dove spedirtela.</div>
+        </div>
+        <div class="gate-fields">
+          <div class="gate-field">
+            <label class="gate-field-label" for="dati-nome">Il tuo nome</label>
+            <input type="text" id="dati-nome" placeholder="Come ti chiamiamo?" autocomplete="given-name" oninput="this.classList.remove('invalid')">
+          </div>
+          <div class="gate-field">
+            <label class="gate-field-label" for="dati-email">La tua email migliore</label>
+            <input type="email" id="dati-email" placeholder="Dove ricevi la mappa e i consigli" autocomplete="email" inputmode="email" oninput="this.classList.remove('invalid')">
+            <div class="gate-field-error" id="dati-email-error"></div>
+          </div>
+          <div class="gate-field">
+            <label class="gate-field-label" for="dati-telefono">Telefono o WhatsApp <span class="gate-field-optional">facoltativo</span></label>
+            <input type="tel" id="dati-telefono" placeholder="+39 333 123 4567" autocomplete="tel">
+          </div>
+        </div>
+        <div class="gate-privacy-wrap">
+          <input type="checkbox" id="dati-privacy" class="gate-privacy-checkbox" onchange="this.classList.remove('invalid')">
+          <label for="dati-privacy" class="gate-privacy-label">Dichiaro di aver letto e compreso l'Informativa sulla Privacy e autorizzo il trattamento dei miei dati personali secondo quanto previsto dal Regolamento UE 2016/679, GDPR, e dalla normativa vigente in materia di protezione dei dati personali.</label>
+        </div>
+        <div class="gate-microcopy">Niente spam, promesso: solo la tua mappa e i passi per migliorarla.<br>I tuoi dati restano tra noi.</div>
+        <div class="gate-trust">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          I tuoi dati sono al sicuro · Privacy Policy
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ELABORAZIONE ══ -->
+    <div class="screen" id="screen-elaborazione">
+      <div class="elab-container">
+        <div class="elab-icon">🔭</div>
+        <div class="elab-title" id="elab-title">Stiamo componendo la tua Mappa…</div>
+        <div class="elab-bar-wrap">
+          <div class="elab-bar-track">
+            <div class="elab-bar-fill" id="elab-bar-fill"></div>
+          </div>
+        </div>
+        <div class="elab-checklist" id="elab-checklist"></div>
+        <div class="elab-footer-text" id="elab-footer">
+          La tua mappa non è un modello prestampato:<br>viene scritta adesso, sulle tue risposte.
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ LA MAPPA ══ -->
+    <div class="screen" id="screen-mappa">
+
+      <div class="cm-header">
+        <div class="cm-header-chip">La tua Mappa</div>
+        <div class="cm-header-title">L'Universo di <span id="cm-nome">—</span></div>
+        <div class="cm-header-meta" id="cm-meta">—</div>
+      </div>
+
+      <div class="clarity-body">
+
+        <!-- Banner per le mappe generate dalla versione precedente del quiz -->
+        <div class="legacy-banner" id="legacy-banner" style="display:none">
+          Mappa generata con la versione precedente del check-up.
+        </div>
+
+        <!-- I 9 semafori: griglia 3×3 + score per Sistema. Calcolati in locale,
+             visibili subito, senza aspettare il motore. -->
+        <div class="clarity-section-title">I tuoi 9 Pianeti</div>
+
+        <div class="planet-grid" id="planet-grid-row1"></div>
+        <div class="system-score-row" id="system-score-row1">
+          <div class="system-score-top">
+            <span class="system-score-label">Sistema Prosperità</span>
+            <span class="system-score-value" id="cm-score-s1">—</span>
+          </div>
+          <div class="system-score-sintesi" id="cm-sintesi-s1">Più soldi</div>
+        </div>
+
+        <div class="planet-grid" id="planet-grid-row2"></div>
+        <div class="system-score-row" id="system-score-row2">
+          <div class="system-score-top">
+            <span class="system-score-label">Sistema Libertà</span>
+            <span class="system-score-value" id="cm-score-s2">—</span>
+          </div>
+          <div class="system-score-sintesi" id="cm-sintesi-s2">Più tempo</div>
+        </div>
+
+        <div class="planet-grid" id="planet-grid-row3"></div>
+        <div class="system-score-row" id="system-score-row3">
+          <div class="system-score-top">
+            <span class="system-score-label">Sistema Serenità</span>
+            <span class="system-score-value" id="cm-score-s3">—</span>
+          </div>
+          <div class="system-score-sintesi" id="cm-sintesi-s3">Meno stress</div>
+        </div>
+
+        <!-- Mappa dell'Universo: SVG generato da renderUniversoSVG() -->
+        <div class="clarity-section-title">Mappa del tuo Universo</div>
+        <div class="universe-map-wrap" id="universe-map-wrap">
+          <svg class="universe-map-svg" id="universe-map-svg" viewBox="0 0 1000 660" role="img"
+               aria-label="I 9 Pianeti del tuo business, raggruppati nei 3 Sistemi"></svg>
+        </div>
+
+        <!-- La Mappa composta dal motore (markdown → HTML) -->
+        <div class="mappa-md" id="mappa-md">
+          <div class="mappa-loading" id="mappa-loading">Stiamo finendo di scrivere la tua lettura…</div>
+        </div>
+
+        <!-- CTA di riserva: mostrate solo se il motore non ha prodotto nulla -->
+        <div class="cta-block" id="cta-fallback" style="display:none">
+          <a href="https://koachify.it/piani-e-prezzi" target="_blank" rel="noopener" style="text-decoration:none">
+            <button class="btn-primary">
+              Inizia ora con Koachify
+              <div class="btn-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </button>
+          </a>
+          <a href="https://koachify.it/#clarity" target="_blank" rel="noopener" style="text-decoration:none">
+            <button class="btn-secondary">Prenota la tua Clarity Call gratuita</button>
+          </a>
+          <div class="cta-reassurance">
+            <span>Gratuita</span><div class="cta-dot"></div>
+            <span>30 minuti</span><div class="cta-dot"></div>
+            <span>Senza impegno</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /content-area -->
+
+  <!-- BOTTOM ACTION -->
+  <div id="bottom-action">
+    <button class="btn-primary" id="btn-continue" onclick="handleContinue()" disabled>
+      <span id="btn-label">Inizia il check-up</span>
+      <div class="btn-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+    </button>
+    <button id="btn-go-back" onclick="goBackOne()" style="display:none;">
+      ← Cambia risposta precedente
+    </button>
+  </div>
+
+  <!-- FOOTER -->
+  <div id="quiz-footer">Koachify Suite © 2026 — koachify.it</div>
+
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// KLARITY QUIZ™ — v4.0
+//
+// Convenzione sui colori: in memoria si usa red|yellow|green
+// (riusa la palette CSS e le classi .sem-*); rosso|giallo|verde
+// solo al confine con DB, motore AI e tag CRM. La conversione
+// avviene in un punto solo: SEM_IT / buildEnginePayload().
+// ═══════════════════════════════════════════════════════════
+
+const QUIZ_VERSION = '4.0.0';
+
+// ── I 9 Pianeti ────────────────────────────────────────────
+// `pubblico` è l'etichetta da usare parlando all'utente quando il nome
+// proprio sarebbe gergo (Doc 2 §B).
+const PIANETI = [
+  { key:'attrazione',   idx:1, nome:'Attrazione',       sistema:'Prosperità', emoji:'🌱' },
+  { key:'conversione',  idx:2, nome:'Conversione',      sistema:'Prosperità', emoji:'💰' },
+  { key:'viaggio',      idx:3, nome:'Viaggio',          sistema:'Prosperità', emoji:'🗺️' },
+  { key:'architettura', idx:4, nome:'Architettura',     sistema:'Libertà',    emoji:'🏗️' },
+  { key:'kontrol',      idx:5, nome:'Koachify Kontrol', sistema:'Libertà',    emoji:'⚙️',
+                        pubblico:'la parte pratica del business' },
+  { key:'ai',           idx:6, nome:'Koachif-AI',       sistema:'Libertà',    emoji:'🤖',
+                        pubblico:"l'intelligenza artificiale" },
+  { key:'bussola',      idx:7, nome:'Bussola',          sistema:'Serenità',   emoji:'🧭' },
+  { key:'villaggio',    idx:8, nome:'Villaggio',        sistema:'Serenità',   emoji:'🏘️' },
+  { key:'scuderia',     idx:9, nome:'Scuderia',         sistema:'Serenità',   emoji:'🏎️' }
+];
+const P_BY_KEY = Object.fromEntries(PIANETI.map(p => [p.key, p]));
+const SISTEMI  = [
+  { nome:'Prosperità', promessa:'Più soldi',  keys:['attrazione','conversione','viaggio'] },
+  { nome:'Libertà',    promessa:'Più tempo',  keys:['architettura','kontrol','ai'] },
+  { nome:'Serenità',   promessa:'Meno stress',keys:['bussola','villaggio','scuderia'] }
+];
+
+const SEM_COLOR = { red:'#E53935', yellow:'#F0A500', green:'#88C057' };
+const SEM_IT    = { red:'rosso',   yellow:'giallo', green:'verde'   };
+const SEM_PUNTI = { red:0,         yellow:1,        green:2         };
+const SEM_SCORE = { red:0,         yellow:50,       green:100       };
+
+const FATTURATO_LABEL = {
+  zero:'Sto partendo (0€)', fino_3k:'Fino a 3.000€',
+  '3_10k':'Tra 3.000€ e 10.000€', oltre_10k:'Oltre 10.000€'
+};
+const OCCUPAZIONE_TEMA = {
+  coach:'il tuo coaching', formatore:'la tua formazione',
+  consulente:'la tua consulenza', terapeuta:'il tuo lavoro con i clienti',
+  sto_iniziando:'il business che stai per avviare'
+};
+
+// ═══════════════════════════════════════════════════════════
+// LE 16 DOMANDE (+ la schermata dati)
+// Principio del Doc 1: mai gergo (funnel/CRM/lead/KPI), e i colori
+// non si vedono mai durante il quiz.
+// ═══════════════════════════════════════════════════════════
+const QUESTIONS = [
+
+  // ── BLOCCO 1 · L'aggancio ────────────────────────────────
+  { id:'D1', tipo:'scelta', campo:'occupazione',
+    testo:'Per iniziare: di cosa ti occupi?',
+    contesto:'Così la tua mappa parlerà la tua lingua.',
+    opzioni:[
+      { v:'coach',         emoji:'🎯', t:'Coach',                             s:'Life, business, sport, mindset, relazioni…' },
+      { v:'formatore',     emoji:'🎓', t:'Formatore o trainer',               s:'Corsi, aule, formazione aziendale…' },
+      { v:'consulente',    emoji:'💼', t:'Consulente o libero professionista',s:'Marketing, finanza, benessere, legale…' },
+      { v:'terapeuta',     emoji:'🌿', t:'Terapeuta o operatore olistico',    s:'Naturopata, counselor, yoga, nutrizionista…' },
+      { v:'sto_iniziando', emoji:'🚀', t:'Sto per iniziare',                  s:'Ho una competenza, ma non ho ancora clienti paganti' }
+    ]},
+
+  { id:'D2', tipo:'aperta', campo:'nicchia', opzionale:true, maxlen:80,
+    testo:'In che ambito, più precisamente?',
+    sub:'Anche due parole vanno benissimo — per esempio "mindset per imprenditrici", "nutrizione sportiva", "yoga per over 50".',
+    placeholder:'Es. nutrizione sportiva' },
+
+  // ── BLOCCO 2 · I 9 semafori ──────────────────────────────
+  // L'ordine delle opzioni è una scala peggio→meglio e NON si randomizza:
+  // è onesto e riduce il carico cognitivo.
+  { id:'D3', tipo:'semaforo', pianeta:'attrazione',
+    testo:'Quante persone nuove ti scoprono ogni settimana?',
+    opzioni:[
+      { v:'A', sem:'red',    t:'Praticamente nessuna: i clienti arrivano solo col passaparola (quando arrivano)' },
+      { v:'B', sem:'yellow', t:'Pubblico sui social, ma like e follower non diventano richieste' },
+      { v:'C', sem:'green',  t:'Ogni settimana persone nuove mi scrivono o mi lasciano il contatto' }
+    ]},
+
+  { id:'D4', tipo:'semaforo', pianeta:'conversione',
+    testo:'Come vanno le vendite?',
+    opzioni:[
+      { v:'A', sem:'red',    t:'Vendere mi mette a disagio: non so bene come propormi' },
+      { v:'B', sem:'yellow', t:'Vendo, ma a singhiozzo: un mese bene, quello dopo quasi zero' },
+      { v:'C', sem:'green',  t:'So cosa proporre, quando e come — e le vendite sono regolari' }
+    ]},
+
+  { id:'D5', tipo:'semaforo', pianeta:'viaggio',
+    testo:'Cosa succede dopo che un cliente compra la prima volta?',
+    opzioni:[
+      { v:'A', sem:'red',    t:'Finisce lì: fa il percorso e sparisce' },
+      { v:'B', sem:'yellow', t:'Qualcuno resta o mi manda gente, ma per caso, non per sistema' },
+      { v:'C', sem:'green',  t:'Ho un percorso chiaro: restano, ricomprano, mi portano altri clienti' }
+    ]},
+
+  { id:'D6', tipo:'semaforo', pianeta:'architettura',
+    testo:'Dove vivono le informazioni importanti del tuo business — chi è il tuo cliente, la tua offerta, come parli?',
+    opzioni:[
+      { v:'A', sem:'red',    t:'Nella mia testa' },
+      { v:'B', sem:'yellow', t:'Sparse tra appunti, file e cartelle che non apro mai' },
+      { v:'C', sem:'green',  t:'In documenti ordinati che domattina potrei consegnare a un collaboratore' }
+    ]},
+
+  { id:'D7', tipo:'semaforo', pianeta:'kontrol',
+    testo:'Come gestisci la parte pratica: email, sito, calendario, pagamenti, messaggi?',
+    opzioni:[
+      { v:'A', sem:'red',    t:'Quasi tutto a mano — o non lo faccio proprio' },
+      { v:'B', sem:'yellow', t:'Pago diversi strumenti, ma non si parlano tra loro e ne uso la metà' },
+      { v:'C', sem:'green',  t:'Ho un sistema unico dove tutto è collegato e molte cose vanno da sole' }
+    ]},
+
+  { id:'D8', tipo:'semaforo', pianeta:'ai',
+    testo:'Che rapporto hai con l’intelligenza artificiale?',
+    opzioni:[
+      { v:'A', sem:'red',    t:'Non la uso, o un po’ mi spaventa' },
+      { v:'B', sem:'yellow', t:'La uso ogni tanto, ma i risultati non suonano come me' },
+      { v:'C', sem:'green',  t:'Lavora per me ogni giorno, con la mia voce, su compiti precisi' }
+    ]},
+
+  { id:'D9', tipo:'semaforo', pianeta:'bussola',
+    testo:'Quanto guadagni davvero, tolto tutto?',
+    opzioni:[
+      { v:'A', sem:'red',    t:'Sinceramente… non lo so con precisione' },
+      { v:'B', sem:'yellow', t:'Ho un’idea, ma decido più a sensazione che sui numeri' },
+      { v:'C', sem:'green',  t:'Conosco i miei numeri e li uso per decidere' }
+    ]},
+
+  { id:'D10', tipo:'semaforo', pianeta:'villaggio',
+    testo:'Chi ti aiuta nel lavoro?',
+    opzioni:[
+      { v:'A', sem:'red',    t:'Nessuno: faccio tutto io' },
+      { v:'B', sem:'yellow', t:'Qualche aiuto saltuario, ma devo spiegare tutto ogni volta' },
+      { v:'C', sem:'green',  t:'Ho persone che lavorano come lavorerei io' }
+    ]},
+
+  { id:'D11', tipo:'semaforo', pianeta:'scuderia',
+    testo:'Come finisce la tua settimana tipo?',
+    opzioni:[
+      { v:'A', sem:'red',    t:'Esausto/a: rincorro le urgenze e non stacco mai' },
+      { v:'B', sem:'yellow', t:'Sopravvivo, ma il tempo per le cose importanti non c’è mai' },
+      { v:'C', sem:'green',  t:'Decido io le priorità: c’è spazio per il lavoro profondo e per la vita' }
+    ]},
+
+  { id:'D12', tipo:'fascia', campo:'fatturato',
+    testo:'Oggi il tuo business quanto fattura al mese?',
+    contesto:'Ci serve solo per darti il percorso giusto. Resta tra noi.',
+    opzioni:[
+      { v:'zero',      t:'Sto partendo — ancora zero' },
+      { v:'fino_3k',   t:'Fino a 3.000 €' },
+      { v:'3_10k',     t:'Tra 3.000 € e 10.000 €' },
+      { v:'oltre_10k', t:'Oltre 10.000 €' }
+    ]},
+
+  // ── BLOCCO 3 · Le 4 aperte ───────────────────────────────
+  // D14 e D16 sono i campi ⭐: l'oro emotivo che alimenta la Miniera d'Oro.
+  { id:'D13', tipo:'aperta', maxlen:300,
+    testo:() => `Qual è la cosa che ti blocca di più, in questo momento, riguardo a ${getTema()}?`,
+    sub:'Scrivilo con parole tue, come lo diresti a un amico. Non serve che sia elegante.',
+    contesto:'Ultime 4 domande — sono quelle che rendono la mappa davvero tua.',
+    placeholder:'Scrivi qui, con parole tue…',
+    esempi:[
+      'Non trovo clienti in modo costante',
+      'Pubblico sui social ma nessuno mi scrive',
+      'Vendo a singhiozzo: un mese bene, uno male',
+      'Mi perdo nella tecnologia: troppi strumenti, troppo caos',
+      'Faccio tutto io e non stacco mai',
+      'Non so proprio da dove cominciare'
+    ]},
+
+  { id:'D14', tipo:'aperta', maxlen:400,
+    testo:'E questa situazione, quando ci pensi, cosa ti fa provare? Qual è la parte che ti pesa di più?',
+    sub:'Qui puoi essere sincero/a fino in fondo. Legge solo chi scrive la tua mappa.',
+    placeholder:'La parte che mi pesa di più è…' },
+
+  { id:'D15', tipo:'aperta', maxlen:300,
+    testo:() => `Cosa vorresti ottenere, concretamente, nei prossimi 6-12 mesi riguardo a ${getTema()}?`,
+    sub:'Concretamente: qualcosa che a fine anno sapresti dire se è successo o no.',
+    placeholder:'Nei prossimi mesi vorrei…',
+    esempi:[
+      'Clienti costanti ogni mese, senza ansia',
+      'Vivere SOLO del mio coaching',
+      'Arrivare a 10.000€ al mese',
+      'Più tempo libero: lavorare meno, guadagnare meglio',
+      'Un team e sistemi che lavorano anche senza di me',
+      'Diventare un punto di riferimento nella mia nicchia'
+    ]},
+
+  { id:'D16', tipo:'aperta', maxlen:400,
+    testo:'E se ci arrivassi davvero: cosa cambierebbe nella tua vita di tutti i giorni? Cosa potresti finalmente fare, dire o sentire?',
+    sub:'Immagina una giornata qualsiasi, a obiettivo raggiunto.',
+    placeholder:'Potrei finalmente…' }
+];
+
+const TOT_DOMANDE = QUESTIONS.length;   // 16, poi la schermata dati
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+const state = {
+  phase: 'welcome',          // welcome | q | dati | elaborazione | mappa
+  qIndex: 0,
+  answers: {},               // { D1:'coach', D3:'B', D12:'3_10k' }
+  semafori: {},              // { attrazione:'red', … }  ← red|yellow|green
+  open: {},                  // { D2:'', D13:'', … }
+  openMeta: {},              // { D13:{ chip:2, dirty:true } }
+  occupazione: null, nicchia: null, fatturato: null,
+  punteggio: null, universo: null, percorso: null, genesis: null,
+  archetipo: null, archetipiMatch: [], tags: [],
+  lead: null,
+  sessionId: null,
+  history: [],
+  _selected: null,
+  _backAvailable: false,
+  report: null,              // { mappa_md, email_oggetto, email_md, source }
+  _reportPromise: null
+};
+
+let _autoAdvanceTimer = null;
+
+const q = () => QUESTIONS[state.qIndex];
+const testoDi = (question) => typeof question.testo === 'function' ? question.testo() : question.testo;
+
+// Il tema con cui si interpola «[il tuo tema]» in D13 e D15.
+// La nicchia si usa solo se è davvero una nicchia: troppo corta non dice
+// nulla, troppo lunga rende la domanda illeggibile.
+function getTema() {
+  const n = (state.nicchia || '').trim();
+  if (n.length >= 3 && n.length <= 45) return n;
+  return OCCUPAZIONE_TEMA[state.occupazione] || 'il tuo business';
+}
+
+// ═══════════════════════════════════════════════════════════
+// SUPABASE
+// Il client scrive solo ciò che l'utente dichiara. I campi derivati
+// (semafori, punteggio, percorso, archetipo, tag) e gli asset generati
+// li scrive la Edge Function con service_role: è ciò che rende
+// impossibile il bug delle UPDATE silenziose del quiz precedente.
+// ═══════════════════════════════════════════════════════════
+const SUPA_URL = 'https://qwxbuqabguvmpzcebygr.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF3eGJ1cWFiZ3V2bXB6Y2VieWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1Njg5MDksImV4cCI6MjA5ODE0NDkwOX0.yFQ0dMj9_L3YNDQEI6WF7LnUBHRXtmpCmIwsHBJrpiE';
+
+let db = null;
+try {
+  if (window.supabase && window.supabase.createClient) {
+    db = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  }
+} catch (e) { console.warn('[Supabase] init:', e); }
+
+async function apriSessione() {
+  if (!db) return;
+  try {
+    const id = crypto.randomUUID();
+    const { error } = await db.from('klarity_sessions').insert([{
+      id,
+      quiz_version: QUIZ_VERSION,
+      user_agent: (navigator.userAgent || '').slice(0, 300)
+    }]);
+    if (error) { console.warn('[Supabase] apriSessione:', error); return; }
+    state.sessionId = id;
+  } catch (e) { console.warn('[Supabase] apriSessione:', e); }
+}
+
+// Le risposte passano da una funzione, non da un insert diretto: il quiz
+// permette di tornare indietro e ricambiare risposta, quindi serve un upsert,
+// e un upsert ha bisogno di leggere la riga in conflitto. Aprire quella
+// lettura ad anon esporrebbe le risposte aperte di chiunque — la Miniera
+// d'Oro. La funzione vede la riga al posto nostro e accetta un solo verbo.
+async function salvaRisposta(question) {
+  if (!db || !state.sessionId) return;
+
+  const args = {
+    p_session: state.sessionId,
+    p_qid: question.id,
+    p_qtipo: question.tipo,
+    p_ordine: state.qIndex + 1,
+    p_pianeta_key: null, p_pianeta_idx: null,
+    p_opzione: state.answers[question.id] ?? null,
+    p_semaforo: null, p_testo: null,
+    p_esempio_idx: null, p_esempio_modificato: null
+  };
+
+  if (question.pianeta) {
+    const p = P_BY_KEY[question.pianeta];
+    args.p_pianeta_key = p.key;
+    args.p_pianeta_idx = p.idx;
+    const sem = state.semafori[p.key];
+    args.p_semaforo = sem ? SEM_IT[sem] : null;
+  }
+  if (question.tipo === 'aperta') {
+    args.p_testo = state.open[question.id] || null;
+    const meta = state.openMeta[question.id];
+    if (meta && meta.chip != null) {
+      args.p_esempio_idx = meta.chip;
+      args.p_esempio_modificato = !!meta.dirty;
+    }
+  }
+
+  try {
+    const { error } = await db.rpc('klarity_salva_risposta', args);
+    if (error) console.warn('[Supabase] salvaRisposta:', error);
+  } catch (e) { console.warn('[Supabase] salvaRisposta:', e); }
+}
+
+async function salvaProfilo() {
+  if (!db || !state.sessionId) return;
+  try {
+    await db.from('klarity_sessions').update({
+      occupazione: state.occupazione,
+      nicchia: state.nicchia,
+      fatturato: state.fatturato
+    }).eq('id', state.sessionId);
+  } catch (e) { console.warn('[Supabase] salvaProfilo:', e); }
+}
+
+async function salvaLead() {
+  if (!db || !state.sessionId || !state.lead) return;
+  try {
+    const { error } = await db.from('klarity_leads').insert([{
+      session_id: state.sessionId,
+      nome: state.lead.nome,
+      email: state.lead.email,
+      telefono: state.lead.telefono || null,
+      privacy_accettata: true
+    }]);
+    if (error) console.warn('[Supabase] salvaLead:', error);
+  } catch (e) { console.warn('[Supabase] salvaLead:', e); }
+}
+
+async function chiudiSessione() {
+  if (!db || !state.sessionId) return;
+  try {
+    await db.from('klarity_sessions').update({
+      status: 'completed',
+      completed_at: new Date().toISOString()
+    }).eq('id', state.sessionId);
+  } catch (e) { console.warn('[Supabase] chiudiSessione:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DERIVAZIONI — funzioni pure
+// Il motore le ricalcola comunque lato server dalle righe del DB:
+// qui servono solo alla UI e ai tag inviati subito al CRM.
+// ═══════════════════════════════════════════════════════════
+function calcPunteggio() {
+  return PIANETI.reduce((t, p) => t + (SEM_PUNTI[state.semafori[p.key]] ?? 0), 0);
+}
+function calcUniverso(punteggio) {
+  return punteggio <= 6 ? 'rosso' : punteggio <= 12 ? 'giallo' : 'verde';
+}
+function calcPercorso() {
+  if (state.fatturato === 'oltre_10k') return 'pieno_ma_schiavo';
+  if (state.fatturato === '3_10k')     return 'vendi_ma_incostante';
+  return 'parti_da_zero';
+}
+function calcGenesis() {
+  const a = state.semafori.architettura;
+  return a === 'red' ? 'zero' : a === 'yellow' ? 'carica' : 'veloce';
+}
+function calcScoreSistema(keys) {
+  const somma = keys.reduce((t, k) => t + (SEM_SCORE[state.semafori[k]] ?? 50), 0);
+  return Math.round(somma / keys.length);
+}
+
+// Archetipi: regole valutate in ordine, vince la prima. Dal più specifico
+// al più lasco. Si conservano TUTTI i match, non solo il vincitore: dopo
+// un centinaio di quiz le soglie si ri-tarano sui dati invece che a intuito.
+const ARCHETIPI = {
+  sognatore:             { nome:'Il Sognatore' },
+  pieno_ma_schiavo:      { nome:'Il Pieno-ma-Schiavo' },
+  esperto_analogico:     { nome:"L'Esperto Analogico" },
+  artigiana_passaparola: { nome:'L’Artigiana del Passaparola' },
+  imbuto_rotto:          { nome:"L'Imbuto Rotto" }
+};
+
+function matchArchetipi() {
+  const s = state.semafori, occ = state.occupazione, fat = state.fatturato;
+  const regole = [
+    ['sognatore',             fat === 'zero' || (occ === 'sto_iniziando' && (fat === 'zero' || fat === 'fino_3k'))],
+    ['pieno_ma_schiavo',      fat === 'oltre_10k' && s.scuderia === 'red'],
+    ['esperto_analogico',     occ === 'formatore' && s.ai === 'red' && s.architettura === 'yellow'],
+    ['artigiana_passaparola', occ === 'terapeuta' && s.attrazione === 'red'],
+    ['imbuto_rotto',          s.kontrol === 'yellow' && fat === '3_10k']
+  ];
+  return regole.filter(([, ok]) => ok).map(([k]) => k);
+}
+
+function pickArchetipo(match) {
+  if (match.length) return match[0];
+  // Fallback sul percorso: garantisce esaustività senza inventare segnali.
+  return { parti_da_zero:'sognatore',
+           vendi_ma_incostante:'imbuto_rotto',
+           pieno_ma_schiavo:'pieno_ma_schiavo' }[state.percorso] || 'sognatore';
+}
+
+const slug = (s) => (s || '').toLowerCase()
+  .normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+// Tassonomia dei tag esattamente come la definisce il Doc 1. Il percorso ha
+// un'etichetta breve per il CRM: percorso-zero / -incostante / -schiavo.
+const PERCORSO_TAG = {
+  parti_da_zero:'zero', vendi_ma_incostante:'incostante', pieno_ma_schiavo:'schiavo'
+};
+
+function buildTags() {
+  const t = ['klarity-completato',
+             'archetipo-' + slug(state.archetipo),
+             'fatturato-' + slug(state.fatturato),
+             'genesis-' + state.genesis,
+             'percorso-' + (PERCORSO_TAG[state.percorso] || slug(state.percorso)),
+             'universo-' + state.universo];
+  PIANETI.forEach(p => {
+    if (state.semafori[p.key] === 'red') t.push('pianeta-rosso-' + p.key);
+  });
+  return t;
+}
+
+function derivaTutto() {
+  state.punteggio = calcPunteggio();
+  state.universo  = calcUniverso(state.punteggio);
+  state.percorso  = calcPercorso();
+  state.genesis   = calcGenesis();
+  state.archetipiMatch = matchArchetipi();
+  state.archetipo = pickArchetipo(state.archetipiMatch);
+  state.tags = buildTags();
+}
+
+// ═══════════════════════════════════════════════════════════
+// UI — helper
+// ═══════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  const ca = document.getElementById('content-area');
+  if (ca) ca.scrollTop = 0;
+  // La barra in alto è sempre su fondo chiaro, quindi sempre logo scuro.
+  // Il logo bianco vive dentro l'hero della welcome, che è navy.
+}
+
+function setTopbar(showBack, counterText) {
+  const back = document.getElementById('topbar-back');
+  const cnt  = document.getElementById('topbar-counter');
+  if (back) back.classList.toggle('hidden', !showBack);
+  if (cnt) {
+    cnt.textContent = counterText || '';
+    cnt.style.visibility = counterText ? 'visible' : 'hidden';
+  }
+}
+
+function setProgress(pct, label) {
+  const wrap = document.getElementById('progress-bar-wrap');
+  if (!wrap) return;
+  if (pct === null) { wrap.style.visibility = 'hidden'; return; }
+  wrap.style.visibility = 'visible';
+  document.getElementById('progress-bar-label-text').textContent = label || '';
+  document.getElementById('progress-bar-pct').textContent = pct + '%';
+  document.getElementById('progress-bar-fill').style.width = pct + '%';
+}
+
+function setBtnLabel(text, disabled) {
+  const b = document.getElementById('btn-continue');
+  document.getElementById('btn-label').textContent = text;
+  b.disabled = !!disabled;
+}
+function setBtnVisible(v) {
+  document.getElementById('bottom-action').style.display = v ? '' : 'none';
+}
+function setTopbarVisible(v) {
+  document.getElementById('topbar').style.display = v ? '' : 'none';
+}
+
+function updateBackBtn() {
+  const mostra = state._backAvailable && state.phase === 'q';
+  const back = document.getElementById('topbar-back');
+  const btn  = document.getElementById('btn-go-back');
+  if (back) back.classList.toggle('hidden', !mostra);
+  if (btn)  btn.style.display = mostra ? '' : 'none';
+}
+function markAdvanced() { state._backAvailable = true; updateBackBtn(); }
+
+// Fallback per i browser senza :has() (Safari <15.4, Firefox <121):
+// lì il selettore condizionale non si applica e lo scroll sparirebbe.
+const HAS_SUPPORT = (() => {
+  try { return CSS.supports('selector(:has(*))'); } catch { return false; }
+})();
+function setScrollable(v) {
+  if (!HAS_SUPPORT) document.body.classList.toggle('scrollable', !!v);
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDERING DELLE DOMANDE
+// ═══════════════════════════════════════════════════════════
+
+// Il badge è un'emoji o un pallino neutro, MAI una lettera: su una scala
+// a tre una lettera suggerisce un voto, e il principio del Doc 1 è che il
+// giudizio non si veda finché non arriva la mappa.
+function renderOptions(question) {
+  const lista = document.getElementById('options-list');
+  lista.innerHTML = '';
+  lista.style.display = '';
+  const scelta = state.answers[question.id];
+
+  question.opzioni.forEach(o => {
+    const card = document.createElement('div');
+    card.className = 'option-card' + (scelta === o.v ? ' selected' : '');
+
+    const badge = document.createElement('div');
+    badge.className = 'option-badge';
+    badge.textContent = o.emoji || '';
+    if (!o.emoji) badge.classList.add('option-badge-dot');
+
+    const content = document.createElement('div');
+    content.className = 'option-content';
+    const testo = document.createElement('div');
+    testo.className = 'option-text';
+    testo.textContent = o.t;
+    content.appendChild(testo);
+    if (o.s) {
+      const sub = document.createElement('div');
+      sub.className = 'option-subtext';
+      sub.textContent = o.s;
+      content.appendChild(sub);
+    }
+
+    const check = document.createElement('div');
+    check.className = 'option-check';
+
+    card.append(badge, content, check);
+    card.onclick = () => {
+      clearTimeout(_autoAdvanceTimer);
+      lista.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      state._selected = o.v;
+      setBtnLabel('Continua', false);
+      _autoAdvanceTimer = setTimeout(handleContinue, 360);
+    };
+    lista.appendChild(card);
+  });
+
+  if (scelta != null) { state._selected = scelta; setBtnLabel('Continua', false); }
+  else                { state._selected = null;   setBtnLabel('Continua', true);  }
+}
+
+// Le chip pre-compilano il campo restando modificabili. La modalità di
+// guasto peggiore sarebbe distruggere ciò che l'utente ha già scritto:
+// perciò a testo "sporco" si accoda, non si sostituisce.
+function renderChips(question) {
+  const wrap  = document.getElementById('example-chips-wrap');
+  const cont  = document.getElementById('example-chips');
+  const toggle= document.getElementById('example-toggle');
+  const box   = document.getElementById('open-wrap');
+  cont.innerHTML = '';
+  if (!question.esempi || !question.esempi.length) {
+    wrap.style.display = 'none';
+    box.classList.remove('has-chips');
+    return;
+  }
+
+  wrap.style.display = '';
+  box.classList.add('has-chips');
+  cont.classList.remove('open');
+  document.getElementById('example-toggle-label').textContent =
+    'Vedi ' + question.esempi.length + ' esempi';
+  toggle.onclick = toggleChips;
+
+  const meta = state.openMeta[question.id] || {};
+  question.esempi.forEach((testo, i) => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'example-chip' + (meta.chip === i && !meta.dirty ? ' selected' : '');
+    chip.textContent = testo;
+    chip.onclick = () => {
+      const ta = document.getElementById('open-input');
+      const sporco = !!(state.openMeta[question.id] && state.openMeta[question.id].dirty);
+      ta.value = (sporco && ta.value.trim())
+        ? (ta.value.replace(/\s+$/, '') + '\n' + testo)   // accoda: non si perde nulla
+        : testo;                                          // sostituisce
+      if (ta.value.length > question.maxlen) ta.value = ta.value.slice(0, question.maxlen);
+      state.openMeta[question.id] = { chip: i, dirty: sporco };
+      cont.querySelectorAll('.example-chip').forEach(c => c.classList.remove('selected'));
+      if (!sporco) chip.classList.add('selected');
+      ta.focus();
+      ta.setSelectionRange(ta.value.length, ta.value.length);
+      updateCharCount();
+    };
+    cont.appendChild(chip);
+  });
+}
+
+function toggleChips() {
+  const cont = document.getElementById('example-chips');
+  const open = cont.classList.toggle('open');
+  document.getElementById('example-toggle-label').textContent =
+    open ? 'Nascondi gli esempi' : 'Vedi ' + (q().esempi || []).length + ' esempi';
+}
+
+// Appena l'utente scrive, le parole diventano sue: le chip si deselezionano.
+function onOpenInput() {
+  const id = q().id;
+  const meta = state.openMeta[id] || {};
+  state.openMeta[id] = { chip: meta.chip ?? null, dirty: true };
+  document.querySelectorAll('.example-chip').forEach(c => c.classList.remove('selected'));
+  updateCharCount();
+}
+
+function updateCharCount() {
+  const ta = document.getElementById('open-input');
+  document.getElementById('char-count').textContent = ta.value.length;
+}
+
+function renderQuestion(i) {
+  state.qIndex = i;
+  state.phase = 'q';
+  const question = QUESTIONS[i];
+
+  // Header di Sistema: solo sui 9 Pianeti.
+  // Durante il quiz si usa l'etichetta comprensibile (Doc 2 §B): il nome di
+  // marca compare solo nella Mappa, dove è un ancoraggio e non gergo.
+  const card = document.getElementById('q-module-card');
+  if (question.pianeta) {
+    const p = P_BY_KEY[question.pianeta];
+    const etichetta = p.pubblico
+      ? p.pubblico.charAt(0).toUpperCase() + p.pubblico.slice(1)
+      : 'Pianeta ' + p.nome;
+    card.style.display = '';
+    document.getElementById('q-module-icon').textContent = p.emoji;
+    document.getElementById('q-module-system').textContent = 'Sistema ' + p.sistema;
+    document.getElementById('q-module-name').textContent = etichetta;
+  } else {
+    card.style.display = 'none';
+  }
+
+  document.getElementById('q-context-row').textContent = question.contesto || '';
+  document.getElementById('q-text').textContent = testoDi(question);
+
+  const sub = document.getElementById('q-sub');
+  sub.textContent = question.sub || '';
+  sub.style.display = question.sub ? '' : 'none';
+
+  const openWrap = document.getElementById('open-wrap');
+  const lista = document.getElementById('options-list');
+
+  if (question.tipo === 'aperta') {
+    lista.innerHTML = '';
+    lista.style.display = 'none';
+    openWrap.classList.add('show');   // la visibilità la decide la classe, non lo stile inline
+    setScrollable(true);
+
+    document.getElementById('open-optional-tag').style.display = question.opzionale ? '' : 'none';
+    const ta = document.getElementById('open-input');
+    ta.maxLength = question.maxlen;
+    ta.placeholder = question.placeholder || 'Scrivi qui la tua risposta…';
+    ta.value = state.open[question.id] || '';
+    document.getElementById('char-max').textContent = question.maxlen;
+    updateCharCount();
+    renderChips(question);
+    // Le aperte non bloccano mai: obbligatorie o no, si prosegue.
+    setBtnLabel('Continua', false);
+  } else {
+    openWrap.classList.remove('show');
+    setScrollable(false);
+    renderOptions(question);
+  }
+
+  setTopbar(state._backAvailable, (i + 1) + '/' + TOT_DOMANDE);
+  setProgress(Math.round(i / TOT_DOMANDE * 100), 'Domanda ' + (i + 1) + ' di ' + TOT_DOMANDE);
+  setBtnVisible(true);
+  updateBackBtn();
+  showScreen('screen-question');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FLUSSO
+// ═══════════════════════════════════════════════════════════
+function startQuiz() {
+  apriSessione();                      // non bloccante: il quiz parte comunque
+  state.history = [];
+  state._backAvailable = false;
+  renderQuestion(0);
+}
+
+function raccogliRisposta() {
+  const question = q();
+
+  if (question.tipo === 'aperta') {
+    const v = document.getElementById('open-input').value.trim();
+    state.open[question.id] = v;
+    if (question.campo === 'nicchia') state.nicchia = v || null;
+  } else {
+    if (state._selected == null) return false;
+    state.answers[question.id] = state._selected;
+    if (question.campo === 'occupazione') state.occupazione = state._selected;
+    if (question.campo === 'fatturato')   state.fatturato   = state._selected;
+    if (question.pianeta) {
+      const opt = question.opzioni.find(o => o.v === state._selected);
+      state.semafori[question.pianeta] = opt ? opt.sem : 'yellow';
+    }
+  }
+  salvaRisposta(question);
+  if (question.campo) salvaProfilo();
+  return true;
+}
+
+function handleContinue() {
+  clearTimeout(_autoAdvanceTimer);
+
+  if (state.phase === 'welcome') { startQuiz(); return; }
+  if (state.phase === 'dati')    { submitDati(); return; }
+  if (state.phase !== 'q') return;
+
+  if (!raccogliRisposta()) return;
+
+  state.history.push(state.qIndex);
+  markAdvanced();
+
+  if (state.qIndex + 1 < TOT_DOMANDE) renderQuestion(state.qIndex + 1);
+  else showDati();
+}
+
+// Back di un passo solo, come nel quiz precedente: un unico ramo invece
+// degli otto della macchina a pilastri.
+function goBackOne() {
+  if (!state._backAvailable || !state.history.length) return;
+  state._backAvailable = false;
+  const prec = state.history.pop();
+  state._selected = state.answers[QUESTIONS[prec].id] ?? null;
+  renderQuestion(prec);
+}
+
+function showDati() {
+  state.phase = 'dati';
+  state._backAvailable = false;
+  setTopbar(false, null);
+  setProgress(100, 'Ci siamo');
+  setBtnLabel('Mostrami la mia Mappa', false);
+  setBtnVisible(true);
+  updateBackBtn();
+  setScrollable(true);
+  showScreen('screen-dati');
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
+
+function submitDati() {
+  const nome  = document.getElementById('dati-nome');
+  const email = document.getElementById('dati-email');
+  const tel   = document.getElementById('dati-telefono');
+  const priv  = document.getElementById('dati-privacy');
+  const errEmail = document.getElementById('dati-email-error');
+
+  let ok = true;
+  errEmail.classList.remove('show');
+  if (!nome.value.trim()) { nome.classList.add('invalid'); ok = false; }
+  if (!EMAIL_RE.test(email.value.trim())) {
+    email.classList.add('invalid');
+    errEmail.textContent = email.value.trim()
+      ? 'Controlla l’indirizzo: manca qualcosa.'
+      : 'Senza email non possiamo mandarti la mappa.';
+    errEmail.classList.add('show');
+    ok = false;
+  }
+  if (!priv.checked) { priv.classList.add('invalid'); ok = false; }
+  if (!ok) return;
+
+  state.lead = {
+    nome: nome.value.trim(),
+    email: email.value.trim(),
+    telefono: tel.value.trim(),      // facoltativo
+    privacy_accettata: true
+  };
+
+  derivaTutto();
+  salvaLead();
+  chiudiSessione();
+  sendToGHL();                        // chiamata #1: il lead è salvo subito
+
+  if (typeof fbq === 'function') {
+    try {
+      fbq('track', 'Lead', { content_name: 'Klarity Quiz', content_category: 'quiz_completato' });
+    } catch (e) { /* il Pixel non deve mai bloccare il flusso */ }
+  }
+
+  // Doppio embed: si porta la pagina contenitore sulla landing della Mappa.
+  // Deve succedere adesso, finché il click dell'utente è ancora "fresco":
+  // è l'unico momento in cui un iframe può far navigare chi lo contiene.
+  if (REDIRECT_MAPPA && vaiAllaMappa()) return;
+
+  showElaborazione();
+}
+
+/**
+ * Porta la pagina contenitore sulla landing della Mappa.
+ *
+ * Quando il browser rifiuta la navigazione non solleva un errore: ignora e
+ * basta. Per questo non ci si fida di un try/catch ma si guarda l'orologio:
+ * se dopo un secondo e mezzo siamo ancora qui, il redirect non è passato e
+ * la Mappa si mostra dentro l'iframe come farebbe la versione a pagina sola.
+ * Meglio una Mappa nel posto sbagliato che nessuna Mappa.
+ */
+function vaiAllaMappa() {
+  if (!state.sessionId) return false;
+  const sep = REDIRECT_MAPPA.indexOf('?') >= 0 ? '&' : '?';
+  const url = REDIRECT_MAPPA + sep + 'report=' + encodeURIComponent(state.sessionId);
+
+  // Si mostra la schermata d'attesa SENZA avviare il motore: a chiamarlo
+  // sarà la landing. Avviarlo qui significherebbe due chiamate per la stessa
+  // persona — la protezione contro i doppioni confronta la mappa già
+  // scritta, e in quei secondi non c'è ancora.
+  showElaborazione({ avviaMotore: false });
+
+  try {
+    if (window.top && window.top !== window.self) window.top.location.href = url;
+    else window.location.href = url;
+  } catch (e) {
+    console.warn('[redirect] bloccato:', e);
+    showElaborazione();
+    return true;
+  }
+
+  // Il browser che rifiuta la navigazione non solleva un errore: ignora e
+  // basta. Quindi non ci si fida del try/catch ma si guarda l'orologio.
+  setTimeout(() => {
+    if (state.phase === 'elaborazione' && !state._reportPromise) {
+      console.warn('[redirect] non è passato: la Mappa si apre qui dentro');
+      showElaborazione();
+    }
+  }, 1500);
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════════
+// GHL — chiamata #1 (il lead). La #2, con l'email scritta dal motore,
+// la fa la Edge Function lato server: se la facesse il browser, un
+// utente che chiude il tab a 40 secondi non riceverebbe mai nulla.
+// ═══════════════════════════════════════════════════════════
+const _GHL_HOOK = 'https://services.leadconnectorhq.com/hooks/jqOTU47ZX031Nj5k6Ztn/' +
+  'webhook-trigger/7fdc9dcc-54ce-4ea1-b448-a9fda3d114c9';
+
+// L'indirizzo da mandare al CRM e da mettere nell'email. Con il doppio embed
+// deve puntare alla landing, non all'iframe nudo: è lì che la persona trova
+// la Mappa insieme a tutto il resto.
+function buildReportUrl() {
+  if (!state.sessionId) return null;
+  const base = REDIRECT_MAPPA || (location.origin + location.pathname);
+  const sep = base.indexOf('?') >= 0 ? '&' : '?';
+  return base + sep + 'report=' + state.sessionId;
+}
+
+async function sendToGHL() {
+  if (!state.lead) return;
+  try {
+    await fetch(_GHL_HOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        evento: 'klarity_lead',
+        firstName: state.lead.nome,
+        email: state.lead.email,
+        phone: state.lead.telefono || '',
+        source: 'Klarity Quiz',
+        tags: state.tags,
+        archetipo: ARCHETIPI[state.archetipo] ? ARCHETIPI[state.archetipo].nome : '',
+        archetipo_key: state.archetipo,
+        occupazione: state.occupazione || '',
+        nicchia: state.nicchia || '',
+        fatturato: state.fatturato || '',
+        percorso: state.percorso || '',
+        genesis: state.genesis || '',
+        colore_universo: state.universo || '',
+        punteggio: String(state.punteggio ?? ''),
+        mappa_url: buildReportUrl() || '',
+        session_id: state.sessionId || '',
+        privacy_policy_accettata: 'true'
+      })
+    });
+  } catch (e) { console.warn('[GHL] lead:', e); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// IL MOTORE
+// Finché ENGINE_URL è vuoto (fase di sviluppo) si usa una mappa
+// di prova, così il flusso è verificabile senza chiamare l'AI.
+// ═══════════════════════════════════════════════════════════
+const ENGINE_URL = 'https://qwxbuqabguvmpzcebygr.supabase.co/functions/v1/klarity-report';
+const ENGINE_TIMEOUT_MS = 120000;
+
+// ═══════════════════════════════════════════════════════════
+// I DUE EMBED
+//
+// Lasciando REDIRECT_MAPPA vuoto il quiz si comporta come una pagina sola:
+// finite le domande, la Mappa compare lì dentro.
+//
+// Mettendoci l'indirizzo di una seconda landing, invece, al click su
+// «Mostrami la mia Mappa» la pagina che contiene l'iframe viene portata su
+// quella landing con ?report=UUID, e lì la Mappa si carica dentro un secondo
+// embed. Sotto quell'embed ci metti quello che vuoi — CTA, video, prezzi —
+// senza che nulla di tutto ciò debba passare dal motore.
+//
+// Perché proprio sul click e non a Mappa pronta: un iframe può far navigare
+// la pagina che lo contiene SOLO nell'istante in cui l'utente ha appena
+// cliccato. Un redirect automatico quaranta secondi dopo verrebbe bloccato
+// dal browser, in silenzio. Quindi si parte subito e l'attesa la gestisce
+// la seconda pagina.
+const REDIRECT_MAPPA = 'https://promo.koachify.it/risultato-klarity-quiz';
+
+// Le due CTA in fondo alla Mappa. Con il doppio embed conviene spegnerle:
+// la chiamata all'azione la fai tu sulla landing, sotto l'iframe, e due
+// inviti diversi nella stessa schermata si annullano a vicenda.
+// (Restano comunque nell'email di consegna, che è un altro contesto.)
+const CTA_NELLA_MAPPA = !REDIRECT_MAPPA;
+
+function buildEnginePayload() {
+  const semIt = {};
+  PIANETI.forEach(p => { semIt[p.key] = SEM_IT[state.semafori[p.key]] || null; });
+  return {
+    session_id: state.sessionId,
+    nome: state.lead?.nome, email: state.lead?.email,
+    occupazione: state.occupazione, nicchia: state.nicchia,
+    semafori: semIt,
+    fatturato: state.fatturato,
+    ostacolo:  state.open.D13 || null,
+    pain:      state.open.D14 || null,
+    obiettivo: state.open.D15 || null,
+    desiderio: state.open.D16 || null,
+    punteggio: state.punteggio,
+    colore_universo: state.universo,
+    percorso: state.percorso,
+    genesis: state.genesis,
+    archetipo: state.archetipo,
+    archetipi_match: state.archetipiMatch,
+    mappa_url: buildReportUrl()
+  };
+}
+
+// Non lancia mai: un guasto del motore non deve rompere la pagina.
+async function callKlarityEngine() {
+  if (!ENGINE_URL) return mappaDiProva();
+
+  const ctrl = new AbortController();
+  const tid = setTimeout(() => ctrl.abort(), ENGINE_TIMEOUT_MS);
+  try {
+    const res = await fetch(ENGINE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: SUPA_KEY },
+      body: JSON.stringify(buildEnginePayload()),
+      signal: ctrl.signal
+    });
+    clearTimeout(tid);
+    if (!res.ok) throw new Error('engine ' + res.status);
+    const data = await res.json();
+    return {
+      mappa_md: data.mappa_md || '',
+      email_oggetto: data.email_oggetto || '',
+      email_md: data.email_md || '',
+      source: data.report_source || 'ai'
+    };
+  } catch (e) {
+    clearTimeout(tid);
+    console.warn('[Engine]', e);
+    return { mappa_md:'', email_oggetto:'', email_md:'', source:'none' };
+  }
+}
+
+// Mappa di prova per lo sviluppo del front-end senza motore (F3).
+function mappaDiProva() {
+  const nome = state.lead?.nome || 'Ciao';
+  const rossi = PIANETI.filter(p => state.semafori[p.key] === 'red');
+  const righe = rossi.slice(0, 3).map(p =>
+    `### ${p.nome}\n\nQui andrà il blocco in quattro movimenti per ${p.pubblico || p.nome}.\n`);
+  return new Promise(r => setTimeout(() => r({
+    mappa_md:
+`# ${nome}, ecco la Mappa del tuo Universo.
+
+_Mappa di prova: il motore non è ancora collegato._
+
+${state.open.D13 ? `Hai scritto: «${state.open.D13}».\n` : ''}
+## La lettura incrociata
+
+Qui andranno le 3-5 frasi che collegano due dei tuoi semafori.
+
+## I Pianeti su cui partire
+
+${righe.join('\n') || 'Nessun rosso: ottimo segno.'}
+
+## Il ponte
+
+${state.open.D16 ? `Hai scritto che vorresti «${state.open.D16}».` : 'Qui andrà il ponte al desiderio.'}`,
+    email_oggetto: `${nome}, la tua Mappa dei 9 Pianeti è pronta (parti da qui)`,
+    email_md: 'Corpo email di prova.',
+    source: 'none'
+  }), 2500));
+}
+
+// ═══════════════════════════════════════════════════════════
+// ELABORAZIONE
+// Pavimento 12s: anche se la mappa è pronta a 8s non si mostra prima —
+// l'attesa è parte dell'esperienza (Doc 2 §1). Soffitto morbido a 90s:
+// cambia il copy. Timeout duro a 120s: dentro callKlarityEngine.
+// ═══════════════════════════════════════════════════════════
+const ELAB_STADI = [
+  { t: 600,   testo:'Risposte raccolte' },
+  { t: 3500,  testo:'I tuoi 9 Pianeti sono accesi' },
+  { t: 8000,  testo:'Incrociamo i semafori tra loro' },
+  { t: 15000, testo:'Cerchiamo il collegamento che conta' },
+  { t: 24000, testo:'Scegliamo da dove ha senso partire' },
+  { t: 34000, testo:'Scriviamo la tua lettura' }
+];
+const ELAB_PAVIMENTO = 12000;
+const ELAB_SOFFITTO  = 90000;
+let _elabTimers = [];
+
+function showElaborazione(opzioni) {
+  const avviaMotore = !opzioni || opzioni.avviaMotore !== false;
+  state.phase = 'elaborazione';
+  setTopbar(false, null);
+  setProgress(null);
+  setBtnVisible(false);
+  setScrollable(false);
+  showScreen('screen-elaborazione');
+
+  const lista = document.getElementById('elab-checklist');
+  lista.innerHTML = '';
+  ELAB_STADI.forEach((s, i) => {
+    const item = document.createElement('div');
+    item.className = 'elab-check-item';
+    item.id = 'elab-item-' + i;
+    item.style.opacity = '.3';
+    item.innerHTML = '<div class="elab-check-icon loading">⟳</div>' +
+                     '<div class="elab-check-text"></div>';
+    item.querySelector('.elab-check-text').textContent = s.testo;
+    lista.appendChild(item);
+  });
+
+  _elabTimers.forEach(clearTimeout);
+  _elabTimers = ELAB_STADI.map((s, i) => setTimeout(() => {
+    const item = document.getElementById('elab-item-' + i);
+    if (!item) return;
+    item.style.opacity = '1';
+    const icona = item.querySelector('.elab-check-icon');
+    icona.className = 'elab-check-icon done';
+    icona.textContent = '✓';
+    const pct = Math.round((i + 1) / ELAB_STADI.length * 92);
+    document.getElementById('elab-bar-fill').style.width = pct + '%';
+  }, s.t));
+
+  _elabTimers.push(setTimeout(() => {
+    document.getElementById('elab-title').textContent =
+      'Ci sta mettendo un attimo in più…';
+    document.getElementById('elab-footer').innerHTML =
+      'Sta incrociando i tuoi 9 semafori.<br>Ancora qualche secondo.';
+  }, ELAB_SOFFITTO));
+
+  // Con il doppio embed questa schermata dura un istante, il tempo che la
+  // pagina contenitore cambi indirizzo: il motore lo chiama la landing.
+  if (!avviaMotore) return;
+
+  const avvio = Date.now();
+  state._reportPromise = callKlarityEngine();
+  state._reportPromise.then(r => {
+    state.report = r;
+    const attesa = Math.max(0, ELAB_PAVIMENTO - (Date.now() - avvio));
+    setTimeout(() => {
+      _elabTimers.forEach(clearTimeout);
+      document.getElementById('elab-bar-fill').style.width = '100%';
+      renderMappa();
+    }, attesa);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// MARKDOWN → HTML
+// escapeHtml() PRIMA di tutto: la Mappa cita verbatim ciò che l'utente
+// ha scritto nelle aperte, e questa pagina è condivisibile via ?report=.
+// Senza escape, un <img onerror=…> in D14 diventerebbe XSS.
+// ═══════════════════════════════════════════════════════════
+const CTA_ALLOWLIST = ['koachify.it'];
+
+function escapeHtml(t) {
+  return String(t)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function inlineMd(t) {
+  return escapeHtml(t)
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[\s(])\*([^*]+)\*/g, '$1<em>$2</em>')
+    .replace(/(^|[\s(])_([^_]+)_/g, '$1<em>$2</em>');
+}
+
+function ctaSicura(url, etichetta, primaria) {
+  let host;
+  try { host = new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; }
+  if (!CTA_ALLOWLIST.some(d => host === d || host.endsWith('.' + d))) return '';
+  const cls = primaria ? 'btn-primary' : 'btn-secondary';
+  return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener" style="text-decoration:none">` +
+         `<button class="${cls}">${escapeHtml(etichetta)}</button></a>`;
+}
+
+function mdToHtml(md) {
+  // Difesa contro il recinto di codice: il motore lo toglie già, ma una
+  // mappa salvata da una versione precedente potrebbe averlo, e qui
+  // finirebbe a schermo come testo.
+  const pulito = String(md)
+    .replace(/^\s*```+[a-z]*\s*\n/i, '')
+    .replace(/\n\s*```+\s*$/, '');
+  const righe = pulito.split('\n');
+  const out = [];
+  let i = 0, nCta = 0;
+
+  while (i < righe.length) {
+    const r = righe[i];
+
+    // Le CTA non sono link markdown ma bottoni: [testo](url) su riga propria.
+    // Con il doppio embed si tolgono: l'invito all'azione lo fa la landing,
+    // e due inviti diversi nella stessa schermata si annullano a vicenda.
+    const solaCta = r.match(/^\s*\[([^\]]+)\]\((https?:\/\/[^)]+)\)\s*$/);
+    if (solaCta) {
+      if (CTA_NELLA_MAPPA) {
+        const html = ctaSicura(solaCta[2], solaCta[1], nCta === 0);
+        if (html) { out.push('<div class="cta-block">' + html + '</div>'); nCta++; }
+      } else {
+        nCta++;   // contate comunque: servono a sapere che il motore le ha emesse
+      }
+      i++; continue;
+    }
+
+    const h = r.match(/^(#{1,3})\s+(.*)$/);
+    if (h) { out.push(`<h${h[1].length}>${inlineMd(h[2])}</h${h[1].length}>`); i++; continue; }
+
+    if (/^\s*(---|\*\*\*|___)\s*$/.test(r)) { out.push('<hr>'); i++; continue; }
+
+    if (/^\s*>/.test(r)) {
+      const b = [];
+      while (i < righe.length && /^\s*>/.test(righe[i])) { b.push(righe[i].replace(/^\s*>\s?/, '')); i++; }
+      out.push('<blockquote>' + inlineMd(b.join(' ')) + '</blockquote>');
+      continue;
+    }
+
+    if (/^\s*[-*+]\s+/.test(r)) {
+      const li = [];
+      while (i < righe.length && /^\s*[-*+]\s+/.test(righe[i])) {
+        li.push(righe[i].replace(/^\s*[-*+]\s+/, '')); i++;
+      }
+      out.push('<ul>' + li.map(t => '<li>' + inlineMd(t) + '</li>').join('') + '</ul>');
+      continue;
+    }
+
+    if (r.trim() === '') { i++; continue; }
+
+    const par = [];
+    while (i < righe.length && righe[i].trim() !== ''
+           && !/^(#{1,3}\s|\s*[-*+]\s|\s*>)/.test(righe[i])
+           && !/^\s*\[([^\]]+)\]\(https?:\/\//.test(righe[i])) {
+      par.push(righe[i]); i++;
+    }
+    out.push('<p>' + inlineMd(par.join(' ')) + '</p>');
+  }
+  return { html: out.join('\n'), nCta };
+}
+
+// ═══════════════════════════════════════════════════════════
+// LA MAPPA — pagina risultati
+// ═══════════════════════════════════════════════════════════
+function renderMappa() {
+  state.phase = 'mappa';
+  setTopbar(false, null);
+  setProgress(null);
+  setBtnVisible(false);
+  setScrollable(true);
+
+  const nome = (state.lead?.nome || '').split(' ')[0] || '';
+  document.getElementById('cm-nome').textContent = nome || 'te';
+  document.getElementById('cm-meta').textContent =
+    'Mappa generata il ' + new Date().toLocaleDateString('it-IT') +
+    (state.archetipo && ARCHETIPI[state.archetipo] ? ' — ' + ARCHETIPI[state.archetipo].nome : '');
+
+  renderGriglia();
+  renderUniversoSVG();
+  applicaReport(state.report);
+
+  showScreen('screen-mappa');
+}
+
+function renderGriglia() {
+  SISTEMI.forEach((sis, si) => {
+    const riga = document.getElementById('planet-grid-row' + (si + 1));
+    if (!riga) return;
+    riga.innerHTML = '';
+    sis.keys.forEach((k, ki) => {
+      const p = P_BY_KEY[k];
+      const sem = state.semafori[k] || 'yellow';
+      const cella = document.createElement('div');
+      cella.className = 'planet-cell';
+
+      const cerchio = document.createElement('div');
+      cerchio.className = 'planet-cell-circle';
+      cerchio.style.background = SEM_COLOR[sem];
+      cerchio.textContent = emojiPianeta(p.idx - 1);
+
+      const nome = document.createElement('div');
+      nome.className = 'planet-cell-name';
+      nome.textContent = etichettaPianeta(p.idx - 1);
+
+      const score = document.createElement('div');
+      score.className = 'planet-cell-score';
+      score.textContent = SEM_SCORE[sem] + '/100';
+
+      cella.append(cerchio, nome, score);
+      riga.appendChild(cella);
+      // Reveal progressivo: le celle entrano una dopo l'altra.
+      setTimeout(() => cella.classList.add('revealed'), 300 + (si * 3 + ki) * 150);
+    });
+
+    const scoreRiga = document.getElementById('system-score-row' + (si + 1));
+    const score = calcScoreSistema(sis.keys);
+    const valore = document.getElementById('cm-score-s' + (si + 1));
+    valore.textContent = score + '/100';
+    // Il numero prende il colore della sua fascia: uno 0/100 scritto in
+    // verde direbbe il contrario di quello che è.
+    valore.style.color = score >= 67 ? SEM_COLOR.green
+                       : score >= 34 ? SEM_COLOR.yellow
+                       : SEM_COLOR.red;
+    setTimeout(() => scoreRiga.classList.add('revealed'), 300 + (si * 3 + 2) * 150 + 200);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// LA MAPPA DELL'UNIVERSO — SVG generato
+// Coordinate esatte per costruzione: non c'è nulla da calibrare.
+// ═══════════════════════════════════════════════════════════
+const NS = 'http://www.w3.org/2000/svg';
+
+function svgEl(tag, attrs, testo) {
+  const el = document.createElementNS(NS, tag);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  if (testo != null) el.textContent = testo;
+  return el;
+}
+
+function renderUniversoSVG() {
+  const svg = document.getElementById('universe-map-svg');
+  if (!svg) return;
+  svg.innerHTML = '';
+
+  const COL   = [175, 500, 825];     // centro delle 3 colonne di Sistema
+  const RIGA  = [248, 380, 512];     // centro delle 3 righe di Pianeti
+  const NAVY  = '#283E4A';
+  const CHIARO= '#8FA8B4';
+
+  svg.appendChild(svgEl('rect', { x:0, y:0, width:1000, height:660, fill:NAVY }));
+
+  // Titolo
+  svg.appendChild(svgEl('text', {
+    x:500, y:52, fill:'#FFFFFF', 'text-anchor':'middle',
+    'font-size':30, 'font-weight':800, 'letter-spacing':3
+  }, 'IL TUO UNIVERSO'));
+
+  // Linea che lega i 3 Sistemi
+  svg.appendChild(svgEl('line', {
+    x1:COL[0], y1:128, x2:COL[2], y2:128,
+    stroke:CHIARO, 'stroke-width':1.5, 'stroke-dasharray':'6 7', opacity:.35
+  }));
+
+  SISTEMI.forEach((sis, si) => {
+    const cx = COL[si];
+
+    svg.appendChild(svgEl('circle', { cx, cy:128, r:7, fill:'#88C057' }));
+    const lab = svgEl('text', {
+      x:cx, y:98, fill:'#FFFFFF', 'text-anchor':'middle', class:'um-sistema-label'
+    }, sis.nome.toUpperCase());
+    svg.appendChild(lab);
+    svg.appendChild(svgEl('text', {
+      x:cx, y:160, fill:CHIARO, 'text-anchor':'middle', class:'um-sistema-sub'
+    }, sis.promessa));
+
+    // Asse verticale della colonna
+    svg.appendChild(svgEl('line', {
+      x1:cx, y1:175, x2:cx, y2:RIGA[2] - 42,
+      stroke:CHIARO, 'stroke-width':1.5, 'stroke-dasharray':'4 6', opacity:.28
+    }));
+
+    sis.keys.forEach((k, ki) => {
+      const p = P_BY_KEY[k];
+      const sem = state.semafori[k] || 'yellow';
+      const colore = SEM_COLOR[sem];
+      const cy = RIGA[ki];
+      const g = svgEl('g', { opacity:0 });
+
+      g.appendChild(svgEl('circle', { cx, cy, r:34, fill:colore, opacity:.22 }));
+      g.appendChild(svgEl('circle', {
+        cx, cy, r:22, fill:colore, stroke:'#FFFFFF', 'stroke-width':2.5
+      }));
+      g.appendChild(svgEl('text', {
+        x:cx, y:cy + 7, fill:'#FFFFFF', 'text-anchor':'middle', class:'um-pianeta-num'
+      }, String(p.idx)));
+      g.appendChild(svgEl('text', {
+        x:cx, y:cy + 52, fill:'#FFFFFF', 'text-anchor':'middle', class:'um-pianeta-nome'
+      }, etichettaPianeta(p.idx - 1)));
+
+      svg.appendChild(g);
+      g.style.transition = `opacity .45s ease ${(si * 3 + ki) * 110}ms`;
+      setTimeout(() => { g.setAttribute('opacity', '1'); }, 60);
+    });
+  });
+
+  // Legenda, centrata sul blocco: si misura la larghezza totale e si parte
+  // da lì, invece di fidarsi di un'ascissa stimata a occhio.
+  const voci = [['green','Solido'], ['yellow','Da sistemare'], ['red','Da cui partire']];
+  const largh = (t) => 26 + t.length * 9.6 + 34;   // pallino + testo + spazio
+  const totale = voci.reduce((t, [, et]) => t + largh(et), 0) - 34;
+  let x = (1000 - totale) / 2;
+  voci.forEach(([sem, etichetta]) => {
+    svg.appendChild(svgEl('circle', { cx:x + 9, cy:622, r:9, fill:SEM_COLOR[sem] }));
+    svg.appendChild(svgEl('text', {
+      x:x + 26, y:629, fill:'#FFFFFF', class:'um-legenda'
+    }, etichetta));
+    x += largh(etichetta);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+function applicaReport(r) {
+  const cont = document.getElementById('mappa-md');
+  const fallback = document.getElementById('cta-fallback');
+
+  if (!r || !r.mappa_md) {
+    cont.innerHTML = '';
+    const p = document.createElement('p');
+    p.textContent = 'La lettura completa della tua mappa ti arriva via email tra pochi minuti. ' +
+                    'Intanto qui sopra trovi i tuoi 9 Pianeti con i loro semafori.';
+    cont.appendChild(p);
+    fallback.style.display = '';
+    return;
+  }
+
+  const { html, nCta } = mdToHtml(r.mappa_md);
+  cont.innerHTML = html;
+  // Le CTA di riserva servono solo se il motore non ne ha emesse — e solo
+  // se in questa pagina le CTA ci vanno.
+  fallback.style.display = (CTA_NELLA_MAPPA && nCta === 0) ? '' : 'none';
+}
+
+// ═══════════════════════════════════════════════════════════
+// REPORT CONDIVISO ?report=UUID
+// Due rami: prima le mappe Klarity, poi quelle della versione
+// precedente. I link già distribuiti devono continuare ad aprirsi.
+// ═══════════════════════════════════════════════════════════
+const LEGACY_PLANET_NAMES = ['Attrazione','Conversione','Viaggio','Architettura',
+  'Laboratorio','Moltiplicazione','Bussola','Villaggio','Scuderia'];
+const LEGACY_PLANET_ICONS = ['🌱','💰','🗺️','🏗️','🔬','✖️','🧭','🏘️','🏎️'];
+
+// Etichette con cui disegnare la griglia e la mappa. Normalmente sono quelle
+// di oggi; sulle mappe storiche si usano quelle di allora.
+//
+// Non è un dettaglio cosmetico: il vecchio «Moltiplicazione» misurava team,
+// intelligenza artificiale e gestione dei task — tre cose che nel modello
+// nuovo stanno in Pianeti diversi. Mostrare quel punteggio sotto l'etichetta
+// «Koachif-AI» racconterebbe al lead un dato che non ha mai dato.
+let etichette = null;   // null = usa PIANETI
+const etichettaPianeta = (i) => etichette ? etichette.nomi[i] : PIANETI[i].nome;
+const emojiPianeta     = (i) => etichette ? etichette.emoji[i] : PIANETI[i].emoji;
+
+async function loadKlarityMappa(uuid) {
+  if (!db) return false;
+
+  let data;
+  try {
+    const r = await db.rpc('get_klarity_mappa', { p_session: uuid });
+    if (r.error) throw r.error;
+    data = r.data;
+  } catch (e) { console.warn('[Mappa]', e); return false; }
+
+  // Nessun nome = non è una sessione Klarity: si prova il ramo storico.
+  if (!data || !data.nome) return false;
+
+  state.sessionId = uuid;
+  state.lead      = { nome: data.nome || '' };
+  state.archetipo = data.archetipo || null;
+  state.universo  = data.colore_universo || null;
+  state.punteggio = data.punteggio ?? null;
+  state.nicchia   = data.nicchia || null;
+  const inv = Object.fromEntries(Object.entries(SEM_IT).map(([en, it]) => [it, en]));
+  PIANETI.forEach(p => {
+    const it = data.semafori ? data.semafori[p.key] : null;
+    state.semafori[p.key] = inv[it] || 'yellow';
+  });
+
+  if (data.mappa_md) {
+    state.report = { mappa_md: data.mappa_md, source: data.report_source || 'ai' };
+    renderMappa();
+    document.getElementById('cm-meta').textContent =
+      'Mappa generata il ' + new Date(data.generata_il).toLocaleDateString('it-IT');
+    return true;
+  }
+
+  // La Mappa non c'è ancora: la persona è appena arrivata dal quiz e questa
+  // è la landing. Il motore lo chiama questa pagina — è il motivo per cui il
+  // quiz, prima di reindirizzare, non lo avvia.
+  showElaborazione();
+  return true;
+}
+
+async function loadLegacyReport(uuid) {
+  if (!db) return false;
+  try {
+    const { data, error } = await db.rpc('get_legacy_report', { p_session: uuid });
+    if (error || !data || !data.nome) return false;
+    const righe = data.clarity_map || [];
+    if (!righe.length) return false;
+
+    const inv = { rosso:'red', giallo:'yellow', verde:'green',
+                  red:'red', yellow:'yellow', green:'green' };
+    righe.forEach(riga => {
+      const i = LEGACY_PLANET_NAMES.indexOf(riga.pianeta);
+      if (i >= 0) state.semafori[PIANETI[i].key] = inv[riga.semaforo] || 'yellow';
+    });
+    state.lead = { nome: data.nome };
+    state.report = { mappa_md: data.report_text || '', source:'none' };
+
+    // Nomi di allora: questa persona ha risposto a quelle domande, non a
+    // queste. Il banner dichiara che la mappa è di una versione precedente.
+    etichette = { nomi: LEGACY_PLANET_NAMES, emoji: LEGACY_PLANET_ICONS };
+    renderMappa();
+    document.getElementById('legacy-banner').style.display = '';
+    document.getElementById('cm-meta').textContent =
+      'Check-up del ' + new Date(data.creato_il).toLocaleDateString('it-IT');
+    return true;
+  } catch (e) { console.warn('[Report legacy]', e); return false; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// ALTEZZA DELL'EMBED
+//
+// Dentro un iframe di altezza fissa la Mappa diventa una finestrella con lo
+// scroll interno, e sotto ci sarebbe la landing con un altro scroll: due
+// barre annidate, la cosa più fastidiosa che si possa fare a chi legge da
+// telefono. La pagina dichiara quanto è alta e la landing ridimensiona
+// l'iframe. Se sulla landing non c'è lo snippet, non cambia nulla.
+// ═══════════════════════════════════════════════════════════
+function annunciaAltezza() {
+  if (window.parent === window.self) return;
+  const h = Math.max(
+    document.body.scrollHeight, document.documentElement.scrollHeight,
+    document.body.offsetHeight
+  );
+  try {
+    window.parent.postMessage({ tipo: 'klarity:altezza', altezza: h }, '*');
+  } catch (e) { /* la landing non ascolta: pazienza */ }
+}
+
+function attivaModalitaEmbed() {
+  document.body.classList.add('modalita-report');
+  annunciaAltezza();
+  if (typeof ResizeObserver === 'function') {
+    new ResizeObserver(annunciaAltezza).observe(document.body);
+  }
+  window.addEventListener('load', annunciaAltezza);
+  setInterval(annunciaAltezza, 1000);   // rete di sicurezza: font, immagini
+}
+
+// ═══════════════════════════════════════════════════════════
+// AVVIO
+// ═══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  const uuid = new URLSearchParams(location.search).get('report');
+
+  if (uuid) {
+    setBtnVisible(false);
+    setTopbar(false, null);
+    setProgress(null);
+    attivaModalitaEmbed();
+    if (await loadKlarityMappa(uuid)) return;
+    if (await loadLegacyReport(uuid)) return;
+    // UUID sconosciuto: si ricade sul quiz normale.
+    document.body.classList.remove('modalita-report');
+    setBtnVisible(true);
+  }
+
+  state.phase = 'welcome';
+  setTopbar(false, null);
+  setProgress(null);
+  setBtnLabel('Inizia il Klarity Quiz', false);
+  setBtnVisible(true);
+  setScrollable(true);
+  showScreen('screen-welcome');
+});
+</script>
+</body>
+</html>

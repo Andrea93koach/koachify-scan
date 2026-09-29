@@ -1,0 +1,37 @@
+# ⚠️ Questo repo è PUBBLICO e servito da GitHub Pages sulla root:
+# qualunque file committato è scaricabile da chiunque.
+
+# Segreti
+# Qualunque file che contenga credenziali, comunque si chiami.
+*key*.txt
+*password*.txt
+*psw*.txt
+*credential*
+service_role*.txt
+*.secret
+*.env
+.env*
+
+# Specifiche e know-how proprietario (glossario ™, libreria blocchi, routing).
+# Vivono qui solo per lo sviluppo; la versione di riferimento sta nel repo
+# privato koachify-klarity-engine.
+docs/
+
+# Schema DB, policy RLS e script di verifica: appartengono al repo privato
+# del motore, non a una pagina servita pubblicamente.
+sql/
+
+# Export con dati personali dei lead (nomi, email, telefoni)
+RISPOSTE-KOACHIFY-SCAN.md
+RISPOSTE-KOACHIFY-SCAN.html
+RISPOSTE-KOACHIFY-SCAN.pdf
+
+# Driver di verifica (Chrome DevTools Protocol): strumenti di sviluppo,
+# non fanno parte del sito pubblicato.
+tools/
+
+# Stringa di connessione al database
+db_url*.txt
+
+# Pagine di prova del doppio embed
+prova-*.html
