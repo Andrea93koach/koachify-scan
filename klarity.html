@@ -553,14 +553,8 @@ body.scrollable #content-area {
   .welcome-area-chip { padding: 5px 4px; font-size: 9px; }
   .welcome-area-chip span { font-size: 12px; }
 
-  .gate-container    { padding: 14px 18px 16px; gap: 10px; }
-  .gate-headline     { font-size: 17px; line-height: 1.25; }
-  .gate-subtitle     { font-size: 12px; }
-  .gate-fields       { gap: 9px; }
-  .gate-field input  { padding: 10px 12px; font-size: 13px; }
-  .gate-field-label  { font-size: 10.5px; margin-bottom: 3px; }
-  .gate-privacy-label{ font-size: 10px; line-height: 1.35; }
 }
+
 
 @media (max-height: 600px) {
   .q-module-card { display: none; }
@@ -570,16 +564,7 @@ body.scrollable #content-area {
 
   /* Sotto questa soglia la rassicurazione cede il posto ai campi: resta
      comunque scritta accanto alla casella della privacy. */
-  .gate-microcopy { display: none; }
-  .gate-trust     { display: none; }
-  .gate-subtitle  { display: none; }
   .welcome-subtitle { display: none; }
-  .gate-headline    { font-size: 15px; margin-bottom: 4px; }
-  .gate-fields      { gap: 7px; }
-  .gate-field       { gap: 3px; }
-  .gate-field input { padding: 9px 11px; font-size: 13px; }
-  .gate-privacy-label { font-size: 9.5px; }
-  .gate-container   { padding: 10px 16px 12px; gap: 8px; }
 }
 
 /* ═══════════════════════════════════════════
@@ -731,6 +716,38 @@ body.scrollable #content-area {
   color: var(--gray-mid);
   font-weight: 500;
   padding-bottom: 4px;
+}
+
+/* ── La schermata dei dati sugli schermi bassi ──────────────
+   Queste regole stanno QUI, e non insieme alle altre responsive più in
+   alto, per una ragione concreta: a parità di specificità il CSS lascia
+   vincere la dichiarazione che viene dopo. Più in alto perdevano contro le
+   regole base qui sopra senza dare alcun segnale — le misure dicevano solo
+   che la schermata restava alta uguale.
+   A dimensione piena questa schermata vuole circa 740 pixel di altezza. */
+@media (max-height: 760px) {
+  .gate-container     { padding: 12px 18px 14px; gap: 8px; }
+  .gate-headline      { font-size: 17px; line-height: 1.25; margin-bottom: 4px; }
+  .gate-subtitle      { font-size: 12px; line-height: 1.45; }
+  .gate-fields        { gap: 8px; }
+  .gate-field         { gap: 3px; }
+  .gate-field input   { padding: 10px 12px; font-size: 13.5px; }
+  .gate-field-label   { font-size: 10.5px; }
+  .gate-privacy-label { font-size: 10px; line-height: 1.35; }
+  .gate-microcopy     { font-size: 10.5px; line-height: 1.4; }
+}
+
+@media (max-height: 680px) {
+  /* Qui la rassicurazione cede il posto ai campi: resta comunque scritta
+     accanto alla casella della privacy, che è dove conta. */
+  .gate-microcopy     { display: none; }
+  .gate-trust         { display: none; }
+  .gate-subtitle      { display: none; }
+  .gate-headline      { font-size: 15px; }
+  .gate-fields        { gap: 7px; }
+  .gate-field input   { padding: 9px 11px; font-size: 13px; }
+  .gate-privacy-label { font-size: 9.5px; }
+  .gate-container     { padding: 10px 16px 12px; gap: 7px; }
 }
 
 /* Privacy checkbox */
