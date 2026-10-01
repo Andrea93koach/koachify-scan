@@ -85,60 +85,9 @@ html, body {
   overflow: hidden;
 }
 
-@media (min-width: 681px) {
-  #app {
-    box-shadow: 0 4px 60px rgba(0,0,0,0.14);
-    border-radius: 20px;
-  }
-}
+/* (Qui c'era la seconda ombra per lo schermo largo: tolta con la cornice.) */
 
-/* ═══════════════════════════════════════════
-   TOP BAR
-═══════════════════════════════════════════ */
-#topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px;
-  min-height: 58px;
-  flex-shrink: 0;
-  background: var(--bg);
-}
-#topbar-back {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: var(--white);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.15s, box-shadow 0.15s;
-  flex-shrink: 0;
-}
-#topbar-back:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
-#topbar-back svg { width: 18px; height: 18px; }
-#topbar-back.hidden { opacity: 0; pointer-events: none; }
-
-#topbar-logo img {
-  height: 40px;
-  width: auto;
-  display: block;
-}
-
-#topbar-counter {
-  background: var(--navy);
-  color: var(--white);
-  font-size: 12px;
-  font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 20px;
-  letter-spacing: 0.5px;
-  min-width: 52px;
-  text-align: center;
-}
+/* (La barra in alto è stata rimossa: il suo stile non serve più.) */
 
 /* ═══════════════════════════════════════════
    LINEAR PROGRESS BAR
@@ -227,20 +176,20 @@ body.scrollable #content-area {
 
 .welcome-hero {
   background: var(--navy);
-  padding: 32px 24px 24px;
+  padding: 22px 24px 18px;
   text-align: center;
 }
 .welcome-kochi-ring {
-  width: 80px;
-  height: 80px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   background: rgba(136,192,87,0.15);
   border: 2px solid rgba(136,192,87,0.4);
-  margin: 0 auto 20px;
+  margin: 0 auto 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
+  font-size: 24px;
 }
 .welcome-title {
   font-size: 28px;
@@ -261,23 +210,24 @@ body.scrollable #content-area {
 .welcome-body {
   background: var(--bg);
   border-radius: 20px 20px 0 0;
-  padding: 24px 20px 32px;
+  padding: 18px 20px 20px;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  justify-content: center;
+  gap: 12px;
 }
 
 .welcome-payoff {
   background: var(--white);
   border-radius: var(--radius-md);
-  padding: 20px;
+  padding: 16px 18px;
   box-shadow: var(--shadow-sm);
 }
 .welcome-payoff p {
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--text-soft);
-  line-height: 1.7;
+  line-height: 1.6;
 }
 .welcome-payoff strong { color: var(--navy); }
 
@@ -302,12 +252,12 @@ body.scrollable #content-area {
 .welcome-areas {
   display: grid;
   grid-template-columns: repeat(3,1fr);
-  gap: 8px;
+  gap: 6px;
 }
 .welcome-area-chip {
   background: var(--white);
   border-radius: var(--radius-sm);
-  padding: 10px 6px;
+  padding: 7px 5px;
   text-align: center;
   font-size: 10px;
   font-weight: 600;
@@ -316,7 +266,7 @@ body.scrollable #content-area {
   line-height: 1.3;
   word-break: break-word;
 }
-.welcome-area-chip span { display: block; font-size: 16px; margin-bottom: 4px; }
+.welcome-area-chip span { display: block; font-size: 14px; margin-bottom: 2px; }
 
 /* ═══════════════════════════════════════════
    BOTTOM ACTION AREA
@@ -572,9 +522,6 @@ body.scrollable #content-area {
    SCHERMI BASSI — layout compatto senza scroll
 ═══════════════════════════════════════════ */
 @media (max-height: 700px) {
-  #topbar          { min-height: 46px; padding: 5px 14px; }
-  #topbar-logo img { height: 34px; }
-  #topbar-counter  { font-size: 11px; padding: 5px 10px; }
   #progress-bar-wrap { padding: 0 14px 8px; }
   #screen-question { padding: 6px 14px 8px; }
   .q-module-card   { padding: 8px 12px; margin-bottom: 7px; }
@@ -592,12 +539,47 @@ body.scrollable #content-area {
   .option-subtext  { font-size: 10px; }
   #bottom-action   { padding: 7px 14px 10px; }
   .btn-primary     { padding: 13px; font-size: 14px; }
+
+  /* Welcome e schermata dati: sui telefoni bassi sforavano. Si stringe
+     quello che è decorazione, non quello che è informazione. */
+  .welcome-hero      { padding: 14px 20px 12px; }
+  .welcome-kochi-ring{ width: 40px; height: 40px; font-size: 18px; margin-bottom: 8px; }
+  .welcome-title     { font-size: 18px !important; }
+  .welcome-subtitle  { font-size: 11.5px; }
+  .welcome-body      { padding: 12px 16px 14px; gap: 9px; }
+  .welcome-payoff    { padding: 12px 14px; }
+  .welcome-payoff p  { font-size: 12.5px; line-height: 1.5; }
+  .welcome-pill      { font-size: 11px; padding: 4px 11px; }
+  .welcome-area-chip { padding: 5px 4px; font-size: 9px; }
+  .welcome-area-chip span { font-size: 12px; }
+
+  .gate-container    { padding: 14px 18px 16px; gap: 10px; }
+  .gate-headline     { font-size: 17px; line-height: 1.25; }
+  .gate-subtitle     { font-size: 12px; }
+  .gate-fields       { gap: 9px; }
+  .gate-field input  { padding: 10px 12px; font-size: 13px; }
+  .gate-field-label  { font-size: 10.5px; margin-bottom: 3px; }
+  .gate-privacy-label{ font-size: 10px; line-height: 1.35; }
 }
+
 @media (max-height: 600px) {
   .q-module-card { display: none; }
   .q-text        { font-size: 12px; }
   .option-text   { font-size: 11px; }
   .option-subtext { display: none; }
+
+  /* Sotto questa soglia la rassicurazione cede il posto ai campi: resta
+     comunque scritta accanto alla casella della privacy. */
+  .gate-microcopy { display: none; }
+  .gate-trust     { display: none; }
+  .gate-subtitle  { display: none; }
+  .welcome-subtitle { display: none; }
+  .gate-headline    { font-size: 15px; margin-bottom: 4px; }
+  .gate-fields      { gap: 7px; }
+  .gate-field       { gap: 3px; }
+  .gate-field input { padding: 9px 11px; font-size: 13px; }
+  .gate-privacy-label { font-size: 9.5px; }
+  .gate-container   { padding: 10px 16px 12px; gap: 8px; }
 }
 
 /* ═══════════════════════════════════════════
@@ -686,7 +668,7 @@ body.scrollable #content-area {
 /* ═══════════════════════════════════════════
    GATE EMAIL
 ═══════════════════════════════════════════ */
-#screen-gate-email { padding: 0; min-height: 100%; }
+#screen-dati { padding: 0; min-height: 100%; }
 
 .gate-container {
   padding: 28px 20px 16px;
@@ -1477,8 +1459,10 @@ body.scrollable #content-area {
 
 /* Schermi bassi: le chip non stanno insieme a textarea e bottone,
    quindi si collassano dietro un toggle. */
-/* Quando ci sono le chip la textarea non deve mangiarsi lo spazio. */
-#open-wrap.has-chips .open-input { flex: 0 1 auto; min-height: 116px; }
+/* Con le chip la textarea non deve mangiarsi lo spazio, ma nemmeno lasciare
+   un buco: cresce a riempire quello che avanza e non scende mai sotto una
+   soglia in cui ci si possa scrivere. */
+#open-wrap.has-chips .open-input { flex: 1 1 auto; min-height: 116px; }
 
 /* Schermi bassi: chip e textarea insieme non ci stanno, quindi le chip
    si collassano dietro un toggle. */
@@ -1510,7 +1494,6 @@ body.modalita-report #content-area {
   overflow: visible;
   height: auto;
 }
-body.modalita-report #topbar,
 body.modalita-report #quiz-footer,
 body.modalita-report #bottom-action { display: none; }
 body.modalita-report .screen.active { animation: none; }
@@ -1544,10 +1527,11 @@ body.modalita-report .screen.active { animation: none; }
 /* ═══════════════════════════════════════════
    DESKTOP SHADOW FRAME
 ═══════════════════════════════════════════ */
-@media (min-width: 520px) {
-  body { display: flex; align-items: center; justify-content: center; background: #e0e8e5; }
-  #app { border-radius: 32px; overflow: hidden; box-shadow: var(--shadow-lg); height: 90vh; max-height: 840px; }
-}
+/* Nessuna cornice su desktop.
+   Prima il quiz si disegnava come una scheda con angoli arrotondati e
+   ombra, su uno sfondo grigio. Da solo funzionava; dentro un iframe su una
+   landing diventa una scatola dentro una scatola, e si vede. Ora riempie lo
+   spazio che gli dà la pagina e lascia che sia quella a incorniciarlo. */
 </style>
 </head>
 <body>
@@ -1555,20 +1539,13 @@ body.modalita-report .screen.active { animation: none; }
 <div id="app">
 
   <!-- TOP BAR -->
-  <div id="topbar">
-    <button id="topbar-back" class="hidden" onclick="goBackOne()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--navy)">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-    </button>
-    <div id="topbar-logo">
-      <img src="logo-scuro.svg" alt="Koachify" id="logo-img">
-    </div>
-    <div id="topbar-counter" style="visibility:hidden">1/9</div>
-  </div>
+  <!-- Niente barra fissa in alto: il quiz vive dentro un iframe su una
+       pagina che il logo ce l'ha già sopra, e quei 58 pixel servono a far
+       stare la prima schermata senza farla scorrere. Il tasto per tornare
+       indietro è sotto, accanto al bottone principale. -->
 
   <!-- PROGRESS BAR -->
-  <div id="progress-bar-wrap" style="visibility:hidden">
+  <div id="progress-bar-wrap" style="display:none">
     <div id="progress-bar-info">
       <span id="progress-bar-label-text"></span>
       <span id="progress-bar-pct"></span>
@@ -1585,7 +1562,6 @@ body.modalita-report .screen.active { animation: none; }
     <div class="screen active" id="screen-welcome">
       <div class="welcome-hero">
         <div class="welcome-kochi-ring">🔭</div>
-        <img src="logo-bianco.svg" alt="Koachify" style="height:28px;width:auto;margin:0 auto 10px;display:block;">
         <div class="welcome-title" style="font-size:22px;letter-spacing:4px;">KLARITY QUIZ</div>
         <div class="welcome-subtitle">Il check-up per coach, formatori, consulenti e terapeuti online</div>
       </div>
@@ -1798,8 +1774,8 @@ body.modalita-report .screen.active { animation: none; }
     </button>
   </div>
 
-  <!-- FOOTER -->
-  <div id="quiz-footer">Koachify Suite © 2026 — koachify.it</div>
+  <!-- Niente footer: la firma sta già sulla pagina che contiene il quiz,
+       e qui sono 26 pixel tolti alla domanda. -->
 
 </div><!-- /app -->
 
@@ -2249,21 +2225,21 @@ function showScreen(id) {
   // Il logo bianco vive dentro l'hero della welcome, che è navy.
 }
 
-function setTopbar(showBack, counterText) {
-  const back = document.getElementById('topbar-back');
-  const cnt  = document.getElementById('topbar-counter');
-  if (back) back.classList.toggle('hidden', !showBack);
-  if (cnt) {
-    cnt.textContent = counterText || '';
-    cnt.style.visibility = counterText ? 'visible' : 'hidden';
-  }
-}
+// La barra in alto non c'è più: il conteggio lo dice la barra di
+// avanzamento («Domanda 7 di 16») e il tasto indietro sta sotto, accanto al
+// bottone principale. Le chiamate restano per non sparpagliare modifiche in
+// venti punti del flusso; qui non fanno nulla.
+function setTopbar() {}
+function setTopbarVisible() {}
 
 function setProgress(pct, label) {
   const wrap = document.getElementById('progress-bar-wrap');
   if (!wrap) return;
-  if (pct === null) { wrap.style.visibility = 'hidden'; return; }
-  wrap.style.visibility = 'visible';
+  // `display` e non `visibility`: nascosta con visibility la barra continua
+  // a occupare i suoi 25 pixel, e sulla prima schermata si vedeva come una
+  // striscia chiara sopra l'intestazione.
+  if (pct === null) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
   document.getElementById('progress-bar-label-text').textContent = label || '';
   document.getElementById('progress-bar-pct').textContent = pct + '%';
   document.getElementById('progress-bar-fill').style.width = pct + '%';
@@ -2277,16 +2253,10 @@ function setBtnLabel(text, disabled) {
 function setBtnVisible(v) {
   document.getElementById('bottom-action').style.display = v ? '' : 'none';
 }
-function setTopbarVisible(v) {
-  document.getElementById('topbar').style.display = v ? '' : 'none';
-}
-
 function updateBackBtn() {
   const mostra = state._backAvailable && state.phase === 'q';
-  const back = document.getElementById('topbar-back');
-  const btn  = document.getElementById('btn-go-back');
-  if (back) back.classList.toggle('hidden', !mostra);
-  if (btn)  btn.style.display = mostra ? '' : 'none';
+  const btn = document.getElementById('btn-go-back');
+  if (btn) btn.style.display = mostra ? '' : 'none';
 }
 function markAdvanced() { state._backAvailable = true; updateBackBtn(); }
 
