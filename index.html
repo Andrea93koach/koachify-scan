@@ -2472,18 +2472,25 @@ async function sendToGHL(reportUrl) {
 async function loadSharedReport(sessionId) {
   if (!db) return false;
   try {
-    const { data: lead } = await db.from('quiz_leads')
-      .select('*').eq('session_id', sessionId).maybeSingle();
-    const { data: mapRows } = await db.from('clarity_map')
-      .select('*').eq('session_id', sessionId);
-    if (!lead || !mapRows || !mapRows.length) return false;
+    // Si passa da una funzione dedicata invece di leggere quiz_leads.
+    // Motivo: la chiave qui sopra è in chiaro in una pagina pubblica, e una
+    // SELECT diretta sulla tabella rendeva scaricabili nome, email e
+    // telefono di TUTTI i lead a chiunque aprisse il sorgente. La funzione
+    // restituisce solo ciò che questa schermata mostra davvero, per la sola
+    // sessione chiesta: l'UUID nel link è la chiave d'accesso.
+    const { data: rep, error } = await db.rpc('get_legacy_report', { p_session: sessionId });
+    if (error) { console.warn('[SharedReport]', error.message); return false; }
+    const mapRows = rep && rep.clarity_map;
+    if (!rep || !mapRows || !mapRows.length) return false;
 
     // Ricostruisce state
     state.sessionId = sessionId;
-    state.leadData  = { nome: lead.nome || '', email: lead.email || '', telefono: lead.telefono || '' };
+    // email e telefono non arrivano più, e non servono: su questo percorso
+    // non si fa né l'insert del lead né la chiamata al CRM.
+    state.leadData  = { nome: rep.nome || '', email: '', telefono: '' };
     let archId = 1;
     for (const [k, v] of Object.entries(ARCHETIPI)) {
-      if (v.name === lead.archetipo) { archId = parseInt(k); break; }
+      if (v.name === rep.archetipo) { archId = parseInt(k); break; }
     }
     state.archetipo = archId;
     mapRows.forEach(row => {
@@ -2497,9 +2504,9 @@ async function loadSharedReport(sessionId) {
     });
 
     // Report AI — JSON completo o fallback solo narrativo
-    if (lead.report_text) {
-      try { _aiReport = JSON.parse(lead.report_text); }
-      catch(e) { _aiReport = { report_narrativo: lead.report_text }; }
+    if (rep.report_text) {
+      try { _aiReport = JSON.parse(rep.report_text); }
+      catch(e) { _aiReport = { report_narrativo: rep.report_text }; }
     }
 
     setTopbar(false, null);

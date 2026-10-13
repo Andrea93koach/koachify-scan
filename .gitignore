@@ -35,3 +35,6 @@ db_url*.txt
 
 # Pagine di prova del doppio embed
 prova-*.html
+
+# Schermate catturate dai driver di verifica
+shots/
